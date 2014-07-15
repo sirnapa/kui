@@ -203,7 +203,8 @@
         this.loadComplete = dato.loadComplete;
         this.paginador = dato.paginador;
         this.onclick = dato.onclick;
-                    
+        this.ondblclick = dato.ondblclick;
+
         this.cargarPaginador();
         this.cargar();
         
@@ -261,12 +262,12 @@
                                     kGrid.onclick : function(){
                                        window.open(kGrid.onclick,'_self');
                                     };
-                                row.addClass('kbtn').click(function(){
-                                   onclick.call(this,item);
-                                });
-                            }
-                            
-                            if(kGrid.ondblclick){
+                                row.addClass('kbtn')
+                                    .css('cursor','pointer')
+                                    .click(function(){
+                                       onclick.call(this,item);
+                                    });
+                            }else if(kGrid.ondblclick){
                                 var ondblclick = typeof kGrid.ondblclick == 'function'?
                                     kGrid.ondblclick : function(){
                                     	// TODO edicion inline
@@ -354,7 +355,8 @@
                                         .html('<i class="fa ' + dimension + ' fa-pencil"></i>')
                                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-primary')}, 
                                                 function(){ $(this).addClass('text-muted').removeClass('text-primary')})
-                                        .click(function(){
+                                        .click(function(e){
+                                            e.stopPropagation();
                                             kGrid.permisos['editar'].call(this,item);
                                         }).appendTo(botones);
                                 }
@@ -366,7 +368,8 @@
                                         .html('<i class="fa ' + dimension + ' fa-times"></i>')
                                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-danger') }, 
                                                 function(){ $(this).addClass('text-muted').removeClass('text-danger')})
-                                        .click(function(){
+                                        .click(function(e){
+                                            e.stopPropagation();
                                             kGrid.permisos['remover'].call(this,item);
                                         }).appendTo(botones);
                                 }
@@ -381,7 +384,8 @@
                                         .html('<i class="fa ' + dimension + ' fa-check"></i>')
                                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-success') }, 
                                                 function(){ $(this).addClass('text-muted').removeClass('text-success')})
-                                        .click(function(){
+                                        .click(function(e){
+                                            e.stopPropagation();
                                             kGrid.permisos['activar'].call(this,item);
                                         }).appendTo(botones);
                                 }
@@ -398,7 +402,8 @@
                                             function(){ $(this).addClass('text-muted')});
                                     
                                     if(boton.onclick!=undefined){
-                                        btn.click(function(){
+                                        btn.click(function(e){
+                                            e.stopPropagation();
                                             boton.onclick.call(this,item);
                                         });
                                     }
@@ -489,13 +494,17 @@
                 
           var centro = $('<div>').addClass('btn btn-default')
                 .css('overflow','hidden')
-                .css('height',$('#'+pk+'pagina_anterior').height())
+                .css('padding-top','2px')
+                .css('height',$('#'+pk+'pagina_anterior').outerHeight())
                 .appendTo(contenedor);
                 
           $('<label>').html('Página ').appendTo(centro);
           $('<input>').attr('id',pk+'pagina')
             .attr('type','text')
             .addClass('pagina')
+            .css('width',$('#'+pk+'pagina_anterior').outerWidth())
+            .css('margin','0 5px')
+            .css('text-align','center')
             .appendTo(centro)
             .keyup(function(e){
                 if(e.keyCode == 13){
