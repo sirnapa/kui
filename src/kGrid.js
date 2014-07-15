@@ -122,7 +122,7 @@
          */
         
         if(dato.ajax==undefined){
-            dato.ajax = 'POST';
+            dato.ajax = 'GET';
         }
 
         if(dato.data==undefined){
