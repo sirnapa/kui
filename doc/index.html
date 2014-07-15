@@ -19,87 +19,226 @@
   <body>
     <div class="container">
 
-      <div class="page-header">
-        <h1>kGrid</h1>
-        <p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
-      </div>
-<pre>
-  Grilla con estilos de Bootstrap
-  
-  Parametros de .kGrid()
-  
-  --- Requeridos
- 
-  url			:	URL para la peticion POST del listar objetos de la clase.
-  
-  id			:	Nombre del atributo que sera considerado como 
+		<div class="page-header">
+			<h1>kGrid</h1>
+			<p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
+		</div>
+
+		<h3>Parametros de .kGrid()</h3>
+
+		<!-- ========================================================= -->
+
+		<h4>Requeridos</h4>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				url
+				</strong>
+			</div>
+			<div class="col-md-9">
+				URL para la peticion POST del listar objetos de la clase.
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				id
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Nombre del atributo que sera considerado como 
   				identificador unico o Primary Key de la clase.
-  
-  campos		:	Array de campos de la entidad, con el siguiente formato:
-  				[{
-                                   nombre: '',                 // (requerido) nombre del atributo
-                                   titulo: '',                 // Titulo de la columna
-                                   tipo: '',                   // Tipo de campo: encabezado, destacado o score
-                                   atributos: [{		// array de atributos para el input 
-                                                   atributo: '',
-                                                   valor: ''
-                                               },...],
-                                   formato: function(){}       // Función para mostrar algo distinto a lo persistido
- 		           	},...]
-  
-  
-  --- Opcionales
-  ajax			:	Tipo de peticion, por defecto es POST.
-  
-  jqGrid               :       Compatibilidad con llamadas preparadas para jqGrid,
-                               por defecto false;
-  
-  data			:	Parametros a ser enviados en la peticion POST.
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				campos
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Array de campos de la entidad, con el siguiente formato:
+				<pre>
+[{
+   nombre: '',          // (requerido) nombre del atributo
+   titulo: '',
+   tipo: '',            // Tipo de campo: encabezado, destacado o score
+   atributos: [{		// array de atributos para el input 
+                   atributo: '',
+                   valor: ''
+               },...],
+   formato: function(){}// Función para mostrar algo distinto a lo recibido
+},...]
+				</pre>
+			</div>
+		</div>
+
+		<!-- ========================================================= -->
+		<h4>Opcionales</h4>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					ajax
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Tipo de peticion, por defecto es POST.
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					jqGrid
+				</strong>
+			</div>
+			<div class="col-md-9">
+            	Compatibilidad con llamadas preparadas para jqGrid, por defecto false
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					data
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Parametros a ser enviados en la peticion POST. Sus valores por defecto son: {}
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					permisos
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Funciones que se llaman para editar, activar y remover objetos.
   				Sus valores por defecto son:
-  				{
- 		               
-                               };
-  
-  permisos		:	Funciones que se llaman para editar, activar y remover objetos.
-  				Sus valores por defecto son:
-  				{
-                                   editar:null,
-                                   activar:null,
-                                   remover:null
-                               };
-             
-  botones		:	Lista de objetos para incluir botones adicionales para cada row, formato:
-  				[{
-            			comentario: '',                         // (requerido) Texto para el tooltip
-            			icono: '',				// (requerido) tipo de bootstrap icon
-            			enlace: '',				// href o enlace del <em>a</em>, por defecto Javascript:void(0);
-            			mostrar: function(item){},                  // funcion que define cuando muestrar el boton
-            			onclick: function(item){},                  // funcion onclick, recibe como argumento al item
-            			atributos: [{			// array de atributos para el <em>a</em> 
-            							atributo: '',
-            							valor: ''
-            					   },...]
- 		           	},...]
-  
-  estado		:	Funcion que debe retornar true cuando el objeto sera mostrado como activo,
+  				<pre>
+{
+   editar: null,
+   activar: null,
+   remover: null
+}
+				</pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					botones
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Lista de objetos para incluir botones adicionales para cada row, formato:
+				<pre>
+[
+	{
+		comentario: '',                         // (requerido) Texto para el tooltip
+		icono: '',				// (requerido) tipo de bootstrap icon
+		enlace: '',				// href o enlace del <em>a</em>, por defecto Javascript:void(0);
+		mostrar: function(item){},                  // funcion que define cuando muestrar el boton
+		onclick: function(item){},                  // funcion onclick, recibe como argumento al item
+		atributos: [
+						{			// array de atributos para el <em>a</em> 
+							atributo: '',
+							valor: ''
+						},...
+				   ]
+   	},...
+]
+	           </pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					estado
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Funcion que debe retornar true cuando el objeto sera mostrado como activo,
   					y false cuando sera identificado como un objeto removido.
-  
-  retorno		:	Nombre de los campo en la respuesta del POST
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					retorno
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Nombre de los campo en la respuesta del POST
   				Sus valores por defecto son:
-  				{
-                                   lista: 'lista',                     // Lista de objetos
-                                   pagina: 'pagina',                   // Número de página actual
-                                   totalPaginas: 'totalPaginas',       // Total de páginas
-                                   totalDatos: 'totalDatos',           // Total de objetos en todas las páginas juntas 
-                               }
-  
-  loadComplete         :       Funcion adicional que se llama al terminar la carga de los objetos.
-  paginador            :       id del div que se utilizará como paginador.  
-  onclick              :       Se aplica cuando se hace click en la tarjeta
-                               si es un string se asume que es una url,
-                               también puede ser una función
- 
- </pre>
+  				<pre>
+{
+   lista: 'lista',                     // Lista de objetos
+   pagina: 'pagina',                   // Número de página actual
+   totalPaginas: 'totalPaginas',       // Total de páginas
+   totalDatos: 'totalDatos',           // Total de objetos en todas las páginas juntas 
+} 
+  				</pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					loadComplete
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Funcion adicional que se llama al terminar la carga de los objetos.
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					paginador
+				</strong>
+			</div>
+			<div class="col-md-9">
+				id del div que se utilizará como paginador. 
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					onclick
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Se aplica cuando se hace click en el row
+               si es un string se asume que es una url,
+               también puede ser una función
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					ondblclick
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Se aplica cuando se hace doble click en el row
+               si es un string se asume que es una url,
+               también puede ser una función
+			</div>
+		</div>
+		<br>
  </div> <!-- /container -->
 
     <script src="../assets/js/jquery-1.11.1.min.js"></script>
