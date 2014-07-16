@@ -11,7 +11,7 @@
     <title>kGrid for Bootstrap</title>
 
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link id="hojaEstilo" href="../assets/css/bootstrap-theme.css" rel="stylesheet">
     <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
 
   </head>
@@ -23,15 +23,29 @@
         <h1>kGrid</h1>
         <p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
       </div>
+      
+      <div class="pull-right">
+          <a href="../doc" class="btn btn-primary">
+            <i class="fa fa-book"></i> Documentación
+          </a>
+          <div class="btn-group">
+            <button class="btn btn-default dropdown-toggle" type="button" id="estilos" data-toggle="dropdown">
+              <i class="fa fa-file-o"></i> CSS <strong id="tema">Bootstrap</strong> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="estilos">
+              <li role="presentation">
+                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Bootstrap</a>
+              </li>
+              <li role="presentation">
+                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Konecta</a>
+              </li>
+              <li role="presentation">
+                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Personal</a>
+              </li>
+            </ul>
+          </div>
+      </div>
 
-      <h3>Requerimientos</h3>
-      <ul>
-        <li>Jquery 1.11.1 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
-        <li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
-        <li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
-      </ul>
-
-      <hr>
       <h3>Ejemplo</h3>
       <br>
       
@@ -45,7 +59,7 @@
     <script src="../assets/js/jquery-1.11.1.min.js"></script>
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="../src/kGrid.js"></script>
-    <script src="js/ejemplo.js"></script>
+    <script src="js/ejemplos.js"></script>
 
   </body>
 </html>

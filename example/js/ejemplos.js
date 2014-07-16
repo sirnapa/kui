@@ -1,3 +1,9 @@
+var estilos = {
+    'Bootstrap' : 'bootstrap-theme',
+    'Konecta'   : 'k',
+    'Personal'  : 'personal' 
+}
+
 $(document).ready(function () {
     $('#grilla').kGrid({
         url : 'js/datos.json',
@@ -39,12 +45,17 @@ $(document).ready(function () {
     });    
 });
 
+function cambioEstilo(btn){
+    $('#tema').html($(btn).html());
+    $('#hojaEstilo').attr('href','../assets/css/'+estilos[$(btn).html()]+'.css');
+}
+
 function remover() {
-    alert('remover no implementado');
+    alert('Remover');
 }
 function activar() {
-    alert('activar no implementado');
+    alert('Activar');
 }
 function editar() {
-    alert('editar no implementado');
+    alert('Editar');
 }
