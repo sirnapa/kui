@@ -16,40 +16,54 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#navbar-menu">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="#" class="navbar-brand">kGrid Ejemplos</a>
+        </div>
+
+        <div id="navbar-menu">
+          <ul class="nav navbar-nav" role="tablist">
+          </ul>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="../doc">
+              <i class="fa fa-book"></i> Documentación
+            </a>
+          </li>
+          <li>
+              <a class="btn dropdown-toggle" id="estilos" data-toggle="dropdown">
+                <i class="fa fa-file-o"></i> CSS <strong id="tema">Bootstrap</strong> <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="estilos">
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Bootstrap</a>
+                </li>
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Konecta</a>
+                </li>
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Personal</a>
+                </li>
+              </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
     <div class="container">
-
-      <div class="page-header">
-        <h1>kGrid</h1>
-        <p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
-      </div>
       
-      <div class="pull-right">
-          <a href="../doc" class="btn btn-primary">
-            <i class="fa fa-book"></i> Documentación
-          </a>
-          <div class="btn-group">
-            <button class="btn btn-default dropdown-toggle" type="button" id="estilos" data-toggle="dropdown">
-              <i class="fa fa-file-o"></i> CSS <strong id="tema">Bootstrap</strong> <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="estilos">
-              <li role="presentation">
-                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Bootstrap</a>
-              </li>
-              <li role="presentation">
-                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Konecta</a>
-              </li>
-              <li role="presentation">
-                <a role="menuitem" tabindex="-1" href="#" onclick="cambioEstilo(this)">Personal</a>
-              </li>
-            </ul>
-          </div>
-      </div>
-
-      <h3>Ejemplo</h3>
-      <br>
-      
-      <div id="grilla">
+      <div id="grillas">
       </div>
 
       <br>

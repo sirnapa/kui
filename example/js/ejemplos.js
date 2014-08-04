@@ -5,49 +5,30 @@ var estilos = {
 }
 
 $(document).ready(function () {
-    $('#grilla').kGrid({
-        url : 'js/datos.json',
-        id : 'pkEncuesta',
-        campos : [{
-                nombre : 'nombre',
-                titulo: '',
-                tipo: 'encabezado'
-        },{
-                nombre : 'fechaAlta',
-                titulo: 'Creado'
-        },{
-                nombre : 'fechaModif',
-                titulo: 'Modificado'
-        },{
-                nombre : 'vigenciaInicio',
-                titulo: 'Vigencia',
-                formato: function(campo,row){
-                    return campo + ' al ' + row['vigenciaFin']
-                },
-                tipo: 'destacado'
-        }],
-        jqGrid: true,
-        estado : function(item) {
-                if (item['activo'] == 'S') {
-                        return true;
-                }
-                return false;
-        },
-        permisos: {
-            remover: remover,
-            activar: activar,
-            editar: editar
-        },
-        //paginador: '#paginador',
-        onclick: function(item){
-            alert('on click!');
-        }
-    });    
+    agregarGrilla('simple','Simple');
+    agregarGrilla('tarjetas','Tarjetas');
+    //agregarGrilla('tarjetasconscores','Con score');
 });
 
 function cambioEstilo(btn){
     $('#tema').html($(btn).html());
     $('#hojaEstilo').attr('href','../assets/css/'+estilos[$(btn).html()]+'.css');
+}
+
+function agregarGrilla(id,label){
+    var wrapper = $('<div>').attr('id','div'+id)
+        .css('padding-top',70)
+        .appendTo('#grillas');
+    $('<h3>').html(label).appendTo(wrapper);
+    $('<hr>').appendTo(wrapper);
+    $('<div>').attr('id',id).appendTo(wrapper);
+    $('<a>').attr('href','#div'+id)
+        .html(label)
+        .appendTo(
+                $('<li>').appendTo('#navbar-menu ul')
+            );
+
+    $('<script>').attr('src','js/'+id+'.js').appendTo('body');
 }
 
 function remover() {
@@ -58,4 +39,7 @@ function activar() {
 }
 function editar() {
     alert('Editar');
+}
+function onclick(item){
+    alert('on click!');
 }

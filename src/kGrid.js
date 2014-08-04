@@ -193,6 +193,7 @@
         this.url = dato.url;
         this.data = data_final;
         this.id = dato.id;
+        this.tarjetas = dato.tarjetas;
         this.campos = dato.campos;
         this.ajax = dato.ajax;
         this.jqGrid = dato.jqGrid;
@@ -206,6 +207,7 @@
         this.ondblclick = dato.ondblclick;
 
         this.cargarPaginador();
+        this.titulos();
         this.cargar();
         
         $(div).on('reloadGrid',function(){
@@ -222,12 +224,59 @@
                 kGrid.data[key] = value;
             });            
         },
+
+        nuevaGrilla : function(){
+            var kGrid = this;
+            kGrid.grilla = $('<div>').attr('id',kGrid.div.id + '_grilla')
+                    .prependTo(kGrid.div);
+        },
+
+        titulos: function(){
+            var kGrid = this;
+
+            if(kGrid.tarjetas){
+                return;
+            }
+
+            var pk = kGrid.div.id + '_titulo';
+            var formGroup = $('<div>').attr('id',pk)
+                .addClass('form-group');
+
+            kGrid.nuevaGrilla();
+                                                                            
+            $.each(kGrid.campos,function(c,campo){                       
+                var label = $('<h4>').html(
+                        $('<i>').addClass('fa fa-fw fa-arrow-down text-muted')
+                    );
+                if(campo.titulo!=undefined){
+                    label.append(campo.titulo);
+                }else{
+                    label.append(campo.nombre);
+                }
+
+                if(!campo.ancho){
+                    campo.ancho = parseInt(12/kGrid.campos.length);
+                }
+
+                $('<div class="col-md-'+campo.ancho+'">').html(label).appendTo(formGroup);
+            });                            
+                        
+            $('<div>').addClass('row')
+                .html(
+                    $('<div>').addClass('form-horizontal col-md-11')
+                        .html(formGroup)
+                )
+                .prependTo(kGrid.div);
+        },
         
         cargar : function() {
             
             var kGrid = this;
-            var form = $(kGrid.div);
-            form.find('.kGridGrilla').remove();
+            if(kGrid.grilla){
+                kGrid.grilla.empty();
+            }else{
+                kGrid.nuevaGrilla();
+            }
             
             $.ajax({
                 type: kGrid.ajax,
@@ -235,7 +284,7 @@
                 data: kGrid.data,
                 success: function(retorno){                                     
                     if (!retorno.error) {
-                        var grilla = $('<div>').addClass('kGridGrilla form-horizontal');
+                        var grilla = $('<div>').addClass('kGrid form-horizontal');
                         var lista;
                         
                         if(!kGrid.jqGrid){
@@ -249,13 +298,20 @@
                             kGrid.totalDatos = retorno.respuesta.totalDatos;
                             lista = retorno.respuesta.datos;
                         }
+
+                        var setearValor = kGrid.tarjetas? function(columna,valor){
+                                columna.html(valor);
+                            } : function(columna,valor){
+                                columna.val(valor);
+                            };
                         
                         $.each(lista,function(i,item){
                             var pk = 'kGrid_' + kGrid.div.id + '_' + item[kGrid.id];
                             
                             var row = $('<div>').attr('id',pk)
-                            .attr('data-pk',item[kGrid.id])
-                            .addClass('form-group well kGrid');
+                                .attr('data-pk',item[kGrid.id])
+                                .addClass('form-group kGrid' 
+                                    + (kGrid.tarjetas? ' well' : ''));
                             
                             if(kGrid.onclick){
                                 var onclick = typeof kGrid.onclick == 'function'?
@@ -271,6 +327,7 @@
                                 var ondblclick = typeof kGrid.ondblclick == 'function'?
                                     kGrid.ondblclick : function(){
                                     	// TODO edicion inline
+                                        kGrid.permisos['editar'].call(this,item);
                                     };
                                 row.dblclick(function(){
                                 	ondblclick.call(this,item);
@@ -282,9 +339,11 @@
                                 activo = kGrid.estado.call(this,item);
                             }
                                                         
-                            var izquierda = $('<div>').addClass('col-md-7')
-                                            .appendTo(row);
-                            var derecha = $('<div>').addClass('col-md-5 text-right')
+                            var izquierda = $('<div>').addClass('col-md-' 
+                                + (kGrid.tarjetas? '7' : '11'))
+                                .appendTo(row);
+                            var derecha = $('<div>').addClass('text-right col-md-'
+                                + (kGrid.tarjetas? '5' : '1'))
                                 .appendTo(row);
                             var botones = $('<div>').addClass('pull-right')
                                 .addClass('acciones')
@@ -294,17 +353,23 @@
                                             
                             $.each(kGrid.campos,function(c,campo){ 
                                 var columna;
-                                
+
                                 if(campo.tipo!='score'){
-                                    var ancho_columna = 6;
-                                    var contenedor = '<p>';
-                                    if(campo.tipo=='destacado' 
-                                        || campo.tipo=='encabezado'){
-                                        ancho_columna = 12;
+                                    var ancho_columna = campo.ancho;
+                                    var contenedor = '<div>';
+
+                                    if(kGrid.tarjetas){
+                                        ancho_columna = 6;
+                                        contenedor = '<p>';
+                                        if(campo.tipo=='destacado' 
+                                            || campo.tipo=='encabezado'){
+                                            ancho_columna = 12;
+                                        }
+                                        if(campo.tipo=='encabezado'){
+                                            contenedor = '<h2>';
+                                        }
                                     }
-                                    if(campo.tipo=='encabezado'){
-                                        contenedor = '<h2>';
-                                    }
+                                    
                                     columna = $(contenedor)
                                         .addClass('col-md-'+ancho_columna)
                                         .appendTo(izquierda);
@@ -318,14 +383,18 @@
                                                 .appendTo(scores)
                                         );
                                 }
-                                
-                                if(typeof campo.formato == 'function'){
-                                    columna.html(campo.formato.call(this,item[campo.nombre],item));
-                                }else{
-                                    columna.html(item[campo.nombre]);
-                                }
+
+                                var input = kGrid.tarjetas? columna : 
+                                    $('<input>').addClass('form-control')
+                                        .attr('readonly',true)
+                                        .appendTo(columna);
+
+                                setearValor(input,
+                                    typeof campo.formato == 'function'? 
+                                        campo.formato.call(this,item[campo.nombre],item)
+                                    :  item[campo.nombre]);
                                     
-                                if(campo.titulo && campo.titulo!=''){
+                                if(kGrid.tarjetas && campo.titulo && campo.titulo!=''){
                                     if(campo.tipo!='score'){
                                         $('<label>').addClass('text-muted')
                                             .html(campo.titulo + '&nbsp; &nbsp;')
@@ -344,7 +413,7 @@
                                 }                              
                             });                            
                                                             
-                            var dimension = 'fa-3x';
+                            var dimension = kGrid.tarjetas? 'fa-3x' : 'fa-lg';
 
                             if(activo){  
                                 if(typeof kGrid.permisos['editar'] == 'function'){
@@ -421,7 +490,7 @@
                             
                         });
 
-                        grilla.prependTo(form);
+                        grilla.prependTo(kGrid.grilla);
                         
                         var lado = 0;
                         grilla.find('.score').each(function(s,score){
