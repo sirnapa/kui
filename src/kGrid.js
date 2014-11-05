@@ -1,3 +1,8 @@
+/* 
+    KGrid
+    Autor: Napa,
+    Versión: 2.0
+*/
 (function () {
     $.kGrids = {
         instances : {}
@@ -205,6 +210,7 @@
         this.paginador = dato.paginador;
         this.onclick = dato.onclick;
         this.ondblclick = dato.ondblclick;
+        this.seleccionable = dato.seleccionable;
 
         this.cargarPaginador();
         this.titulos();
@@ -229,6 +235,10 @@
             var kGrid = this;
             kGrid.grilla = $('<div>').attr('id',kGrid.div.id + '_grilla')
                     .prependTo(kGrid.div);
+
+            if(kGrid.seleccionable){
+                $(kGrid.div).data('seleccionados',[]);
+            }
         },
 
         titulos: function(){
@@ -350,6 +360,11 @@
                                 .appendTo(derecha);
                             var scores = $('<div>').addClass('pull-right')
                                 .appendTo(derecha);
+
+                            if(kGrid.seleccionable){
+                                // Agregar campo de selección al principio;
+                                
+                            }
                                             
                             $.each(kGrid.campos,function(c,campo){ 
                                 var columna;
@@ -407,8 +422,16 @@
                                 }                       
 	                            
                                 if(campo.atributos!=undefined){
-                                    $.each(campo.atributos,function(a,atributo){
-                                        input.attr(atributo.atributo,atributo.valor);
+                                    if(!kGrid.tarjetas && campo.atributos['type']=='checkbox'){
+                                        if(input.val()=='true') {
+                                            input.attr('checked','checked');
+                                        }
+                                        input.attr('disabled','disabled');
+                                        input.removeClass('form-control');
+                                        input.parent().addClass('text-center');
+                                    }
+                                    $.each(campo.atributos,function(atributo,valor){
+                                        input.attr(atributo,valor);
                                     });
                                 }                              
                             });                            
@@ -478,8 +501,8 @@
                                     }
                                     
                                     if(boton.atributos!=undefined){
-                                        $.each(boton.atributos,function(a,atributo){
-                                            btn.attr(atributo.atributo,atributo.valor);
+                                        $.each(boton.atributos,function(atributo,valor){
+                                            btn.attr(atributo,valor);
                                         });
                                     }    	                            
                                     btn.appendTo(botones);
@@ -610,6 +633,11 @@
                 .click(function(){
                     $('#'+kGrid.div.id).kGrid('pagina','ultima');
                 });
+        },
+
+        seleccionar: function(seleccionados){
+            var kGrid = this;
+            return $(kGrid.div).data('seleccionados',seleccionados);
         }
     };
 })();

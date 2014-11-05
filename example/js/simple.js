@@ -4,7 +4,8 @@ $('#simple').kGrid({
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
-            tipo: 'encabezado'
+            tipo: 'encabezado',
+            ancho: 5
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado'
@@ -18,7 +19,15 @@ $('#simple').kGrid({
                 return campo + ' al ' + row['vigenciaFin']
             },
             tipo: 'destacado',
-            atributos: [{atributo:'readonly',valor:false}]
+            atributos: {'readonly':false}
+    },{
+            nombre : 'anonimo',
+            titulo: 'NN',
+            ancho: 1,
+            formato: function(campo,row){
+                    return campo=='S';
+            },
+            atributos: {'type':'checkbox'}
     }],
     jqGrid: true,
     estado : function(item) {

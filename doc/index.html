@@ -11,7 +11,7 @@
     <title>kGrid for Bootstrap</title>
 
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-theme.css" rel="stylesheet">
     <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
 
   </head>
@@ -75,15 +75,15 @@
 				Array de campos de la entidad, con el siguiente formato:
 				<pre>
 [{
-   nombre: '',          // (requerido) nombre del atributo
+   nombre: '',          		// (requerido) nombre del atributo
    titulo: '',
-   tipo: '',            // Tipo de campo: encabezado, destacado o score
+   tipo: '',            		// Tipo de campo: encabezado, destacado o score
    ancho: '',			// Solo se utiliza en kGrid Simple.
-   atributos: [{		// array de atributos para el input 
-                   atributo: '',
-                   valor: ''
-               },...],
-   formato: function(){}// Función para mostrar algo distinto a lo recibido
+   atributos: {			// Atributos para el input 
+       atributo1: 'valor',
+       atributo2: 'valor',...
+   },
+   formato: function(){}		// Función para mostrar algo distinto a lo recibido
 },...]
 				</pre>
 			</div>
@@ -132,7 +132,7 @@
 				</strong>
 			</div>
 			<div class="col-md-9">
-				Parametros a ser enviados en la peticion POST. Sus valores por defecto son: {}
+				Parametros a ser enviados en la petición AJAX. Sus valores por defecto son: {}
 			</div>
 		</div>
 
@@ -169,14 +169,12 @@
 		comentario: '',                         // (requerido) Texto para el tooltip
 		icono: '',				// (requerido) tipo de bootstrap icon
 		enlace: '',				// href o enlace del <em>a</em>, por defecto Javascript:void(0);
-		mostrar: function(item){},                  // funcion que define cuando muestrar el boton
-		onclick: function(item){},                  // funcion onclick, recibe como argumento al item
-		atributos: [
-						{			// array de atributos para el <em>a</em> 
-							atributo: '',
-							valor: ''
-						},...
-				   ]
+		mostrar: function(item){},		// funcion que define cuando muestrar el boton
+		onclick: function(item){},		// funcion onclick, recibe como argumento al item
+		atributos: {				// Atributos para el <em>a</em> 
+			atributo1: 'valor',
+			atributo2: 'valor',...
+		}
    	},...
 ]
 	           </pre>
@@ -259,6 +257,18 @@
 			<div class="col-md-9">
 				Función que se aplica cuando se hace doble click en el row. 
 				Sólo puede ser utilizado cuando no hay la orden "onclick".
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+					seleccionable
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Habilitar la casilla de selección múltiple en la primera columna. 
+				Solo funciona en en el formato simple y su valor por defecto es: false.
 			</div>
 		</div>
 		<br>
