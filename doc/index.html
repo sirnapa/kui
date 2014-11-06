@@ -271,6 +271,74 @@
 				Solo funciona en en el formato simple y su valor por defecto es: false.
 			</div>
 		</div>
+		
+		<hr>
+		<h3>Funciones de .kGrid()</h3>
+
+		<!-- ========================================================= -->
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				.kGrid(recargar,data)
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Recargar la grilla haciendo una petición AJAX con los parametros de <em>data</em>. El argumento data es opcional, en caso de omisión se mantiene el campo <em>data</em> configurado previamente en kGrid.
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				.kGrid(pagina,dato)
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Cargar a la grilla los datos de la página especificada. Dato es requerido y puede tener cualquierda de los siguientes valores:
+				<ul>
+					<li>primera</li>
+					<li>anterior</li>
+					<li>siguiente</li>
+					<li>ultima</li>
+					<li>El número de la página específica que desea cargarse.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				.kGrid(buscar,clave)
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Filtrar los resultados bajo cierto criterio o <em>clave</em> de búsqueda, <span class="text-danger">por el momento solo es compatible cuando el modo de compatibilidad con <strong>jqgrid</strong> está activo</span>. La clave debe tener el siguiente formato:
+				<pre>
+{
+    data: 'clave de busqueda global (requerido)',
+    reglas: [
+             field: 'nombre del campo (requerido)',
+             data: 'opcional, por defecto toma el valor de aux.data',
+             op: 'opcional, por defecto cn'
+         ]
+    groupOp: 'opcional, por defecto es AND'
+}
+				</pre>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<strong>
+				.kGrid(seleccionar,array)
+				</strong>
+			</div>
+			<div class="col-md-9">
+				Seleccionar todas las filas indicadas en el array de <em>id</em>s, <span class="text-danger">sólo se puede utilizar cuando está habilitada la opción <strong>seleccionable</strong></span>.
+			</div>
+		</div>
+
 		<br>
  </div> <!-- /container -->
 

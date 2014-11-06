@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0
+    Versión: 2.0.1
 */
 (function () {
     $.kGrids = {
@@ -64,16 +64,7 @@
                         if(!instancia.jqGrid || aux==undefined){
                             return;
                         }
-                        // aux debe tener el siguiente formato
-                        // {
-                        //     data: 'clave de busqueda global (requerido)',
-                        //     reglas: [
-                        //              field: 'nombre del campo (requerido)',
-                        //              data: 'opcional, por defecto toma el valor de aux.data',
-                        //              op: 'opcional, por defecto cn'
-                        //          ]
-                        //     groupOp: 'opcional, por defecto es AND'
-                        // }
+                        
                         var groupOp = 'AND'
                         if(aux.groupOp!=undefined){
                             groupOp=aux.groupOp;
@@ -94,6 +85,9 @@
                                 })
                         });
                         instancia.cargar();
+                        break;
+                    case 'seleccionar':
+                        instancia.seleccionar(aux);
                         break;
                     case 'info':
                         console.log(instancia);
@@ -560,7 +554,7 @@
                                     $(item).attr('checked','checked');
                                 }
                                 $(item).change(function(){
-                                    kGrid.seleccionar($(item).data('pk'),$(item).is(':checked'));
+                                    kGrid.cambiarSeleccion($(item).data('pk'),$(item).is(':checked'));
                                 });
                             });
                         
@@ -684,16 +678,38 @@
                 });
         },
 
-        seleccionar: function(codigo,estado){
+        cambiarSeleccion: function(codigo,estado){
+            var kGrid = this;
+            kGrid.seleccionados[codigo] = estado;
+            kGrid.refrescarSeleccionados();
+        },
+
+        seleccionar: function(seleccionados){
+            var kGrid = this;
+            kGrid.seleccionados = {};
+            $.each(seleccionados,function(s,seleccionado){
+                kGrid.seleccionados[seleccionado] = true;
+            });
+
+            $('.' + kGrid.div.id + '_seleccionar_row').each(function(i,item){
+                $(item).removeAttr('checked');
+                if(kGrid.seleccionados[$(item).data('pk')]){
+                    $(item).click();
+                }
+            });
+
+            kGrid.refrescarSeleccionados();
+        },
+
+        refrescarSeleccionados: function(){
             var kGrid = this;
             var seleccionados = [];
-            kGrid.seleccionados[codigo] = estado;
             $.each(kGrid.seleccionados,function(codigo,estado){
                 if(estado){
                     seleccionados.push(codigo);
                 }
             });
-            return $(kGrid.div).data('seleccionados',seleccionados);
+            $(kGrid.div).data('seleccionados',seleccionados);
         }
     };
 })();
