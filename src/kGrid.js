@@ -294,11 +294,14 @@
                     var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
                         .attr('type','checkbox')
                         .change(function(){
-                            var elemento = '.' + kGrid.div.id + '_seleccionar_row';
-                            $(elemento).removeAttr('checked');
-                            if($(this).is(':checked')){
-                                $(elemento).click();
-                            }
+                            var todos = $(this).is(':checked');
+                            $('.' + kGrid.div.id + '_seleccionar_row').each(function(i,item){
+                                $(item).removeAttr('checked');
+                                if(todos){
+                                    $(item).click();
+                                }
+                                $(item).trigger('change');
+                            });
                         });
                     label.html(checkall);
                 }
@@ -551,9 +554,15 @@
 
                         grilla.prependTo(kGrid.grilla);
 
-                        $(grilla).find('.' + kGrid.div.id + '_seleccionar_row').click(function(){
-                            kGrid.seleccionar($(this).data('pk'),$(this).is(':checked'));
-                        });
+                        $(grilla).find('.' + kGrid.div.id + '_seleccionar_row')
+                            .each(function(i,item){
+                                if(kGrid.seleccionados[$(item).data('pk')]){
+                                    $(item).attr('checked','checked');
+                                }
+                                $(item).change(function(){
+                                    kGrid.seleccionar($(item).data('pk'),$(item).is(':checked'));
+                                });
+                            });
                         
                         var lado = 0;
                         grilla.find('.score').each(function(s,score){
