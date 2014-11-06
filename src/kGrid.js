@@ -192,7 +192,23 @@
         
         $.each(dato.retorno,function(key,value){
             retorno_final[key] = value;
-        });        
+        });
+
+        if(dato.seleccionable){
+            // Agregar campo de selección al principio;
+            var campo_seleccion = {
+                nombre: 'kGrid_seleccionado',
+                titulo: '',
+                ancho: 1,
+                atributos: {
+                    'type':'checkbox',
+                    'readonly': 'false',
+                    'disabled': 'false',
+                    'class': div.id + '_seleccionar_row'
+                }
+            }
+            dato.campos.unshift(campo_seleccion);
+        }   
                 
         this.div = div;
         this.url = dato.url;
@@ -211,6 +227,7 @@
         this.onclick = dato.onclick;
         this.ondblclick = dato.ondblclick;
         this.seleccionable = dato.seleccionable;
+        this.seleccionados = {};
 
         this.cargarPaginador();
         this.titulos();
@@ -233,6 +250,7 @@
 
         nuevaGrilla : function(){
             var kGrid = this;
+            $(kGrid.div).addClass('form-horizontal');
             kGrid.grilla = $('<div>').attr('id',kGrid.div.id + '_grilla')
                     .prependTo(kGrid.div);
 
@@ -248,9 +266,8 @@
                 return;
             }
 
-            var pk = kGrid.div.id + '_titulo';
-            var formGroup = $('<div>').attr('id',pk)
-                .addClass('form-group');
+            var formGroup = $('<div>').addClass('form-group');
+            var columnas = $('<div>').addClass('col-md-11').appendTo(formGroup);
 
             kGrid.nuevaGrilla();
                                                                             
@@ -268,14 +285,26 @@
                     campo.ancho = parseInt(12/kGrid.campos.length);
                 }
 
-                $('<div class="col-md-'+campo.ancho+'">').html(label).appendTo(formGroup);
+                var titulo = $('<div>').html(label)
+                    .addClass('col-md-'+campo.ancho)
+                    .appendTo(columnas);
+
+                if(kGrid.seleccionable && c==0){
+                    titulo.addClass('text-center');
+                    var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
+                        .attr('type','checkbox')
+                        .change(function(){
+                            var elemento = '.' + kGrid.div.id + '_seleccionar_row';
+                            $(elemento).removeAttr('checked');
+                            if($(this).is(':checked')){
+                                $(elemento).click();
+                            }
+                        });
+                    label.html(checkall);
+                }
             });                            
                         
-            $('<div>').addClass('row')
-                .html(
-                    $('<div>').addClass('form-horizontal col-md-11')
-                        .html(formGroup)
-                )
+            $('<div>').html(formGroup)
                 .prependTo(kGrid.div);
         },
         
@@ -292,9 +321,9 @@
                 type: kGrid.ajax,
                 url: kGrid.url,
                 data: kGrid.data,
-                success: function(retorno){                                     
+                success: function(retorno){                                    
                     if (!retorno.error) {
-                        var grilla = $('<div>').addClass('kGrid form-horizontal');
+                        var grilla = $('<div>').addClass('kGrid');
                         var lista;
                         
                         if(!kGrid.jqGrid){
@@ -318,9 +347,9 @@
                         $.each(lista,function(i,item){
                             var pk = 'kGrid_' + kGrid.div.id + '_' + item[kGrid.id];
                             
-                            var row = $('<div>').attr('id',pk)
+                            var formGroup = $('<div>').attr('id',pk)
                                 .attr('data-pk',item[kGrid.id])
-                                .addClass('form-group kGrid' 
+                                .addClass('form-group' 
                                     + (kGrid.tarjetas? ' well' : ''));
                             
                             if(kGrid.onclick){
@@ -328,7 +357,7 @@
                                     kGrid.onclick : function(){
                                        window.open(kGrid.onclick,'_self');
                                     };
-                                row.addClass('kbtn')
+                                formGroup.addClass('kbtn')
                                     .css('cursor','pointer')
                                     .click(function(){
                                        onclick.call(this,item);
@@ -339,7 +368,7 @@
                                     	// TODO edicion inline
                                         kGrid.permisos['editar'].call(this,item);
                                     };
-                                row.dblclick(function(){
+                                formGroup.dblclick(function(){
                                 	ondblclick.call(this,item);
                                 });
                             }
@@ -351,20 +380,15 @@
                                                         
                             var izquierda = $('<div>').addClass('col-md-' 
                                 + (kGrid.tarjetas? '7' : '11'))
-                                .appendTo(row);
+                                .appendTo(formGroup);
                             var derecha = $('<div>').addClass('text-right col-md-'
                                 + (kGrid.tarjetas? '5' : '1'))
-                                .appendTo(row);
+                                .appendTo(formGroup);
                             var botones = $('<div>').addClass('pull-right')
                                 .addClass('acciones')
                                 .appendTo(derecha);
                             var scores = $('<div>').addClass('pull-right')
                                 .appendTo(derecha);
-
-                            if(kGrid.seleccionable){
-                                // Agregar campo de selección al principio;
-                                
-                            }
                                             
                             $.each(kGrid.campos,function(c,campo){ 
                                 var columna;
@@ -426,13 +450,25 @@
                                         if(input.val()=='true') {
                                             input.attr('checked','checked');
                                         }
-                                        input.attr('disabled','disabled');
-                                        input.removeClass('form-control');
+                                        input.attr('disabled','disabled')
+                                            .removeClass('form-control')
+                                            .attr('data-pk',item[kGrid.id])
+                                            .dblclick(function(e){
+                                                e.stopPropagation();
+                                            });
                                         input.parent().addClass('text-center');
                                     }
                                     $.each(campo.atributos,function(atributo,valor){
                                         input.attr(atributo,valor);
                                     });
+                                    
+                                    var campos_especiales = ['disabled','readonly'];
+                                    $.each(campos_especiales,function(e,especial){
+                                        if(campo.atributos[especial]=='false'){
+                                            input.removeAttr(especial);
+                                        }
+                                    });
+
                                 }                              
                             });                            
                                                             
@@ -468,7 +504,7 @@
                                 
                             } else{                                    
                                 if(typeof kGrid.permisos['activar'] == 'function'){
-                                    row.addClass('has-error');
+                                    formGroup.addClass('has-error');
                                     $('<a>').addClass('text-muted')
                                         .css('margin-left','15px')
                                         .attr('title','Reactivar')
@@ -509,11 +545,15 @@
                                 }	
                             });
                             
-                            row.appendTo(grilla); 
+                            formGroup.appendTo(grilla); 
                             
                         });
 
                         grilla.prependTo(kGrid.grilla);
+
+                        $(grilla).find('.' + kGrid.div.id + '_seleccionar_row').click(function(){
+                            kGrid.seleccionar($(this).data('pk'),$(this).is(':checked'));
+                        });
                         
                         var lado = 0;
                         grilla.find('.score').each(function(s,score){
@@ -635,8 +675,15 @@
                 });
         },
 
-        seleccionar: function(seleccionados){
+        seleccionar: function(codigo,estado){
             var kGrid = this;
+            var seleccionados = [];
+            kGrid.seleccionados[codigo] = estado;
+            $.each(kGrid.seleccionados,function(codigo,estado){
+                if(estado){
+                    seleccionados.push(codigo);
+                }
+            });
             return $(kGrid.div).data('seleccionados',seleccionados);
         }
     };

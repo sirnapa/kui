@@ -5,7 +5,7 @@ $('#simple').kGrid({
             nombre : 'nombre',
             titulo: 'Nombre',
             tipo: 'encabezado',
-            ancho: 5
+            ancho: 4
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado'
@@ -41,5 +41,6 @@ $('#simple').kGrid({
         activar: activar,
         editar: editar
     },
-    ondblclick: true
+    ondblclick: true,
+    seleccionable: true
 });
