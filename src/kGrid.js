@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0.1
+    Versión: 2.0.2
 */
 (function () {
     $.kGrids = {
