@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0.2
+    Versión: 2.0.3
 */
 (function () {
     $.kGrids = {
@@ -409,7 +409,7 @@
 
                                 if(!kGrid.tarjetas){
                                     var label = $('<label>').css('margin-top','20px')
-                                        .addClass('visible-xs-block visible-sm-block')
+                                        .addClass('visible-xs visible-sm')
                                         .html(kGrid.etiquetas[c])
                                         .appendTo(columna);
                                 }
@@ -539,7 +539,7 @@
                             formGroup.appendTo(grilla);
 
                             if(!kGrid.tarjetas){
-                                formGroup.after($('<hr>').addClass('visible-xs-block visible-sm-block'));
+                                formGroup.after($('<hr>').addClass('visible-xs visible-sm'));
                             }                            
                         });
 
