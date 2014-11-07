@@ -29,7 +29,6 @@ $('#simple').kGrid({
             },
             atributos: {'type':'checkbox'}
     }],
-    jqGrid: true,
     estado : function(item) {
             if (item['activo'] == 'S') {
                     return true;

@@ -20,7 +20,6 @@ $('#tarjetas').kGrid({
             },
             tipo: 'destacado'
     }],
-    jqGrid: true,
     estado : function(item) {
             if (item['activo'] == 'S') {
                     return true;

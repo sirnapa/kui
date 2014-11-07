@@ -35,7 +35,6 @@ $('#tarjetasconscores').kGrid({
                 return row['pkEncuesta'] + row['empresa.pkEmpresa'];
             }
     }],
-    jqGrid: true,
     estado : function(item) {
             if (item['activo'] == 'S') {
                     return true;

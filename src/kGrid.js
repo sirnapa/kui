@@ -52,16 +52,12 @@
                         if(pagina<1 || pagina>parseInt(instancia.totalPaginas)){
                             return;
                         }
-                        if(!instancia.jqGrid){
-                            instancia.setData({pagina:pagina});
-                        }else{
-                            instancia.setData({page:pagina});
-                        }
+                        instancia.setData({page:pagina});
                         instancia.cargar();
                         break;
-                    case 'buscar':  // Por el momento sólo es valido para jqGrid=true
+                    case 'buscar':
                         // aux es la clave de búsqueda
-                        if(!instancia.jqGrid || aux==undefined){
+                        if(aux==undefined){
                             return;
                         }
                         
@@ -145,23 +141,15 @@
                 .appendTo(div);
         }
         
-        var data_final = {};
-        
-        if(dato.jqGrid){
-            data_final = {
-                _search:false,
-                filters:null,
-                page:1,
-                rows:5,
-                sidx:dato.id,
-                sord:'asc', 
-                todos:false
-            };
-        }else{
-            data_final = {
-                pagina:1
-            }
-        }  
+        var data_final = {
+            _search:false,
+            filters:null,
+            page:1,
+            rows:5,
+            sidx:dato.id,
+            sord:'asc', 
+            todos:false
+        };
 
         $.each(dato.data,function(key,value){
             data_final[key] = value;
@@ -202,6 +190,10 @@
                 }
             }
             dato.campos.unshift(campo_seleccion);
+
+            if(!dato.seleccionados){
+                dato.seleccionados = [];
+            }
         }   
                 
         this.div = div;
@@ -209,9 +201,9 @@
         this.data = data_final;
         this.id = dato.id;
         this.tarjetas = dato.tarjetas;
+        this.etiquetas = [];
         this.campos = dato.campos;
         this.ajax = dato.ajax;
-        this.jqGrid = dato.jqGrid;
         this.permisos = permisos_finales;
         this.botones = dato.botones;
         this.estado = dato.estado;
@@ -222,6 +214,7 @@
         this.ondblclick = dato.ondblclick;
         this.seleccionable = dato.seleccionable;
         this.seleccionados = {};
+        this.preseleccionados = dato.seleccionados;
 
         this.cargarPaginador();
         this.titulos();
@@ -249,7 +242,7 @@
                     .prependTo(kGrid.div);
 
             if(kGrid.seleccionable){
-                $(kGrid.div).data('seleccionados',[]);
+                kGrid.seleccionar(kGrid.preseleccionados);
             }
         },
 
@@ -260,20 +253,22 @@
                 return;
             }
 
-            var formGroup = $('<div>').addClass('form-group');
+            var formGroup = $('<div>').addClass('form-group hidden-xs hidden-sm');
             var columnas = $('<div>').addClass('col-md-11').appendTo(formGroup);
 
             kGrid.nuevaGrilla();
                                                                             
             $.each(kGrid.campos,function(c,campo){                       
-                var label = $('<h4>').html(
-                        $('<i>').addClass('fa fa-fw fa-arrow-down text-muted')
-                    );
+                var label = $('<h4>');
                 if(campo.titulo!=undefined){
                     label.append(campo.titulo);
                 }else{
                     label.append(campo.nombre);
                 }
+
+                kGrid.etiquetas.push(label.html());
+                $('<i>').addClass('fa fa-fw fa-arrow-down text-muted')
+                    .prependTo(label);
 
                 if(!campo.ancho){
                     campo.ancho = parseInt(12/kGrid.campos.length);
@@ -301,8 +296,7 @@
                 }
             });                            
                         
-            $('<div>').html(formGroup)
-                .prependTo(kGrid.div);
+            formGroup.prependTo(kGrid.div);
         },
         
         cargar : function() {
@@ -323,17 +317,10 @@
                         var grilla = $('<div>').addClass('kGrid');
                         var lista;
                         
-                        if(!kGrid.jqGrid){
-                            kGrid.pagina = retorno[kGrid.retorno.pagina];
-                            kGrid.totalPaginas = retorno[kGrid.retorno.totalPaginas];
-                            kGrid.totalDatos = retorno[kGrid.retorno.totalDatos];
-                            lista = retorno[kGrid.retorno.lista];
-                        }else{
-                            kGrid.pagina = retorno.respuesta.pagina;
-                            kGrid.totalPaginas = retorno.respuesta.totalPaginas;
-                            kGrid.totalDatos = retorno.respuesta.totalDatos;
-                            lista = retorno.respuesta.datos;
-                        }
+                        kGrid.pagina = retorno.respuesta.pagina;
+                        kGrid.totalPaginas = retorno.respuesta.totalPaginas;
+                        kGrid.totalDatos = retorno.respuesta.totalDatos;
+                        lista = retorno.respuesta.datos;
 
                         var setearValor = kGrid.tarjetas? function(columna,valor){
                                 columna.html(valor);
@@ -418,6 +405,13 @@
                                                 .css('height',0)
                                                 .appendTo(scores)
                                         );
+                                }
+
+                                if(!kGrid.tarjetas){
+                                    var label = $('<label>').css('margin-top','20px')
+                                        .addClass('visible-xs-block visible-sm-block')
+                                        .html(kGrid.etiquetas[c])
+                                        .appendTo(columna);
                                 }
 
                                 var input = kGrid.tarjetas? columna : 
@@ -541,9 +535,12 @@
                                     btn.appendTo(botones);
                                 }	
                             });
-                            
-                            formGroup.appendTo(grilla); 
-                            
+
+                            formGroup.appendTo(grilla);
+
+                            if(!kGrid.tarjetas){
+                                formGroup.after($('<hr>').addClass('visible-xs-block visible-sm-block'));
+                            }                            
                         });
 
                         grilla.prependTo(kGrid.grilla);
@@ -557,24 +554,26 @@
                                     kGrid.cambiarSeleccion($(item).data('pk'),$(item).is(':checked'));
                                 });
                             });
-                        
-                        var lado = 0;
-                        grilla.find('.score').each(function(s,score){
-                            if(s==0){
-                                lado = $(score).parent().parent().parent().height();
-                            }
-                            $(score).css('width',lado);
-                            $(score).css('height',lado);
-                        });
-                        
-                        grilla.find('.acciones').each(function(a,accion){
-                            var top = ($(accion).parent().parent().height() 
-                                - $(accion).height())/2
-                            if(top > 0){
-                                $(accion).css('padding-top',top);
-                            }
-                        });
-                        
+
+                        if(kGrid.tarjetas){
+                            var lado = 0;
+                            grilla.find('.score').each(function(s,score){
+                                if(s==0){
+                                    lado = $(score).parent().parent().parent().height();
+                                }
+                                $(score).css('width',lado);
+                                $(score).css('height',lado);
+                            });
+                            
+                            grilla.find('.acciones').each(function(a,accion){
+                                var top = ($(accion).parent().parent().height() 
+                                    - $(accion).height())/2
+                                if(top > 0){
+                                    $(accion).css('padding-top',top);
+                                }
+                            });
+                        }
+                                                
                         $('#kGrid_' + kGrid.div.id + '_pagina')
                             .val(kGrid.pagina)
                             .data('pagina',kGrid.pagina);
