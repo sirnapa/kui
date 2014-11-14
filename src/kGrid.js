@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0.5
+    Versión: 2.0.6
 */
 (function () {
     $.kGrids = {
@@ -341,6 +341,11 @@
                                 .attr('data-pk',item[kGrid.id])
                                 .addClass('form-group' 
                                     + (kGrid.tarjetas? ' well' : ''));
+
+                            var activo = false;
+                            if(typeof kGrid.estado == 'function'){
+                                activo = kGrid.estado.call(this,item);
+                            }
                             
                             if(kGrid.onclick){
                                 var onclick = typeof kGrid.onclick == 'function'?
@@ -353,19 +358,17 @@
                                        onclick.call(this,item);
                                     });
                             }else if(kGrid.ondblclick){
-                                var ondblclick = typeof kGrid.ondblclick == 'function'?
-                                    kGrid.ondblclick : function(){
-                                    	// TODO edicion inline
-                                        kGrid.permisos['editar'].call(this,item);
-                                    };
-                                formGroup.dblclick(function(){
-                                	ondblclick.call(this,item);
-                                });
-                            }
-
-                            var activo = false;
-                            if(typeof kGrid.estado == 'function'){
-                                activo = kGrid.estado.call(this,item);
+                                if( (typeof kGrid.ondblclick == 'function') || 
+                                    (activo && typeof kGrid.permisos['editar'] == 'function')){
+                                    var ondblclick = typeof kGrid.ondblclick == 'function'?
+                                        kGrid.ondblclick : function(){
+                                        	// TODO edicion inline
+                                            kGrid.permisos['editar'].call(this,item);
+                                        };
+                                    formGroup.dblclick(function(){
+                                        ondblclick.call(this,item);
+                                    });
+                                }
                             }
                                                         
                             var izquierda = $('<div>').addClass('col-md-' 

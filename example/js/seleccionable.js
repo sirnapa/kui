@@ -15,7 +15,6 @@ $(document).ready(function() {
 			}
 			return false;
 		},
-		ondblclick : true,
 		seleccionable : true,
 		seleccionados: seleccionados
 	});
