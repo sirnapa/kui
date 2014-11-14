@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0.4
+    Versión: 2.0.5
 */
 (function () {
     $.kGrids = {
@@ -80,6 +80,7 @@
                                 "rules": reglas
                                 })
                         });
+                        instancia.setData({page:1});
                         instancia.cargar();
                         break;
                     case 'seleccionar':
@@ -109,6 +110,7 @@
         if( dato.url==undefined
             || dato.id==undefined
             || dato.campos==undefined){
+            console.error('Los campos id, url y campos son obligatorios.');
             return;
         }
         
