@@ -1,7 +1,7 @@
 /* 
     KGrid
     Autor: Napa,
-    Versión: 2.0.3
+    Versión: 2.0.4
 */
 (function () {
     $.kGrids = {
@@ -145,11 +145,15 @@
             _search:false,
             filters:null,
             page:1,
-            rows:5,
+            rows:10,
             sidx:dato.id,
             sord:'asc', 
             todos:false
         };
+
+        if(dato.tarjetas){
+            data_final.rows = 5;
+        }
 
         $.each(dato.data,function(key,value){
             data_final[key] = value;

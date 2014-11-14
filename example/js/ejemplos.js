@@ -6,8 +6,8 @@ var estilos = {
 
 $(document).ready(function () {
     agregarGrilla('simple','Simple');
-    agregarGrilla('tarjetas','Tarjetas');
     agregarGrilla('seleccionable','Grilla seleccionable');
+    agregarGrilla('tarjetas','Tarjetas');
     //agregarGrilla('tarjetasconscores','Con score');
 });
 

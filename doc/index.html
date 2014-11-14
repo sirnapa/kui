@@ -121,7 +121,18 @@
 				</strong>
 			</div>
 			<div class="col-md-9">
-				Parametros a ser enviados en la petición AJAX. Sus valores por defecto son: {}
+				Parametros a ser enviados en la petición AJAX. Sus valores por defecto son:
+				<pre>
+{
+    _search:false,
+    filters:null,
+    page:1,
+    rows: 10 // Cuando tarjeta es false rows: 10, caso contratio es 5. 
+    sidx:dato.id,
+    sord:'asc', 
+    todos:false
+}
+				</pre>
 			</div>
 		</div>
 
