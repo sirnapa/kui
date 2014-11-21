@@ -1,7 +1,9 @@
 /* 
     KGrid
-    Autor: Napa,
-    Versión: 2.0.6
+    Autor: Nelson Páez,
+    Mail: nelpa90@gmail.com,
+    Web: www.konecta.com.py
+    Versión: 2.1.0
 */
 (function () {
     $.kGrids = {
@@ -19,7 +21,7 @@
                     case 'recargar':
                         // aux sirve para sobre-escribir el data
                         if(aux!=undefined){
-                            instancia.setData(aux);
+                            instancia.set_data(aux);
                         }
                         instancia.cargar();
                         break;
@@ -52,7 +54,7 @@
                         if(pagina<1 || pagina>parseInt(instancia.totalPaginas)){
                             return;
                         }
-                        instancia.setData({page:pagina});
+                        instancia.set_data({page:pagina});
                         instancia.cargar();
                         break;
                     case 'buscar':
@@ -73,14 +75,14 @@
                                 'op': (campo.op!=undefined)? campo.op : 'cn'
                             });
                         });  
-                        instancia.setData({
+                        instancia.set_data({
                             _search: true,
                             filters: JSON.stringify({
                                 "groupOp":groupOp,
                                 "rules": reglas
                                 })
                         });
-                        instancia.setData({page:1});
+                        instancia.set_data({page:1});
                         instancia.cargar();
                         break;
                     case 'seleccionar':
@@ -214,7 +216,7 @@
         this.botones = dato.botones;
         this.estado = dato.estado;
         this.retorno = retorno_final;
-        this.loadComplete = dato.loadComplete;
+        this.load_complete = dato.loadComplete;
         this.paginador = dato.paginador;
         this.onclick = dato.onclick;
         this.ondblclick = dato.ondblclick;
@@ -222,7 +224,8 @@
         this.seleccionados = {};
         this.preseleccionados = dato.seleccionados;
 
-        this.cargarPaginador();
+        this.cargar_estilos();
+        this.cargar_paginador();
         this.titulos();
         this.cargar();
         
@@ -234,16 +237,16 @@
     
     KGrid.prototype = {
     		
-        setData: function(data){
+        set_data: function(data){
             var kGrid = this;
             $.each(data,function(key,value){
                 kGrid.data[key] = value;
             });            
         },
 
-        nuevaGrilla : function(){
+        nueva_grilla : function(){
             var kGrid = this;
-            $(kGrid.div).addClass('form-horizontal');
+            $(kGrid.div).addClass('kgrid form-horizontal');
             kGrid.grilla = $('<div>').attr('id',kGrid.div.id + '_grilla')
                     .prependTo(kGrid.div);
 
@@ -262,7 +265,7 @@
             var formGroup = $('<div>').addClass('form-group hidden-xs hidden-sm');
             var columnas = $('<div>').addClass('col-md-11').appendTo(formGroup);
 
-            kGrid.nuevaGrilla();
+            kGrid.nueva_grilla();
                                                                             
             $.each(kGrid.campos,function(c,campo){                       
                 var label = $('<h4>');
@@ -311,7 +314,7 @@
             if(kGrid.grilla){
                 kGrid.grilla.empty();
             }else{
-                kGrid.nuevaGrilla();
+                kGrid.nueva_grilla();
             }
             
             $.ajax({
@@ -353,7 +356,6 @@
                                        window.open(kGrid.onclick,'_self');
                                     };
                                 formGroup.addClass('kbtn')
-                                    .css('cursor','pointer')
                                     .click(function(){
                                        onclick.call(this,item);
                                     });
@@ -378,9 +380,9 @@
                                 + (kGrid.tarjetas? '5' : '1'))
                                 .appendTo(formGroup);
                             var botones = $('<div>').addClass('pull-right')
-                                .addClass('acciones')
+                                .addClass('kacciones')
                                 .appendTo(derecha);
-                            var scores = $('<div>').addClass('pull-right')
+                            var scores = $('<div>').addClass('kscores pull-right')
                                 .appendTo(derecha);
                                             
                             $.each(kGrid.campos,function(c,campo){ 
@@ -406,18 +408,15 @@
                                         .addClass('col-md-'+ancho_columna)
                                         .appendTo(izquierda);
                                 }else{
-                                    columna = $('<p>').css('margin-top','25%')
-                                        .appendTo(
+                                    columna = $('<p>').appendTo(
                                             $('<div>')
-                                                .addClass('text-center pull-left score')
-                                                .css('width',0)
-                                                .css('height',0)
+                                                .addClass('text-center pull-left kscore')
                                                 .appendTo(scores)
                                         );
                                 }
 
                                 if(!kGrid.tarjetas){
-                                    var label = $('<label>').css('margin-top','20px')
+                                    var label = $('<label>').addClass('klabel')
                                         .addClass('visible-xs visible-sm')
                                         .html(kGrid.etiquetas[c])
                                         .appendTo(columna);
@@ -476,8 +475,7 @@
 
                             if(activo){  
                                 if(typeof kGrid.permisos['editar'] == 'function'){
-                                    $('<a>').addClass('text-muted')
-                                        .css('margin-left','15px')
+                                    $('<a>').addClass('text-muted kaccion')
                                         .attr('title','Editar')
                                         .attr('href','JavaScript:void(0);')
                                         .html('<i class="fa ' + dimension + ' fa-pencil"></i>')
@@ -489,8 +487,7 @@
                                         }).appendTo(botones);
                                 }
                                 if(typeof kGrid.permisos['remover'] == 'function'){
-                                    $('<a>').addClass('text-muted')
-                                        .css('margin-left','15px')
+                                    $('<a>').addClass('text-muted kaccion')
                                         .attr('title','Remover')
                                         .attr('href','JavaScript:void(0);')
                                         .html('<i class="fa ' + dimension + ' fa-times"></i>')
@@ -505,8 +502,7 @@
                             } else{                                    
                                 if(typeof kGrid.permisos['activar'] == 'function'){
                                     formGroup.addClass('has-error');
-                                    $('<a>').addClass('text-muted')
-                                        .css('margin-left','15px')
+                                    $('<a>').addClass('text-muted kaccion')
                                         .attr('title','Reactivar')
                                         .attr('href','JavaScript:void(0);')
                                         .html('<i class="fa ' + dimension + ' fa-check"></i>')
@@ -522,8 +518,7 @@
                             $.each(kGrid.botones,function(b,boton){
                                 if(typeof boton.mostrar != 'function' || boton.mostrar.call(this,item)){
                                     var btn = $('<a>').attr('title',boton.comentario)
-                                        .addClass('text-muted')
-                                        .css('margin-left','15px')
+                                        .addClass('text-muted kaccion')
                                         .attr('href', (boton.enlace!=undefined)? boton.enlace : 'Javascript:void(0);')
                                         .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
                                         .hover( function(){ $(this).removeClass('text-muted') }, 
@@ -560,25 +555,31 @@
                                     $(item).attr('checked','checked');
                                 }
                                 $(item).change(function(){
-                                    kGrid.cambiarSeleccion($(item).data('pk'),$(item).is(':checked'));
+                                    kGrid.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
                                 });
                             });
 
                         if(kGrid.tarjetas){
                             var lado = 0;
-                            grilla.find('.score').each(function(s,score){
+                            grilla.find('.kscore').each(function(s,score){
                                 if(s==0){
-                                    lado = $(score).parent().parent().parent().height();
+                                    lado = parseInt(grilla.find('.kbtn').first().height()) * 0.8;
                                 }
                                 $(score).css('width',lado);
                                 $(score).css('height',lado);
                             });
                             
-                            grilla.find('.acciones').each(function(a,accion){
-                                var top = ($(accion).parent().parent().height() 
-                                    - $(accion).height())/2
+                            grilla.find('.kacciones,.kscores').each(function(e,elemento){
+                                var top = $(elemento).parent().parent().height() 
+                                    - $(elemento).height();
+                                var siguiente = $(elemento).next();
+                                if(siguiente.hasClass('kscores') && !siguiente.is(':empty')){
+                                    $(elemento).css('font-size','0.5em');
+                                }else{
+                                    top = top/2;
+                                }
                                 if(top > 0){
-                                    $(accion).css('padding-top',top);
+                                    $(elemento).css('padding-top',top);
                                 }
                             });
                         }
@@ -599,15 +600,15 @@
                         
                     }
             
-                    if(typeof kGrid.loadComplete == 'function'){
-                        kGrid.loadComplete.call(this,retorno);
+                    if(typeof kGrid.load_complete == 'function'){
+                        kGrid.load_complete.call(this,retorno);
                     }
                 },
                 async: false
             });
         },
         
-        cargarPaginador : function(){
+        cargar_paginador : function(){
             var kGrid = this;    
             if(!$(kGrid.paginador).length){
                 return;
@@ -635,9 +636,7 @@
                     $('#'+kGrid.div.id).kGrid('pagina','anterior');
                 });
                 
-          var centro = $('<div>').addClass('btn btn-default')
-                .css('overflow','hidden')
-                .css('padding-top','2px')
+          var centro = $('<div>').addClass('btn btn-default kpagina')
                 .css('height',$('#'+pk+'pagina_anterior').outerHeight())
                 .appendTo(contenedor);
                 
@@ -646,8 +645,6 @@
             .attr('type','text')
             .addClass('pagina')
             .css('width',$('#'+pk+'pagina_anterior').outerWidth())
-            .css('margin','0 5px')
-            .css('text-align','center')
             .appendTo(centro)
             .keyup(function(e){
                 if(e.keyCode == 13){
@@ -686,10 +683,87 @@
                 });
         },
 
-        cambiarSeleccion: function(codigo,estado){
+        cargar_estilos: function(){
+            if($('#kgrid_estilos').length){
+                return;
+            }
+            var reglas = {
+                '.kgrid .kbtn': 
+                        [
+                            'cursor: pointer'
+                        ],
+                '.kgrid .kbtn:hover':
+                        [
+                            'background: #ECECF0',
+                            'border: 1px solid #cacaca'
+                        ],
+                '.kgrid h2':
+                        [
+                            'padding-bottom: 10px'
+                        ],
+                '.kgrid .kscore':
+                        [
+                            'width: 0',
+                            'height: 0',
+                            'border: 1px solid #999999',
+                            'background: #ECECF0',
+                            'font-size: 1.7em',
+                            'margin-left: 10px',
+                            'overflow: hidden',
+                            'border-radius: 50%'
+                        ],
+                '.kgrid .kscore p':
+                        [
+                            'margin-top: 25%'
+                        ],
+                '.kgrid .kscore small':
+                        [
+                            'font-size: 0.5em'
+                        ],
+                '.kgrid .klabel':
+                        [
+                            'margin-top: 20px'
+                        ],
+                '.kgrid .kaccion':
+                        [
+                            'margin-left: 15px'
+                        ],
+                '.kgrid .kpagina':
+                        [
+                            'overflow: hidden',
+                            'padding-top: 2px'
+                        ],
+                '.kgrid .kpagina input':
+                        [
+                            'margin: 0 5px',
+                            'text-align: center'
+                        ]
+                }
+
+            var estilo = '';
+            $.each(reglas,function(elemento,regla){
+                estilo += elemento+'{';
+                $.each(regla,function(l,linea){
+                    estilo += linea + ';';
+                });
+                estilo += '}';
+            });
+
+            var primer_estilo = $('head').find('link,style').first();
+            var estilos_k = $('<style>').attr('id','kgrid_estilos')
+                .html(estilo);
+
+            if(primer_estilo.length){
+                primer_estilo.before(estilos_k);
+            }else{
+                estilos_k.prependTo('head');
+            }
+        },
+
+        cambiar_seleccion: function(codigo,estado){
             var kGrid = this;
             kGrid.seleccionados[codigo] = estado;
-            kGrid.refrescarSeleccionados();
+            kGrid.refrescar_seleccionados();
         },
 
         seleccionar: function(seleccionados){
@@ -706,10 +780,10 @@
                 }
             });
 
-            kGrid.refrescarSeleccionados();
+            kGrid.refrescar_seleccionados();
         },
 
-        refrescarSeleccionados: function(){
+        refrescar_seleccionados: function(){
             var kGrid = this;
             var seleccionados = [];
             $.each(kGrid.seleccionados,function(codigo,estado){

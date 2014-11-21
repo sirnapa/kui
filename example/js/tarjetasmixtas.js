@@ -1,4 +1,4 @@
-$('#tarjetasconscores').kGrid({
+$('#tarjetasmixtas').kGrid({
     url : 'js/datos.json',
     id : 'pkEncuesta',
     tarjetas: true,
@@ -40,6 +40,11 @@ $('#tarjetasconscores').kGrid({
                     return true;
             }
             return false;
+    },
+    permisos: {
+        remover: remover,
+        activar: activar,
+        editar: editar
     },
     onclick: onclick
 });

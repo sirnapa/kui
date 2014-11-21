@@ -8,7 +8,8 @@ $(document).ready(function () {
     agregarGrilla('simple','Simple');
     agregarGrilla('seleccionable','Grilla seleccionable');
     agregarGrilla('tarjetas','Tarjetas');
-    //agregarGrilla('tarjetasconscores','Con score');
+    agregarGrilla('tarjetasconscores','Tarjetas con score');
+    agregarGrilla('tarjetasmixtas','Tarjetas mixtas');
 });
 
 function cambioEstilo(btn){
