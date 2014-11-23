@@ -14,28 +14,64 @@
     <link href="../assets/css/bootstrap-theme.css" rel="stylesheet">
     <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
 
+    <style>
+    	.seccion{
+    		padding: 70px 0 20px;
+    		border-bottom: 1px solid #eee;
+    	}
+    </style>
   </head>
 
   <body>
+
+  	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../example">kGrid <small>Documentación</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <div id="navbar-menu">
+            <ul id="menu-secciones" class="nav navbar-nav">
+            </ul>
+          </div>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="../example">
+                <i class="fa fa-desktop"></i> Ejemplos
+              </a>
+            </li>
+            <li>
+              <a href="../src/kGrid.min.js">
+                <i class="fa fa-arrow-down"></i> Descargar
+              </a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
     <div class="container">
 
-		<div class="page-header">
+		<div id="informacion" class="seccion">
 			<h1>kGrid</h1>
 			<p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
 		</div>
 
-		<div class="pull-right">
-	          <a href="../example" class="btn btn-primary"><i class="fa fa-file-o"></i> Ejemplos</a>
-      	</div>
-
+      	<div id="requerimientos" class="seccion">
       	<h3>Requerimientos</h3>
 		<ul>
 			<li>Jquery 1.11.1 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
 			<li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
 			<li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
 		</ul>
+		</div>
 
-		<hr>
 		<h3>Parametros de .kGrid()</h3>
 
 		<!-- ========================================================= -->
@@ -357,6 +393,14 @@
     <script src="../assets/js/jquery-1.11.1.min.js"></script>
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="../src/kGrid.js"></script>
-
+    <script>
+    	$('.seccion').each(function(s,seccion){
+        	$('<a>').attr('href','#'+$(seccion).attr('id'))
+        		.html($(seccion).find('h1,h2,h3').first().html())
+        		.appendTo(
+        			$('<li>').appendTo('#menu-secciones')
+    			);
+    	});
+    </script>
   </body>
 </html>

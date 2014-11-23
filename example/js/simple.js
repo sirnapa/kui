@@ -40,6 +40,5 @@ $('#simple').kGrid({
         activar: activar,
         editar: editar
     },
-    ondblclick: true,
-    seleccionable: true
+    ondblclick: true
 });
