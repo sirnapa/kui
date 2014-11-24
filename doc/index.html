@@ -11,13 +11,15 @@
     <title>kGrid for Bootstrap</title>
 
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/css/bootstrap-theme.css" rel="stylesheet">
     <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
 
     <style>
     	.seccion{
     		padding: 70px 0 20px;
     		border-bottom: 1px solid #eee;
+    	}
+    	.subseccion{
+    		padding-top: 70px;
     	}
     </style>
   </head>
@@ -58,13 +60,47 @@
 
     <div class="container">
 
+		<!-- ========================================================= -->
 		<div id="informacion" class="seccion">
 			<h1>kGrid</h1>
 			<p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
-		</div>
+			<p>
+				El proyecto kGrid es una librería javascript que responde a las necesidades más comunes de listado, edición y selección.
+				Busca ser un reeamplazo para <a href="http://www.trirand.com/blog/" target="_blank">Jqgrid <i class="fa fa-external-link"></i></a> en los proyectos desarrollados con Bootstrap, en consecuencia el formato requerido para los servicios es el mismo que el de dicho plugin.
+			</p>
+			<p>
+				Se centra en las opciones de edición rápida y las tarjetas de información. En esta etapa de desarrollo ya cuenta con soporte parcial para <em>responsive design</em>, especialmente en el tipo grilla.
+			</p>
+			<br>
 
+			<h2>Datos</h2>
+			<div class="table-responsive">
+			  <table class="table table-bordered">
+			  	<tr>
+			  		<td class="text-right">Autor</td>
+			  		<td>Nelson Páez <a href="http://equipo.dixit.com.py/nelson" target="_blank"><i class="fa fa-external-link"></i></a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Contacto laboral</td>
+			  		<td><a href="mailto:nelson.paez@konecta.com.py">nelson.paez@konecta.com.py</a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Contacto personal</td>
+			  		<td><a href="mailto:nelpa90@gmail.com">nelpa90@gmail.com</a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Departamento</td>
+			  		<td>Aplicaciones móviles.</td>
+			  	</tr>
+			  </table>
+			</div>
+
+		</div>
+		<!-- ========================================================= -->
+
+		<!-- ========================================================= -->
       	<div id="requerimientos" class="seccion">
-      	<h3>Requerimientos</h3>
+      	<h2>Requerimientos</h2>
 		<ul>
 			<li>Jquery 1.11.1 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
 			<li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
@@ -72,138 +108,163 @@
 		</ul>
 		</div>
 
-		<h3>Parametros de .kGrid()</h3>
-
 		<!-- ========================================================= -->
+      	<div id="parametros" class="seccion">
+			<h2>Parámetros</h2>
 
-		<h4>Requeridos</h4>
+			<div id="requeridos" class="subseccion">
+				<h3>Requeridos</h3>
+				<div class="table-responsive">
+				  <table class="table table-bordered">
+				  	<thead>
+				  		<tr>
+				  			<th>Campo</th>
+				  			<th>Descripción</th>
+					  		<th>Valor</th>
+				  		</tr>
+			  		</thead>
+				  	<tbody>
+					  	<tr>
+							<td>
+								url
+							</td>
+							<td>
+								URL del servicio para listar objetos de la clase.
+							</td>
+							<td>
+								<em>string</em>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				url
-				</strong>
-			</div>
-			<div class="col-md-9">
-				URL para la peticion POST del listar objetos de la clase.
-			</div>
-		</div>
+						<tr>
+							<td>
+								id
+							</td>
+							<td>
+								Nombre del atributo que será considerado como identificador único o <em>Primary Key</em> de la clase.
+							</td>
+							<td>
+								<em>string</em>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				id
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Nombre del atributo que sera considerado como 
-  				identificador unico o Primary Key de la clase.
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				campos
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Array de campos de la entidad, con el siguiente formato:
-				<pre>
+						<tr>
+							<td>
+								campos
+							</td>
+							<td>
+								Array de campos de la entidad.
+							</td>
+							<td>
+								<pre>
 [{
    nombre: '',          		// (requerido) nombre del atributo
    titulo: '',
-   tipo: '',            		// Tipo de campo: encabezado, destacado o score
-   ancho: '',			// Solo se utiliza en kGrid Simple.
+   tipo: '',            		// Solo para tipo tarjeta, opciones: encabezado, destacado o score
+   ancho: '',			// No se utiliza en el tipo tarjeta
    atributos: {			// Atributos para el input 
        atributo1: 'valor',
        atributo2: 'valor',...
    },
-   formato: function(){}		// Función para mostrar algo distinto a lo recibido
-},...]
-				</pre>
+   formato: function(){}		// Función para mostrar algo distinto a lo recibido del servicio
+},...]</pre>
+							</td>
+						</tr>
+					</tbody>
+				  </table>
+				</div>
 			</div>
-		</div>
 
-		<!-- ========================================================= -->
-		<h4>Opcionales</h4>
+			<div id="opcionales" class="subseccion">
+				<h3>Opcionales</h3>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					tarjetas
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Presentación de los datos con apariencia de tarjetas. Por defecto es <strong>false</strong>.
-			</div>
-		</div>
+				<div class="table-responsive">
+				  <table class="table table-bordered">
+				  	<thead>
+				  		<tr>
+				  			<th>Campo</th>
+				  			<th>Descripción</th>
+					  		<th>Valor por defecto</th>
+				  		</tr>
+			  		</thead>
+				  	<tbody>
+						<tr>
+							<td>
+								tarjetas
+							</td>
+							<td>
+								Presentación de los datos con apariencia de tarjetas. 
+							</td>
+							<td>
+								<span class="bg-danger">false</span>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					ajax
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Tipo de peticion, por defecto es GET.
-			</div>
-		</div>
+						<tr>
+							<td>
+								ajax
+							</td>
+							<td>
+								Tipo de petición.
+							</td>
+							<td>
+								"GET"
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					data
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Parametros a ser enviados en la petición AJAX. Sus valores por defecto son:
-				<pre>
+						<tr id="parametro-data">
+							<td>
+								data
+							</td>
+							<td>
+								Parámetros a ser enviados en la petición AJAX.
+							</td>
+							<td>
+								<pre>
 {
     _search:false,
     filters:null,
     page:1,
-    rows: 10 // Cuando tarjeta es false rows: 10, caso contratio es 5. 
+    rows: 10 // Cuando tarjeta es false rows: 10, caso contrario es 5. 
     sidx:dato.id,
     sord:'asc', 
     todos:false
-}
-				</pre>
-			</div>
-		</div>
+}</pre>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					permisos
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Funciones que se llaman para editar, activar y remover objetos.
-  				Sus valores por defecto son:
-  				<pre>
+						<tr>
+							<td>
+								permisos
+							</td>
+							<td>
+								Funciones que se llaman para editar, activar y remover objetos.
+				  			</td>
+				  			<td>
+				  				<pre>
 {
    editar: null,
    activar: null,
    remover: null
-}
-				</pre>
-			</div>
-		</div>
+}</pre>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					botones
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Lista de objetos para incluir botones adicionales para cada row, formato:
-				<pre>
+						<tr>
+							<td>
+								botones
+							</td>
+							<td>
+								Lista de objetos para incluir botones adicionales para cada entrada.
+							</td>
+							<td>
+								Formato:
+								<br><br>
+								<pre>
 [
 	{
 		comentario: '',                         // (requerido) Texto para el tooltip
-		icono: '',				// (requerido) tipo de bootstrap icon
+		icono: '',				// (requerido) ícono a mostar
 		enlace: '',				// href o enlace del <em>a</em>, por defecto Javascript:void(0);
 		mostrar: function(item){},		// funcion que define cuando muestrar el boton
 		onclick: function(item){},		// funcion onclick, recibe como argumento al item
@@ -212,157 +273,162 @@
 			atributo2: 'valor',...
 		}
    	},...
-]
-	           </pre>
-			</div>
-		</div>
+]</pre>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					estado
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Funcion que debe retornar true cuando el objeto sera mostrado como activo,
-  					y false cuando sera identificado como un objeto removido.
-			</div>
-		</div>
+						<tr>
+							<td>
+								estado
+							</td>
+							<td>
+								Función que debe retornar <span class="bg-success">true</span> cuando se mostrará el objeto como activo,
+				  					y <span class="bg-danger">false</span> cuando será identificado como un objeto deshabilitado.
+							</td>
+							<td>
+								<span class="bg-danger">function(){return false};</span>
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					retorno
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Nombre de los campo en la respuesta del POST
-  				Sus valores por defecto son:
-  				<pre>
+						<tr>
+							<td>
+								retorno
+							</td>
+							<td>
+								Nombre de los campos en la respuesta del AJAX
+				  			</td>
+				  			<td>
+				  				<pre>
 {
    lista: 'lista',                     // Lista de objetos
    pagina: 'pagina',                   // Número de página actual
    totalPaginas: 'totalPaginas',       // Total de páginas
    totalDatos: 'totalDatos',           // Total de objetos en todas las páginas juntas 
-} 
-  				</pre>
+}</pre>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								seleccionable
+							</td>
+							<td>
+								Habilitar la casilla de selección múltiple en la primera columna. 
+								Solo funciona en el formato simple.
+							</td>
+							<td>
+								<span class="bg-danger">false</span>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								seleccionados
+							</td>
+							<td colspan="2">
+								Lista de elementos marcados como <em>pre-seleccionados</em>.
+								Solo funciona en el formato simple y cuando seleccionable=true.
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								loadComplete
+							</td>
+							<td colspan="2">
+								Función adicional que se llama al terminar la carga de los objetos.
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								paginador
+							</td>
+							<td colspan="2">
+								id del div que se utilizará como paginador. En caso de omisión kGrid crea un div paginador debajo de la grilla.
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								onclick
+							</td>
+							<td colspan="2">
+								Se aplica cuando se hace click en la entrada. Si es un string se asume que es una url, también puede ser una función
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								ondblclick
+							</td>
+							<td colspan="2">
+								Función que se aplica cuando se hace doble click en la entrada. 
+								Sólo puede ser utilizado cuando no hay la orden "onclick".
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
 			</div>
 		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					loadComplete
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Funcion adicional que se llama al terminar la carga de los objetos.
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					paginador
-				</strong>
-			</div>
-			<div class="col-md-9">
-				id del div que se utilizará como paginador. 
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					onclick
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Se aplica cuando se hace click en el row
-               si es un string se asume que es una url,
-               también puede ser una función
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					ondblclick
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Función que se aplica cuando se hace doble click en el row. 
-				Sólo puede ser utilizado cuando no hay la orden "onclick".
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					seleccionable
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Habilitar la casilla de selección múltiple en la primera columna. 
-				Solo funciona en el formato simple y su valor por defecto es: false.
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-					seleccionados
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Lista de elementos marcados como <em>pre-seleccionados</em>.
-				Solo funciona en el formato simple y cuando seleccionable=true.
-			</div>
-		</div>
-		
-		<hr>
-		<h3>Funciones de .kGrid()</h3>
-
 		<!-- ========================================================= -->
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				.kGrid(recargar,data)
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Recargar la grilla haciendo una petición AJAX con los parametros de <em>data</em>. El argumento data es opcional, en caso de omisión se mantiene el campo <em>data</em> configurado previamente en kGrid.
-			</div>
-		</div>
+		<!-- ========================================================= -->
+		<div id="funciones" class="seccion">
+			<h2>Funciones</h2>
+			<p>Formato de funciones: $('#mi-div').kGrid('<strong class="text-danger">nombre de la función</strong>','<strong class="text-danger">objeto parámetro</strong>')</p>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				.kGrid(pagina,dato)
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Cargar a la grilla los datos de la página especificada. Dato es requerido y puede tener cualquierda de los siguientes valores:
-				<ul>
-					<li>primera</li>
-					<li>anterior</li>
-					<li>siguiente</li>
-					<li>ultima</li>
-					<li>El número de la página específica que desea cargarse.</li>
-				</ul>
-			</div>
-		</div>
+			<div class="table-responsive">
+				  <table class="table table-bordered">
+				  	<thead>
+				  		<tr>
+				  			<th>Función</th>
+				  			<th>Descripción</th>
+					  		<th>Formato del parámetro</th>
+				  		</tr>
+			  		</thead>
+				  	<tbody>
+						<tr>
+							<td>
+								recargar
+							</td>
+							<td>
+								Recargar la grilla haciendo una petición AJAX con los parametros de <em>data</em>.
+							</td>
+							<td>
+								El parámetro reemplaza la configuración del <a href="#parametro-data">data <i class="fa fa-external-link"></i></a>. Es opcional y en caso de omisión se mantiene la configuración previa.
+							</td>
+						</tr>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				.kGrid(buscar,clave)
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Filtrar los resultados bajo cierto criterio o <em>clave</em> de búsqueda. La clave debe tener el siguiente formato:
-				<pre>
+						<tr>
+							<td>
+								pagina
+							</td>
+							<td>
+								Cargar a la grilla los datos de la página especificada.
+							</td>
+							<td>
+								El parámetro es requerido y puede tener uno de los siguientes valores:
+								<ul>
+									<li>"primera"</li>
+									<li>"anterior"</li>
+									<li>"siguiente"</li>
+									<li>"ultima"</li>
+									<li>El número de la página específica que desea cargarse.</li>
+								</ul>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								buscar
+							</td>
+							<td>
+								Filtrar los resultados bajo cierto criterio o <em>clave</em> de búsqueda.
+							</td>
+							<td>
+								<pre>
 {
     data: 'clave de busqueda global (requerido)',
     reglas: [
@@ -371,35 +437,134 @@
              op: 'opcional, por defecto cn'
          ]
     groupOp: 'opcional, por defecto es AND'
+}</pre>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								seleccionar
+							</td>
+							<td>
+								Seleccionar todas las entradas indicadas en el parámetro, sólo se puede utilizar cuando está habilitada la opción <strong>seleccionable</strong>.
+							</td>
+							<td>
+								Array con los <em>id</em>s de las entradas a seleccionar.
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								info
+							</td>
+							<td>
+								Imprime información de la instacia actual de kGrid.
+							</td>
+							<td>
+								No requiere parámetro alguno.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+		<!-- ========================================================= -->
+
+		<!-- ========================================================= -->
+		<div id="personalizacion" class="seccion">
+			<h2>Personalización</h2><br>
+
+			<h3>Temas</h3>
+			<p>
+				Para personalizar la apariencia de kGrid se cuenta con soporte para temas.
+				Para aplicar un tema en particular sólo se debe importar una hoja de estilos (css) en el <span class="text-danger">&lt;head&gt;</span>.
+			</p><br>
+
+			<h4>Crear tu propio tema</h4>
+			Para crear tu propio tema solo debes reescribir el código del tema por defecto.<br><br>
+			<pre>
+.kgrid .kbtn {
+	cursor:pointer;
 }
-				</pre>
-			</div>
-		</div>
 
-		<div class="row">
-			<div class="col-md-3 text-right">
-				<strong>
-				.kGrid(seleccionar,array)
-				</strong>
-			</div>
-			<div class="col-md-9">
-				Seleccionar todas las filas indicadas en el array de <em>id</em>s, <span class="text-danger">sólo se puede utilizar cuando está habilitada la opción <strong>seleccionable</strong></span>.
-			</div>
-		</div>
+.kgrid .kbtn:hover {
+	background:#ECECF0;
+	border:1px solid #cacaca;
+}
 
-		<br>
- </div> <!-- /container -->
+.kgrid h2 {
+	padding-bottom:10px;
+}
+
+.kgrid .kscore {
+	width:0;
+	height:0;
+	border:1px solid #999;
+	background:#ECECF0;
+	font-size:1.7em;
+	margin-left:10px;
+	overflow:hidden;
+	border-radius:50%;
+}
+
+.kgrid .kscore p {
+	margin-top:25%;
+}
+
+.kgrid .kscore small {
+	font-size:.5em;
+}
+
+.kgrid .klabel {
+	margin-top:20px;
+}
+
+.kgrid .kaccion {
+	margin-left:15px;
+}
+
+.kgrid .kpagina {
+	overflow:hidden;
+	padding-top:2px;
+}
+
+.kgrid .kpagina input {
+	text-align:center;
+	margin:0 5px;
+}			</pre>
+		</div>
+		<!-- ========================================================= -->
+ </div>
 
     <script src="../assets/js/jquery-1.11.1.min.js"></script>
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="../src/kGrid.js"></script>
     <script>
     	$('.seccion').each(function(s,seccion){
-        	$('<a>').attr('href','#'+$(seccion).attr('id'))
-        		.html($(seccion).find('h1,h2,h3').first().html())
-        		.appendTo(
-        			$('<li>').appendTo('#menu-secciones')
-    			);
+    		var li = $('<li>').appendTo('#menu-secciones');
+    		var a = $('<a>').attr('href','#'+$(seccion).attr('id'))
+        		.html($(seccion).find('h2,h3,h4').first().html())
+        		.appendTo(li);
+			var subsecciones = $(seccion).find('.subseccion');
+			if(subsecciones.length){
+				li.addClass('dropdown');
+				a.addClass('dropdown-toggle')
+					.attr('href','#')
+					.attr('data-toggle','dropdown')
+					.attr('role','button')
+					.attr('aria-expanded','true');
+				$('<span>').addClass('caret')
+					.appendTo(a);
+				var ul = $('<ul>').addClass('dropdown-menu')
+					.attr('role','menu')
+					.appendTo(li);
+				$.each(subsecciones,function(ss,subseccion){
+					$('<a>').attr('href','#'+$(subseccion).attr('id'))
+		        		.html($(subseccion).find('h2,h3,h4').first().html())
+		        		.appendTo($('<li>').appendTo(ul));
+				})
+			}
     	});
     </script>
   </body>

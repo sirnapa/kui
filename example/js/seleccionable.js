@@ -6,7 +6,6 @@ $('#seleccionable').kGrid({
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
-            tipo: 'encabezado',
             ancho: 4
     },{
             nombre : 'fechaAlta',
@@ -20,7 +19,6 @@ $('#seleccionable').kGrid({
             formato: function(campo,row){
                 return campo + ' al ' + row['vigenciaFin']
             },
-            tipo: 'destacado',
             atributos: {'readonly':false}
     },{
             nombre : 'anonimo',
