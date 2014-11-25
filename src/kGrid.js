@@ -626,7 +626,7 @@
 
                         if(kGrid.tarjetas){
                             grilla.find('.kscore').each(function(s,score){
-                                var lado = parseInt($(score).parent().parent().parent().height()) * 0.95;
+                                var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
                                 $(score).css('width',lado);
                                 $(score).css('height',lado);
                             });
