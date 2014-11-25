@@ -323,12 +323,12 @@
                 success: function(retorno){                                    
                     if (!retorno.error) {
                         var grilla = $('<div>').addClass('kGrid');
-                        var lista;
+                        var lista = retorno.respuesta.datos;
+                        var datos = {};
 
                         kGrid.totalDatos = retorno.respuesta.totalDatos;
                         kGrid.pagina = retorno.respuesta.pagina;
                         kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
-                        lista = retorno.respuesta.datos;
 
                         var setearValor = kGrid.tarjetas? function(columna,valor){
                                 columna.html(valor);
@@ -338,6 +338,7 @@
                         
                         $.each(lista,function(i,item){
                             var pk = 'kGrid_' + kGrid.div.id + '_' + item[kGrid.id];
+                            datos[item[kGrid.id]] = item;
                             
                             var formGroup = $('<div>').attr('id',pk)
                                 .attr('data-pk',item[kGrid.id])
@@ -582,6 +583,8 @@
                                 }
                             });
                         }
+
+                        $(kGrid.div).data('datos',datos);
                                                 
                         $('#kGrid_' + kGrid.div.id + '_pagina')
                             .val(kGrid.pagina)

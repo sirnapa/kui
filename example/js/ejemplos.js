@@ -18,19 +18,19 @@ var estilos = {
 }
 
 $(document).ready(function () {
-    agregarGrilla('simple','Simple');
-    agregarGrilla('seleccionable','Seleccionable');
-    agregarGrilla('tarjetas','Tarjetas');
-    agregarGrilla('tarjetasconscores','Tarjetas con score');
-    agregarGrilla('tarjetasmixtas','Tarjetas mixtas');
+    agregar_grilla('simple','Simple');
+    agregar_grilla('seleccionable','Seleccionable');
+    agregar_grilla('tarjetas','Tarjetas');
+    agregar_grilla('tarjetasconscores','Tarjetas con score');
+    agregar_grilla('tarjetasmixtas','Tarjetas mixtas');
 });
 
-function cambioEstilo(btn){
+function cambio_estilo(btn){
     $('#tema').html($(btn).html());
     $('#hojaEstilo').attr('href','../assets/css/'+estilos[$(btn).html()]+'.css');
 }
 
-function agregarGrilla(id,label){
+function agregar_grilla(id,label){
     var wrapper = $('<div>').attr('id','div-'+id)
         .css('padding-top',70)
         .appendTo('#grillas');
