@@ -10,3 +10,7 @@ function editar() {
 function onclick(item){
     alert('on click!');
 }
+function guardar(item){
+	console.log(item);
+	alert('Guardar');
+}

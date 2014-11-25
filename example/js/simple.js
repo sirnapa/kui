@@ -34,9 +34,10 @@ $('#simple').kGrid({
             return false;
     },
     permisos: {
-        remover: remover,
+        remover: true,
         activar: activar,
-        editar: editar
+        editar: true,
+        guardar: guardar
     },
     ondblclick: true
 });

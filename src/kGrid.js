@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.2
+    Versión: 2.1.5
 */
 (function () {
     $.kGrids = {
@@ -162,6 +162,7 @@
 
         var permisos_finales = {
             editar:null,
+            guardar: null,
             activar:null,
             remover:null
         };
@@ -361,7 +362,6 @@
                                     (activo && typeof kGrid.permisos['editar'] == 'function')){
                                     var ondblclick = typeof kGrid.ondblclick == 'function'?
                                         kGrid.ondblclick : function(){
-                                        	// TODO edicion inline
                                             kGrid.permisos['editar'].call(this,item);
                                         };
                                     formGroup.dblclick(function(){
@@ -422,6 +422,7 @@
                                 var input = kGrid.tarjetas? columna : 
                                     $('<input>').addClass('form-control')
                                         .attr('readonly',true)
+                                        .attr('name',campo.nombre)
                                         .appendTo(columna);
 
                                 setearValor(input,
@@ -442,21 +443,11 @@
                                 }                       
 	                            
                                 if(campo.atributos!=undefined){
-                                    if(!kGrid.tarjetas && campo.atributos['type']=='checkbox'){
-                                        if(input.val()=='true') {
-                                            input.attr('checked','checked');
-                                        }
-                                        input.attr('disabled','disabled')
-                                            .removeClass('form-control')
-                                            .attr('data-pk',item[kGrid.id])
-                                            .dblclick(function(e){
-                                                e.stopPropagation();
-                                            });
-                                        input.parent().addClass('text-center');
-                                    }
                                     $.each(campo.atributos,function(atributo,valor){
                                         input.attr(atributo,valor);
                                     });
+
+                                    input.attr('data-disabled',$(input).is(':disabled'));
                                     
                                     var campos_especiales = ['disabled','readonly'];
                                     $.each(campos_especiales,function(e,especial){
@@ -465,47 +456,115 @@
                                         }
                                     });
 
+                                    if(!kGrid.tarjetas && campo.atributos['type']=='checkbox'){
+                                        if(input.val()=='true') {
+                                            input.attr('checked','checked');
+                                        }
+
+                                        input.removeClass('form-control')
+                                            .attr('data-pk',item[kGrid.id])
+                                            .dblclick(function(e){
+                                                e.stopPropagation();
+                                            });
+
+                                        if(input.attr('readonly')){
+                                            input.attr('disabled','disabled');
+                                        }
+                                        
+                                        input.parent().addClass('text-center');
+                                    }
                                 }                              
                             });                            
                                                             
                             var dimension = kGrid.tarjetas? 'fa-3x' : 'fa-lg';
 
-                            if(activo){  
-                                if(typeof kGrid.permisos['editar'] == 'function'){
-                                    $('<a>').addClass('text-muted kaccion')
-                                        .attr('title','Editar')
+                            var crear_boton = function(titulo,icono,hover){
+                                    var boton = $('<a>').addClass('text-muted kaccion')
+                                        .attr('title',titulo)
                                         .attr('href','JavaScript:void(0);')
-                                        .html('<i class="fa ' + dimension + ' fa-pencil"></i>')
-                                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-primary')}, 
-                                                function(){ $(this).addClass('text-muted').removeClass('text-primary')})
-                                        .click(function(e){
+                                        .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
+                                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover)}, 
+                                                function(){ $(this).addClass('text-muted').removeClass('text-'+hover)});
+                                    return boton;
+                                }
+
+                            if(activo){  
+                                if(kGrid.permisos['editar']){
+                                    var btn_editar = crear_boton('Editar','pencil','primary');
+
+                                    if(typeof kGrid.permisos['editar'] == 'function'){
+                                        btn_editar.click(function(e){
                                             e.stopPropagation();
                                             kGrid.permisos['editar'].call(this,item);
+                                        });
+                                    }else if(typeof kGrid.permisos['guardar'] == 'function'){
+
+                                        var btn_guardar = crear_boton('Guardar','save','primary');
+                                        btn_guardar.hide().click(function(e){
+                                            e.stopPropagation();
+                                            var cambios = {};
+
+                                            // Deshabilitar edición
+                                            $('#'+pk).find('input[data-editando]').each(function(x,input){
+                                                $(input).attr('readonly',true).removeAttr('data-editando');
+                                                if($(input).attr('type')=='checkbox'){
+                                                    $(input).attr('disabled',true);
+                                                    cambios[$(input).attr('name')] = $(input).is(':checked');
+                                                }else{
+                                                    cambios[$(input).attr('name')] = $(input).val();
+                                                }
+                                            });
+
+                                            // Cambio de botones
+                                            btn_guardar.hide();
+                                            btn_editar.fadeIn();
+                                            kGrid.permisos['guardar'].call(this,$.extend(item,cambios));
                                         }).appendTo(botones);
+
+                                        btn_editar.click(function(e){
+                                            e.stopPropagation();
+                                            
+                                            // Habilitar edición inline
+                                             $('#'+pk).find('input[readonly]').each(function(x,input){
+                                                if($(input).attr('data-disabled')!='true'){
+                                                    $(input).removeAttr('readonly')
+                                                        .removeAttr('disabled')
+                                                        .attr('data-editando',true);
+                                                }
+                                            });
+
+                                            // Cambio de botones        
+                                            btn_editar.hide();
+                                            btn_guardar.fadeIn();
+                                        });
+                                    }
+
+                                    btn_editar.appendTo(botones);
                                 }
-                                if(typeof kGrid.permisos['remover'] == 'function'){
-                                    $('<a>').addClass('text-muted kaccion')
-                                        .attr('title','Remover')
-                                        .attr('href','JavaScript:void(0);')
-                                        .html('<i class="fa ' + dimension + ' fa-times"></i>')
-                                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-danger') }, 
-                                                function(){ $(this).addClass('text-muted').removeClass('text-danger')})
-                                        .click(function(e){
+                                if(kGrid.permisos['remover']){
+                                    var btn_remover = crear_boton('Remover','times','danger');
+
+                                    if(typeof kGrid.permisos['remover'] == 'function'){
+                                        btn_remover.click(function(e){
                                             e.stopPropagation();
                                             kGrid.permisos['remover'].call(this,item);
-                                        }).appendTo(botones);
+                                        });
+                                    }else{
+                                        btn_remover.click(function(e){
+                                            e.stopPropagation();
+                                            $('#'+pk).remove();
+                                        });
+                                    }
+
+                                    btn_remover.appendTo(botones);
                                 }
                                 
                             } else{                                    
                                 if(typeof kGrid.permisos['activar'] == 'function'){
                                     formGroup.addClass('has-error');
-                                    $('<a>').addClass('text-muted kaccion')
-                                        .attr('title','Reactivar')
-                                        .attr('href','JavaScript:void(0);')
-                                        .html('<i class="fa ' + dimension + ' fa-check"></i>')
-                                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-success') }, 
-                                                function(){ $(this).addClass('text-muted').removeClass('text-success')})
-                                        .click(function(e){
+                                    var btn_activar = crear_boton('Reactivar','check','success');
+
+                                    btn_activar.click(function(e){
                                             e.stopPropagation();
                                             kGrid.permisos['activar'].call(this,item);
                                         }).appendTo(botones);
@@ -557,11 +616,8 @@
                             });
 
                         if(kGrid.tarjetas){
-                            var lado = 0;
                             grilla.find('.kscore').each(function(s,score){
-                                if(s==0){
-                                    lado = parseInt(grilla.find('.kbtn').first().height()) * 0.8;
-                                }
+                                var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
                                 $(score).css('width',lado);
                                 $(score).css('height',lado);
                             });

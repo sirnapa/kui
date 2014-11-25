@@ -238,14 +238,20 @@
 								permisos
 							</td>
 							<td>
-								Funciones que se llaman para editar, activar y remover objetos.
+								Habilita las funciones de editar, activar y remover objetos.
+								Soporta dos valores posibles:
+								<ul>
+									<li><strong>Booleano</strong>: Habilita acciones predeterminadas para los permisos.</li>
+									<li><strong>Función</strong>: Habilita acciones personalizadas para los permisos.</li>
+								</ul>
 				  			</td>
 				  			<td>
 				  				<pre>
 {
-   editar: null,
-   activar: null,
-   remover: null
+   editar: null,  // Acción predeterminada: Habilitar la edición rápida "inline"
+   guardar: null, // Solo sirve cuando la acción editar inline está activada.
+   activar: null, // No tiene acción predeterminada
+   remover: null  // Acción predeterminada: Remueve el objeto solo de la vista actual (no persiste el cambio),
 }</pre>
 							</td>
 						</tr>
@@ -362,8 +368,13 @@
 								ondblclick
 							</td>
 							<td colspan="2">
-								Función que se aplica cuando se hace doble click en la entrada. 
+								Se aplica cuando se hace doble click en la entrada. 
 								Sólo puede ser utilizado cuando no hay la orden "onclick".
+								Puede tener uno de los siguientes valores:
+								<ul>
+									<li><strong>Booleano</strong>: Cuando es true, llama al permiso de "editar".</li>
+									<li><strong>Función</strong>: <span class="bg-danger">function(){ /* Acción personalizada aquí */ };</span></li>
+								</ul>
 							</td>
 						</tr>
 					</tbody>
