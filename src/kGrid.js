@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.0
+    Versión: 2.1.1
 */
 (function () {
     $.kGrids = {
@@ -173,16 +173,15 @@
             permisos_finales[key] = value;
         });
                 
-        var retorno_final = {
+        /*var retorno_final = {
             lista: 'lista',                    
             pagina: 'pagina',
-            totalPaginas: 'totalPaginas',
             totalDatos: 'totalDatos'
         }
         
         $.each(dato.retorno,function(key,value){
             retorno_final[key] = value;
-        });
+        });*/
 
         if(dato.seleccionable){
             // Agregar campo de selección al principio;
@@ -215,7 +214,7 @@
         this.permisos = permisos_finales;
         this.botones = dato.botones;
         this.estado = dato.estado;
-        this.retorno = retorno_final;
+        //this.retorno = retorno_final;
         this.load_complete = dato.loadComplete;
         this.paginador = dato.paginador;
         this.onclick = dato.onclick;
@@ -325,10 +324,10 @@
                     if (!retorno.error) {
                         var grilla = $('<div>').addClass('kGrid');
                         var lista;
-                        
-                        kGrid.pagina = retorno.respuesta.pagina;
-                        kGrid.totalPaginas = retorno.respuesta.totalPaginas;
+
                         kGrid.totalDatos = retorno.respuesta.totalDatos;
+                        kGrid.pagina = retorno.respuesta.pagina;
+                        kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
                         lista = retorno.respuesta.datos;
 
                         var setearValor = kGrid.tarjetas? function(columna,valor){

@@ -1,3 +1,11 @@
+var datos_json = JSON.stringify($.parseJSON($.ajax({
+      url:'js/datos.json',
+      success:function(data){
+        return data;
+      },
+      async: false
+    }).responseText),null,4);
+
 var estilos = {
     'Bootstrap' : 'bootstrap-theme',
     'Konecta'   : 'k',
@@ -30,6 +38,10 @@ function agregarGrilla(id,label){
         .addClass('nav nav-tabs')
         .appendTo(tabpanel);
 
+    var tabcontents = $('<div>').addClass('tab-content')
+        .appendTo(tabpanel);
+
+    // Pestaña de ejemplo
     $('<a>').attr('href','#ejemplo-'+id)
         .attr('aria-controls','ejemplo-'+id)
         .attr('role','tab')
@@ -41,19 +53,6 @@ function agregarGrilla(id,label){
                 .appendTo(tabs)
         );
 
-    $('<a>').attr('href','#codigo-'+id)
-        .attr('aria-controls','codigo-'+id)
-        .attr('role','tab')
-        .attr('data-toggle','tab')
-        .html('<i class="fa fa-code"></i>')
-        .appendTo(
-            $('<li>').attr('role','presentation').appendTo(tabs)
-        );
-
-    var tabcontents = $('<div>').addClass('tab-content')
-        .appendTo(tabpanel);
-
-    // Pestaña de ejemplo
     var ejemplo = $('<div>').attr('id','ejemplo-'+id)
         .attr('role','tabpanel')
         .addClass('tab-pane active')
@@ -64,6 +63,15 @@ function agregarGrilla(id,label){
    
 
     // Pestaña de código
+    $('<a>').attr('href','#codigo-'+id)
+        .attr('aria-controls','codigo-'+id)
+        .attr('role','tab')
+        .attr('data-toggle','tab')
+        .html('<i class="fa fa-code"></i>')
+        .appendTo(
+            $('<li>').attr('role','presentation').appendTo(tabs)
+        );
+
     var codigo = $('<div>').attr('id','codigo-'+id)
         .attr('role','tabpanel')
         .addClass('tab-pane')
@@ -76,6 +84,23 @@ function agregarGrilla(id,label){
         //$('<script>').html(retorno).appendTo('body');
     });
 
+    // Pestaña de datos
+    $('<a>').attr('href','#datos-'+id)
+        .attr('aria-controls','datos-'+id)
+        .attr('role','tab')
+        .attr('data-toggle','tab')
+        .html('<i class="fa fa-database"></i>')
+        .appendTo(
+            $('<li>').attr('role','presentation').appendTo(tabs)
+        );
+
+    var datos = $('<div>').attr('id','datos-'+id)
+        .attr('role','tabpanel')
+        .addClass('tab-pane')
+        .appendTo(tabcontents);
+    $('<pre>').html(datos_json)
+            .appendTo(datos);   
+
     // Menú y código requerido
      $('<a>').attr('href','#div-'+id)
         .html(label)
@@ -83,17 +108,4 @@ function agregarGrilla(id,label){
                 $('<li>').appendTo('#navbar-menu ul')
             );
 
-}
-
-function remover() {
-    alert('Remover');
-}
-function activar() {
-    alert('Activar');
-}
-function editar() {
-    alert('Editar');
-}
-function onclick(item){
-    alert('on click!');
 }

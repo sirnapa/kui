@@ -2,7 +2,6 @@
     "error": false,
     "respuesta": {
         "pagina": "1",
-        "totalPaginas": "1",
         "totalDatos": "5",
         "datos": [
             {
