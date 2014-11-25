@@ -1,3 +1,8 @@
+var funciones = '';
+$.get('js/funciones.js',{},function(retorno){
+    funciones = retorno;
+});
+
 var datos_json = JSON.stringify($.parseJSON($.ajax({
       url:'js/datos.json',
       success:function(data){
@@ -79,9 +84,8 @@ function agregarGrilla(id,label){
 
     var url = 'js/'+id+'.js';
     $.get(url,{},function(retorno){
-        $('<pre>').html(retorno)
+        $('<pre>').html(retorno + '\n\n' + funciones)
             .appendTo(codigo);
-        //$('<script>').html(retorno).appendTo('body');
     });
 
     // Pestaña de datos
