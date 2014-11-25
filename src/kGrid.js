@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.1
+    Versión: 2.1.2
 */
 (function () {
     $.kGrids = {
@@ -87,9 +87,6 @@
                         break;
                     case 'seleccionar':
                         instancia.seleccionar(aux);
-                        break;
-                    case 'info':
-                        console.log(instancia);
                         break;
                     default:
                         return;
@@ -585,6 +582,9 @@
                         }
 
                         $(kGrid.div).data('datos',datos);
+                        $(kGrid.div).data('totalDatos',kGrid.totalDatos);
+                        $(kGrid.div).data('pagina',kGrid.pagina);
+                        $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
                         $('#kGrid_' + kGrid.div.id + '_pagina')
                             .val(kGrid.pagina)
