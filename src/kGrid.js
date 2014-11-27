@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.6
+    Versión: 2.1.7
 */
 (function () {
     $.kGrids = {
@@ -506,10 +506,26 @@
                                             e.stopPropagation();
                                             kGrid.permisos['editar'].call(this,item);
                                         });
-                                    }else if(typeof kGrid.permisos['guardar'] == 'function'){
+                                    }else if(kGrid.permisos['guardar']){
 
                                         var btn_guardar = crear_boton('Guardar','save','primary');
-                                        btn_guardar.hide().click(function(e){
+                                        btn_guardar.hide();
+
+                                        var on_guardar = typeof kGrid.permisos['guardar'] == 'function'?
+                                            function(formulario){
+                                                kGrid.permisos['guardar'].call(this,formulario);
+                                            } : function(formulario){
+                                                $.ajax({
+                                                    type: 'POST',
+                                                    url: kGrid.permisos['guardar'],
+                                                    data: formulario,
+                                                    success: function(retorno){  
+                                                        kGrid.cargar();
+                                                    }
+                                                });
+                                            }
+
+                                        btn_guardar.click(function(e){
                                             e.stopPropagation();
                                             var cambios = {};
 
@@ -527,7 +543,7 @@
                                             // Cambio de botones
                                             btn_guardar.hide();
                                             btn_editar.fadeIn();
-                                            kGrid.permisos['guardar'].call(this,$.extend(item,cambios));
+                                            on_guardar($.extend(item,cambios));
                                         }).appendTo(botones);
 
                                         btn_editar.click(function(e){
