@@ -31,5 +31,5 @@ $('#tarjetas').kGrid({
         activar: activar,
         editar: editar
     },
-    onclick: onclick
+    onclick: click
 });

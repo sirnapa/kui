@@ -41,5 +41,5 @@ $('#tarjetasconscores').kGrid({
             }
             return false;
     },
-    onclick: onclick
+    onclick: click
 });

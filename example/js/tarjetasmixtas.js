@@ -46,5 +46,5 @@ $('#tarjetasmixtas').kGrid({
         activar: activar,
         editar: editar
     },
-    onclick: onclick
+    onclick: click
 });

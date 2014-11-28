@@ -7,7 +7,7 @@ function activar() {
 function editar() {
     alert('Editar');
 }
-function onclick(item){
+function click(item){
     alert('on click!');
 }
 function guardar(item){
