@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.8
+    Versión: 2.1.9
 */
 (function () {
     $.kGrids = {
@@ -854,7 +854,10 @@
             });
 
             $('.' + kGrid.div.id + '_seleccionar_row').each(function(i,item){
-                $(item).prop('checked',kGrid.seleccionados[$(item).data('pk')]);
+                $(item).removeAttr('checked');
+                if(kGrid.seleccionados[$(item).data('pk')]){
+                    $(item).prop('checked',true);
+                }
             });
 
             kGrid.refrescar_seleccionados();
