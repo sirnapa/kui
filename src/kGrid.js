@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.7
+    Versión: 2.1.8
 */
 (function () {
     $.kGrids = {
@@ -296,10 +296,7 @@
                         .change(function(){
                             var todos = $(this).is(':checked');
                             $('.' + kGrid.div.id + '_seleccionar_row').each(function(i,item){
-                                $(item).removeAttr('checked');
-                                if(todos){
-                                    $(item).click();
-                                }
+                                $(item).prop('checked',todos);
                                 $(item).trigger('change');
                             });
                         });
@@ -857,10 +854,7 @@
             });
 
             $('.' + kGrid.div.id + '_seleccionar_row').each(function(i,item){
-                $(item).removeAttr('checked');
-                if(kGrid.seleccionados[$(item).data('pk')]){
-                    $(item).click();
-                }
+                $(item).prop('checked',kGrid.seleccionados[$(item).data('pk')]);
             });
 
             kGrid.refrescar_seleccionados();
