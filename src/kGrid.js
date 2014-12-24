@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.1.9
+    Versión: 2.2.0
 */
 (function () {
     $.kGrids = {
@@ -255,6 +255,28 @@
             if(kGrid.seleccionable){
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
+        },
+
+        nuevo_mensaje: function(tipo,mensaje){
+            var kGrid = this;
+
+            if(kGrid.mensaje){
+                kGrid.mensaje.remove();
+            }
+
+            kGrid.mensaje = $('<div>')
+                .attr('role','alert')
+                .addClass('alert')
+                .addClass(tipo? tipo : 'alert-info')
+                .html(mensaje)
+                .prependTo(kGrid.grilla);
+
+            $('<button>').attr('data-dismiss','alert')
+                .addClass('close')
+                .attr('type','button')
+                .html('<i class="fa fa-times"></i>')
+                .appendTo(kGrid.mensaje);
+            
         },
 
         titulos: function(){
@@ -678,6 +700,8 @@
                         $('#kGrid_' + kGrid.div.id + '_siguiente_pagina')
                             .attr('disabled',kGrid.pagina==kGrid.totalPaginas);
                         
+                    }else if(retorno.mensaje){
+                        kGrid.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete == 'function'){
