@@ -548,10 +548,10 @@
                         .attr('name',campo.nombre)
                         .appendTo(columna);
 
-                setearValor(input,
-                    typeof campo.formato == 'function'? 
-                        campo.formato.call(this,item[campo.nombre],item)
-                    :  item[campo.nombre]);
+                if(typeof campo.formato == 'function'){
+                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
+                }
+                setearValor(input, item[campo.nombre]);
                     
                 if(kGrid.tarjetas && campo.titulo && campo.titulo!=''){
                     if(campo.tipo!='score'){
@@ -629,12 +629,45 @@
                     $('#'+ pk + '_editar').hide();
                     if(!nueva_entrada){
                         $('#'+ pk + '_remover').hide();
+                        $('#'+ pk + '_deshacer').fadeIn();
                     }
                     $('#'+ pk + '_guardar').fadeIn();
 
                     // Focus
                     $('#'+pk).find('input[data-editando]').first().focus();
-                }
+                };
+
+            var deshabilitar_edicion = function(){
+                // Deshabilitar edición
+                $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
+                    $(input).attr('readonly',$(input).attr('data-readonly')!='false').removeAttr('data-editando');
+                    if($(input).attr('type')=='checkbox'){
+                        $(input).attr('disabled',$(input).attr('data-disabled')!='false');
+                    }
+                });
+
+                // Cambio de botones
+                $('#'+ pk + '_guardar').hide();
+                $('#'+ pk + '_deshacer').hide();
+                $('#'+ pk + '_editar').fadeIn();
+                $('#'+ pk + '_remover').fadeIn();
+            };
+
+            var deshacer_cambios = function(){
+                    var original = $(kGrid.div).data('datos')[$('#'+pk).attr('data-pk')];
+                    var editados = $('#'+pk+' form').find('input[data-editando]');
+                    //deshabilitar_edicion();
+                    editados.each(function(x,input){
+                        if($(input).attr('type')=='checkbox'){
+                            $(item).removeAttr('checked');
+                            if(kGrid.seleccionados[$(item).data('pk')]){
+                                $(item).prop('checked',original[$(input).attr('name')]);
+                            }
+                        }else{
+                            $(input).val(original[$(input).attr('name')]);
+                        }
+                    });
+                };
 
             if(activo){
 
@@ -648,6 +681,7 @@
                         });
                     }else if(kGrid.permisos['guardar']){
 
+                        // Guardar cambios
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
 
@@ -667,24 +701,20 @@
 
                         btn_guardar.click(function(e){
                             e.stopPropagation();
-
-                            // Deshabilitar edición
-                            $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
-                                $(input).attr('readonly',$(input).attr('data-readonly')!='false').removeAttr('data-editando');
-                                if($(input).attr('type')=='checkbox'){
-                                    $(input).attr('disabled',$(input).attr('data-disabled')!='false');
-                                }
-                            });
-
-                            // Cambio de botones
-                            $('#'+ pk + '_guardar').hide();
-                            $('#'+ pk + '_editar').fadeIn();
-                            $('#'+ pk + '_remover').fadeIn();
-
+                            deshabilitar_edicion();
                             on_guardar($.extend(item,$('#'+pk+' form').serialize()));
                             
                         }).appendTo(botones);
 
+                        // Deshacer cambios
+                        var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
+                        btn_deshacer.hide()
+                            .click(function(e){
+                                e.stopPropagation();
+                                deshacer_cambios();
+                            }).appendTo(botones);
+
+                        // Editar (o hacer cambios)
                         btn_editar.click(function(e){
                             e.stopPropagation();
                             habilitar_edicion();
