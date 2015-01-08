@@ -12,13 +12,6 @@ $('#simple').kGrid({
             nombre : 'fechaModif',
             titulo: 'Modificado'
     },{
-            nombre : 'vigenciaInicio',
-            titulo: 'Vigencia',
-            formato: function(campo,row){
-                return campo + ' al ' + row['vigenciaFin']
-            },
-            atributos: {'readonly':false}
-    },{
             nombre : 'anonimo',
             titulo: 'NN',
             ancho: 1,
