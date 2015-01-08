@@ -4,7 +4,11 @@ $('#simple').kGrid({
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
-            ancho: 4
+            ancho: 4,
+            atributos: {
+                'readonly':true,
+                'data-creable': true
+                }
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado'

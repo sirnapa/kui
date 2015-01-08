@@ -165,6 +165,7 @@
    atributos: {			// Atributos para el input 
        atributo1: 'valor',
        atributo2: 'valor',...
+       data-creable: true 	// El campo será editable siempre en el formulario de agregar entrada
    },
    formato: function(){}		// Función para mostrar algo distinto a lo recibido del servicio
 },...]</pre>
@@ -479,8 +480,11 @@
 							<td>
 								agregar
 							</td>
-							<td colspan="2">
-								Agregar nueva entrada vacía a la grilla.
+							<td>
+								Agregar nueva entrada a la grilla.
+							</td>
+							<td>
+								Objeto que se agregará al final de la página actual, en caso de omisión se agregará una entrada vacía editable al principio de dicha página.
 							</td>
 						</tr>
 					</tbody>

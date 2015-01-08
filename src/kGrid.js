@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.3.0
+    Versión: 2.3.1
 */
 (function () {
     $.kGrids = {
@@ -89,7 +89,7 @@
                         instancia.seleccionar(aux);
                         break;
                     case 'agregar':
-                        instancia.agregar();
+                        instancia.agregar(aux);
                     default:
                         return;
                 }	
@@ -227,6 +227,7 @@
         this.seleccionable = dato.seleccionable;
         this.seleccionados = {};
         this.preseleccionados = dato.seleccionados;
+        this.nuevos = 0;
 
         this.cargar_estilos();
         this.cargar_paginador();
@@ -427,15 +428,27 @@
             });
         },
 
-        cargar_entrada: function(item,nueva_entrada){
+        cargar_entrada: function(item){
 
             var kGrid = this;
+            var nueva_entrada = item==undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
-                (nueva_entrada? 'nuevo' : item[kGrid.id]);
+                (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
 
-            if(nueva_entrada && $('#kGrid_' + kGrid.div.id + '_nuevo').is(':visible')){
-                $('#'+pk).find('input[data-editando]').first().focus();
-                return;
+            if(nueva_entrada){
+                if($('#'+pk).is(':visible')){
+                    var primer_input = $('#'+pk).find('input[data-editando]').first();
+                    if(primer_input.length){
+                        primer_input.focus();
+                    }else{
+                        kGrid.nuevos++;
+                        kGrid.cargar_entrada(item);
+
+                    }
+                    return;
+                }
+
+                item = {};
             }
 
             var setearValor = kGrid.tarjetas? function(columna,valor){
@@ -551,14 +564,13 @@
                     $.each(campo.atributos,function(atributo,valor){
                         input.attr(atributo,valor);
                     });
-
-                    input.attr('data-disabled',$(input).is(':disabled'));
                     
                     var campos_especiales = ['disabled','readonly'];
                     $.each(campos_especiales,function(e,especial){
                         if(campo.atributos[especial]=='false'){
                             input.removeAttr(especial);
                         }
+                        input.attr('data-'+especial,campo.atributos[especial]);
                     });
 
                     if(!kGrid.tarjetas && campo.atributos['type']=='checkbox'){
@@ -595,9 +607,13 @@
                 }
 
             var habilitar_edicion = function(){
+                    // Deshabilitamos ediciones anteriores
+                    //kGrid.cargar();
+
                     // Habilitar edición inline
                      $('#'+pk).find('input[readonly]').each(function(x,input){
-                        if($(input).attr('data-disabled')!='true'){
+                        if(($(input).attr('data-disabled')!='true' && $(input).attr('data-readonly')!='true')
+                            || (nueva_entrada && $(input).attr('data-creable'))){
                             $(input).removeAttr('readonly')
                                 .removeAttr('disabled')
                                 .attr('data-editando',true);
@@ -925,10 +941,10 @@
             $(kGrid.div).data('seleccionados',seleccionados);
         },
 
-        agregar: function(){
+        agregar: function(nuevo){
             var kGrid = this;
             if(!kGrid.tarjetas){
-                kGrid.cargar_entrada({},true);
+                kGrid.cargar_entrada(nuevo);
             }
         }
     };
