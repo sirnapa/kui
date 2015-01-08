@@ -656,7 +656,7 @@
             var deshacer_cambios = function(){
                     var original = $(kGrid.div).data('datos')[$('#'+pk).attr('data-pk')];
                     var editados = $('#'+pk+' form').find('input[data-editando]');
-                    //deshabilitar_edicion();
+                    deshabilitar_edicion();
                     editados.each(function(x,input){
                         if($(input).attr('type')=='checkbox'){
                             $(item).removeAttr('checked');
