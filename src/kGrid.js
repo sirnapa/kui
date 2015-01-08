@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.3.1
+    Versión: 2.3.2
 */
 (function () {
     $.kGrids = {
@@ -448,7 +448,12 @@
                     return;
                 }
 
-                item = {};
+                if(!kGrid.tarjetas && kGrid.permisos['guardar']){
+                    item = {};
+                }else{
+                    console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "guardar"');
+                    return;
+                }
             }
 
             var setearValor = kGrid.tarjetas? function(columna,valor){
@@ -488,8 +493,8 @@
                 }
             }
                                         
-            var izquierda = $('<div>').addClass('col-md-' 
-                + (kGrid.tarjetas? '7' : '11'))
+            var izquierda = $(kGrid.permisos['guardar']? '<form>' : '<div>')
+                .addClass('col-md-' + (kGrid.tarjetas? '7' : '11'))
                 .appendTo(formGroup);
             var derecha = $('<div>').addClass('text-right col-md-'
                 + (kGrid.tarjetas? '5' : '1'))
@@ -611,7 +616,7 @@
                     //kGrid.cargar();
 
                     // Habilitar edición inline
-                     $('#'+pk).find('input[readonly]').each(function(x,input){
+                     $('#'+pk+' form').find('input[readonly]').each(function(x,input){
                         if(($(input).attr('data-disabled')!='true' && $(input).attr('data-readonly')!='true')
                             || (nueva_entrada && $(input).attr('data-creable'))){
                             $(input).removeAttr('readonly')
@@ -622,6 +627,9 @@
 
                     // Cambio de botones        
                     $('#'+ pk + '_editar').hide();
+                    if(!nueva_entrada){
+                        $('#'+ pk + '_remover').hide();
+                    }
                     $('#'+ pk + '_guardar').fadeIn();
 
                     // Focus
@@ -638,7 +646,7 @@
                             e.stopPropagation();
                             kGrid.permisos['editar'].call(this,item);
                         });
-                    }else if(nueva_entrada || kGrid.permisos['guardar']){
+                    }else if(kGrid.permisos['guardar']){
 
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
@@ -659,23 +667,22 @@
 
                         btn_guardar.click(function(e){
                             e.stopPropagation();
-                            var cambios = {};
 
                             // Deshabilitar edición
-                            $('#'+pk).find('input[data-editando]').each(function(x,input){
-                                $(input).attr('readonly',true).removeAttr('data-editando');
+                            $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
+                                $(input).attr('readonly',$(input).attr('data-readonly')!='false').removeAttr('data-editando');
                                 if($(input).attr('type')=='checkbox'){
-                                    $(input).attr('disabled',true);
-                                    cambios[$(input).attr('name')] = $(input).is(':checked');
-                                }else{
-                                    cambios[$(input).attr('name')] = $(input).val();
+                                    $(input).attr('disabled',$(input).attr('data-disabled')!='false');
                                 }
                             });
 
                             // Cambio de botones
-                            btn_guardar.hide();
-                            btn_editar.fadeIn();
-                            on_guardar($.extend(item,cambios));
+                            $('#'+ pk + '_guardar').hide();
+                            $('#'+ pk + '_editar').fadeIn();
+                            $('#'+ pk + '_remover').fadeIn();
+
+                            on_guardar($.extend(item,$('#'+pk+' form').serialize()));
+                            
                         }).appendTo(botones);
 
                         btn_editar.click(function(e){
@@ -943,9 +950,7 @@
 
         agregar: function(nuevo){
             var kGrid = this;
-            if(!kGrid.tarjetas){
-                kGrid.cargar_entrada(nuevo);
-            }
+            kGrid.cargar_entrada(nuevo);
         }
     };
 })();
