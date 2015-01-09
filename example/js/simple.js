@@ -36,5 +36,16 @@ $('#simple').kGrid({
         editar: true,
         guardar: guardar
     },
-    ondblclick: true
+    ondblclick: true,
+    loadComplete: function(){
+        // Agrego un botón para agregar entradas
+        $('#simple').before(
+            $('<button>').html('Agregar entrada')
+            .addClass('btn btn-default')
+            .click(function(){
+                $('#simple').kGrid('agregar');
+            })
+        );
+        $('#simple').before('<br><br>');
+    }
 });

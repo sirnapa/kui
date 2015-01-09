@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.3.2
+    Versión: 2.3.3
 */
 (function () {
     $.kGrids = {
@@ -659,10 +659,7 @@
                     deshabilitar_edicion();
                     editados.each(function(x,input){
                         if($(input).attr('type')=='checkbox'){
-                            $(item).removeAttr('checked');
-                            if(kGrid.seleccionados[$(item).data('pk')]){
-                                $(item).prop('checked',original[$(input).attr('name')]);
-                            }
+                            $(input).prop('checked',original[$(input).attr('name')]);
                         }else{
                             $(input).val(original[$(input).attr('name')]);
                         }
@@ -685,7 +682,7 @@
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
 
-                        var on_guardar = typeof kGrid.permisos['guardar'] == 'function'?
+                        var guardar_cambios = typeof kGrid.permisos['guardar'] == 'function'?
                             function(formulario){
                                 kGrid.permisos['guardar'].call(this,formulario);
                             } : function(formulario){
@@ -697,13 +694,20 @@
                                         kGrid.cargar();
                                     }
                                 });
-                            }
+                            };
+
+                        izquierda.on('submit',function(e){
+                            e.preventDefault();
+                            deshabilitar_edicion();
+                            $.each($('#'+pk+' form').serializeArray(), function(_, it) {
+                                item[it.name] = it.value;
+                            });
+                            guardar_cambios(item);
+                        });
 
                         btn_guardar.click(function(e){
                             e.stopPropagation();
-                            deshabilitar_edicion();
-                            on_guardar($.extend(item,$('#'+pk+' form').serialize()));
-                            
+                            $('#'+pk+' form').submit();                      
                         }).appendTo(botones);
 
                         // Deshacer cambios
