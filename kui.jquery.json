@@ -1,0 +1,28 @@
+{
+  "name": "kui",
+  "title": "kUI - Utilidades para jQuery",
+  "description": "Utilidades para jQuery + Bootstrap: Grillas, Formularios, etc.",
+  "version": "0.0.1",
+  "homepage": "",
+  "author": {
+    "name": "Nelson Paez",
+    "url": "https://github.com/sirnapa"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": "",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.11.2"
+  },
+  "keywords": [
+    "jquery-plugin"
+  ]
+}
