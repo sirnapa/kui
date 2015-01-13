@@ -20,7 +20,7 @@
       throws(block, [expected], [message])
   */
 
-  module('jQuery#awesome', {
+  module('jQuery#kui', {
     // This will run before each test in this module.
     setup: function() {
       this.elems = $('#qunit-fixture').children();
@@ -30,33 +30,35 @@
   test('is chainable', function() {
     expect(1);
     // Not a bad test to run on collection methods.
-    strictEqual(this.elems.awesome(), this.elems, 'should be chainable');
+    strictEqual(this.elems.kui(), this.elems, 'should be chainable');
   });
 
-  test('is awesome', function() {
+  test('is kui', function() {
     expect(1);
-    strictEqual(this.elems.awesome().text(), 'awesome0awesome1awesome2', 'should be awesome');
+    strictEqual(this.elems.kui().text(), 'kui0kui1kui2', 'should be kui');
   });
 
-  module('jQuery.awesome');
+  module('jQuery.kui');
 
-  test('is awesome', function() {
+  test('is kui', function() {
     expect(2);
-    strictEqual($.awesome(), 'awesome.', 'should be awesome');
-    strictEqual($.awesome({punctuation: '!'}), 'awesome!', 'should be thoroughly awesome');
+    strictEqual($.kui(), 'kui.', 'should be kui');
+    strictEqual($.kui({punctuation: '!'}), 'kui!', 'should be thoroughly kui');
   });
 
-  module(':awesome selector', {
+  /*
+  module(':kui selector', {
     // This will run before each test in this module.
     setup: function() {
       this.elems = $('#qunit-fixture').children();
     }
   });
 
-  test('is awesome', function() {
+  test('is kui', function() {
     expect(1);
     // Use deepEqual & .get() when comparing jQuery objects.
-    deepEqual(this.elems.filter(':awesome').get(), this.elems.last().get(), 'knows awesome when it sees it');
+    deepEqual(this.elems.filter(':kui').get(), this.elems.last().get(), 'knows kui when it sees it');
   });
+  */
 
 }(jQuery));
