@@ -3,7 +3,7 @@
     Autor: Nelson Páez,
     Mail: nelpa90@gmail.com,
     Web: www.konecta.com.py
-    Versión: 2.3.3
+    Versión: 2.3.4
 */
 (function () {
     $.kGrids = {
@@ -621,7 +621,13 @@
                             || (nueva_entrada && $(input).attr('data-creable'))){
                             $(input).removeAttr('readonly')
                                 .removeAttr('disabled')
-                                .attr('data-editando',true);
+                                .attr('data-editando',true)
+                                .keyup(function(e){
+                                    if(e.keyCode == 13){
+                                        e.preventDefault();
+                                        $('#'+pk+' form').submit();
+                                    }
+                                });
                         }
                     });
 
@@ -640,7 +646,9 @@
             var deshabilitar_edicion = function(){
                 // Deshabilitar edición
                 $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
-                    $(input).attr('readonly',$(input).attr('data-readonly')!='false').removeAttr('data-editando');
+                    $(input).attr('readonly',$(input).attr('data-readonly')!='false')
+                        .removeAttr('data-editando')
+                        .unbind('keyup');
                     if($(input).attr('type')=='checkbox'){
                         $(input).attr('disabled',$(input).attr('data-disabled')!='false');
                     }
@@ -696,13 +704,23 @@
                                 });
                             };
 
-                        izquierda.on('submit',function(e){
-                            e.preventDefault();
-                            deshabilitar_edicion();
-                            $.each($('#'+pk+' form').serializeArray(), function(_, it) {
-                                item[it.name] = it.value;
-                            });
-                            guardar_cambios(item);
+                        $.kUI.validaciones.cargar();
+
+                        $(izquierda).validate({
+                            showErrors: function(errorMap, errorList) {
+                                $.kUI.validaciones.error(this, errorMap, errorList);
+                            },
+                            submitHandler: function(form) {
+                                $.kUI.validaciones.fechas(form);
+                                
+                                deshabilitar_edicion();
+                                $.each($('#'+pk+' form').serializeArray(), function(_, it) {
+                                    item[it.name] = it.value;
+                                });
+                                guardar_cambios(item);
+
+                                return false;
+                            }
                         });
 
                         btn_guardar.click(function(e){
@@ -986,6 +1004,7 @@
             var kGrid = this;
             kGrid.cargar_entrada(nuevo);
         }
+
     };
 })();
 

@@ -20,6 +20,7 @@ var estilos = {
 $(document).ready(function () {
     agregar_grilla('simple','Simple');
     agregar_grilla('seleccionable','Seleccionable');
+    agregar_grilla('conagregar','Agregar entradas');
     agregar_grilla('tarjetas','Tarjetas');
     agregar_grilla('tarjetasconscores','Tarjetas con score');
     agregar_grilla('tarjetasmixtas','Tarjetas mixtas');

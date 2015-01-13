@@ -1,4 +1,4 @@
-$('#simple').kGrid({
+$('#conagregar').kGrid({
     url : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
@@ -6,11 +6,16 @@ $('#simple').kGrid({
             titulo: 'Nombre',
             ancho: 4,
             atributos: {
-                'readonly':true
+                'readonly':true,
+                'data-creable': true,
+                'required':true
                 }
     },{
             nombre : 'fechaAlta',
-            titulo: 'Creado'
+            titulo: 'Creado',
+            atributos: {
+                'required':true
+            }
     },{
             nombre : 'fechaModif',
             titulo: 'Modificado'
@@ -35,5 +40,16 @@ $('#simple').kGrid({
         editar: true,
         guardar: guardar
     },
-    ondblclick: true
+    ondblclick: true,
+    loadComplete: function(){
+        // Agrego un botón para agregar entradas
+        $('#conagregar').before(
+            $('<button>').html('Agregar entrada')
+            .addClass('btn btn-default')
+            .click(function(){
+                $('#conagregar').kGrid('agregar');
+            })
+        );
+        $('#conagregar').before('<br><br>');
+    }
 });
