@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <title>kUI</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+
+    <style>
+    	.seccion{
+    		padding: 70px 0 20px;
+    		border-bottom: 1px solid #eee;
+    	}
+    	.subseccion{
+    		padding-top: 70px;
+    	}
+    </style>
+  </head>
+
+  <body>
+
+  	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><i class="fa fa-puzzle-piece text-danger"></i> KUI</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <div id="navbar-menu">
+            <ul id="menu-secciones" class="nav navbar-nav">
+            </ul>
+          </div>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="mailto:nelpa90@gmail.com">
+                <i class="fa fa-envelope"></i> Contacto
+              </a>
+            </li>
+            <li>
+              <a href="http://github.com/konecta/kui">
+                <i class="fa fa-github"></i> Github
+              </a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+		<!-- ========================================================= -->
+		<div id="informacion" class="seccion">
+			<h1><i class="fa fa-puzzle-piece text-muted"></i> kUI</h1>
+			<p class="lead">Herramientas para aplicaciones web de Konecta SA.</p>
+			<p>
+				El proyecto kUI es una plataforma javascript que incluye grillas (listas), formularios y otras soluciones.
+			</p>
+			<br>
+
+			<h2><i class="fa fa-info-circle text-muted"></i> Información</h2>
+			<div class="table-responsive">
+			  <table class="table table-bordered">
+			  	<tr>
+			  		<td class="text-right">Autor</td>
+			  		<td>Nelson Páez <a href="http://equipo.dixit.com.py/nelson" target="_blank"><i class="fa fa-external-link"></i></a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Contacto laboral</td>
+			  		<td><a href="mailto:nelson.paez@konecta.com.py">nelson.paez@konecta.com.py</a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Contacto personal</td>
+			  		<td><a href="mailto:nelpa90@gmail.com">nelpa90@gmail.com</a></td>
+			  	</tr>
+			  	<tr>
+			  		<td class="text-right">Departamento</td>
+			  		<td>Aplicaciones móviles.</td>
+			  	</tr>
+			  </table>
+			</div>
+
+		</div>
+		<!-- ========================================================= -->
+
+		<!-- ========================================================= -->
+  	<div id="requerimientos" class="seccion">
+    	<h2><i class="fa fa-file-text-o text-muted"></i> Requerimientos</h2>
+	    <ul>
+        <li>Jquery 1.11.2 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
+        <li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
+        <li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
+        <li>Bootstrap.datetimepicker.js <a href="http://tarruda.github.io/bootstrap-datetimepicker/" target="_blank"><i class="fa fa-external-link"></i></a></li>
+        <li>Bootstrap.combobox.js (versión modificada) <a href="assets/js/bootstrap.combobox.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
+        <li>delegate.js <a href="assets/js/delegate.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
+        <li>Jquery.validation.js <a href="assets/js/jquery.validation.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
+      </ul>
+		</div>
+    <!-- ========================================================= -->
+
+    <!-- ========================================================= -->
+    <div id="herramientas" class="seccion">
+      <h2><i class="fa fa-puzzle-piece text-muted"></i> Herramientas</h2><br>
+      <div class="row">
+        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kgrid">
+          <a href="doc/kgrid">
+            <i class="fa fa-4x fa-table"></i><br><br>
+            <h3>kGrid</h3>
+          </a>
+        </div>
+        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kform">
+          <a href="doc/kform">
+            <i class="fa fa-4x fa-file-o"></i><br><br>
+            <h3>kForm</h3>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- ========================================================= -->
+
+    <!-- ========================================================= -->
+    <div id="descargas" class="seccion" style="border-bottom:none;">
+      <h2><i class="fa fa-download text-muted"></i> Descargar</h2>
+      <div class="row">
+        <div class="col-xs-3 text-center subseccion" data-enlace="dist/jquery.kui.all.min.js">
+          <a href="dist/jquery.kui.all.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>Todo en uno</h3>
+          </a>
+        </div>
+        <div class="col-xs-3 text-center subseccion" data-enlace="dist/jquery.kui.min.js">
+          <a href="dist/jquery.kui.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kUI</h3>
+          </a>
+        </div>
+        <div class="col-xs-3 text-center subseccion" data-enlace="dist/jquery.kui.kgrid.min.js">
+          <a href="dist/jquery.kui.kgrid.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kGrid</h3>
+          </a>
+        </div>
+        <div class="col-xs-3 text-center subseccion" data-enlace="dist/jquery.kui.kform.min.js">
+          <a href="dist/jquery.kui.kform.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kForm</h3>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- ========================================================= -->
+
+    <br><br><br><br><br>
+
+	</div>
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/secciones.js"></script>
+
+  </body>
+</html>

@@ -10,8 +10,8 @@
 
     <title>kGrid for Bootstrap</title>
 
-    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../assets/css/font-awesome.min.css" rel="stylesheet">
 
     <style>
     	.seccion{
@@ -35,7 +35,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../example">kGrid <small>Documentación</small></a>
+          <a class="navbar-brand" href="../.."><i class="fa fa-puzzle-piece text-danger"></i> kGrid <small>Documentación</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <div id="navbar-menu">
@@ -44,13 +44,13 @@
           </div>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="../example">
+              <a href="../../example/kgrid">
                 <i class="fa fa-desktop"></i> Ejemplos
               </a>
             </li>
             <li>
-              <a href="../src/kGrid.min.js">
-                <i class="fa fa-arrow-down"></i> Descargar
+              <a href="../../#descargas">
+                <i class="fa fa-download"></i> Descargar
               </a>
             </li>
           </ul>
@@ -63,7 +63,7 @@
 		<!-- ========================================================= -->
 		<div id="informacion" class="seccion">
 			<h1>kGrid</h1>
-			<p class="lead">Grilla para aplicaciones web de Konecta SA.</p>
+			<p class="lead">Grilla para aplicaciones web de kUI.</p>
 			<p>
 				El proyecto kGrid es una librería javascript que responde a las necesidades más comunes de listado, edición y selección.
 				Busca ser un reemplazo para <a href="http://www.trirand.com/blog/" target="_blank">Jqgrid <i class="fa fa-external-link"></i></a> en los proyectos desarrollados con Bootstrap, en consecuencia el formato requerido para los servicios es el mismo que el de dicho plugin.
@@ -71,42 +71,8 @@
 			<p>
 				Se centra en las opciones de edición rápida y las tarjetas de información. En esta etapa de desarrollo ya cuenta con soporte parcial para <em>responsive design</em>, especialmente en el tipo grilla.
 			</p>
-			<br>
-
-			<h2>Información</h2>
-			<div class="table-responsive">
-			  <table class="table table-bordered">
-			  	<tr>
-			  		<td class="text-right">Autor</td>
-			  		<td>Nelson Páez <a href="http://equipo.dixit.com.py/nelson" target="_blank"><i class="fa fa-external-link"></i></a></td>
-			  	</tr>
-			  	<tr>
-			  		<td class="text-right">Contacto laboral</td>
-			  		<td><a href="mailto:nelson.paez@konecta.com.py">nelson.paez@konecta.com.py</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td class="text-right">Contacto personal</td>
-			  		<td><a href="mailto:nelpa90@gmail.com">nelpa90@gmail.com</a></td>
-			  	</tr>
-			  	<tr>
-			  		<td class="text-right">Departamento</td>
-			  		<td>Aplicaciones móviles.</td>
-			  	</tr>
-			  </table>
-			</div>
-
 		</div>
 		<!-- ========================================================= -->
-
-		<!-- ========================================================= -->
-      	<div id="requerimientos" class="seccion">
-      	<h2>Requerimientos</h2>
-		<ul>
-			<li>Jquery 1.11.1 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
-			<li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
-			<li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
-		</ul>
-		</div>
 
 		<!-- ========================================================= -->
       	<div id="parametros" class="seccion">
@@ -623,35 +589,10 @@
 		<!-- ========================================================= -->
  </div>
 
-    <script src="../assets/js/jquery-1.11.1.min.js"></script>
-    <script src="../assets/js/bootstrap.min.js"></script>
-    <script src="../src/kGrid.js"></script>
-    <script>
-    	$('.seccion').each(function(s,seccion){
-    		var li = $('<li>').appendTo('#menu-secciones');
-    		var a = $('<a>').attr('href','#'+$(seccion).attr('id'))
-        		.html($(seccion).find('h2,h3,h4').first().html())
-        		.appendTo(li);
-			var subsecciones = $(seccion).find('.subseccion');
-			if(subsecciones.length){
-				li.addClass('dropdown');
-				a.addClass('dropdown-toggle')
-					.attr('href','#')
-					.attr('data-toggle','dropdown')
-					.attr('role','button')
-					.attr('aria-expanded','true');
-				$('<span>').addClass('caret')
-					.appendTo(a);
-				var ul = $('<ul>').addClass('dropdown-menu')
-					.attr('role','menu')
-					.appendTo(li);
-				$.each(subsecciones,function(ss,subseccion){
-					$('<a>').attr('href','#'+$(subseccion).attr('id'))
-		        		.html($(subseccion).find('h2,h3,h4').first().html())
-		        		.appendTo($('<li>').appendTo(ul));
-				})
-			}
-    	});
+    <script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../../assets/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/secciones.js"></script>
+    	
     </script>
   </body>
 </html>

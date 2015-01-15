@@ -5,28 +5,38 @@ $('#conagregar').kGrid({
             nombre : 'nombre',
             titulo: 'Nombre',
             ancho: 4,
+            requerido: true,
             atributos: {
                 'readonly':true,
-                'data-creable': true,
-                'required':true
-                }
+                'data-creable': true
+                },
+            tipo: 'combo',
+            opciones: {
+                origen: [
+                    {id:'1',nombre:'Administrador'},
+                    {id:'2',nombre:'Supervisor'},
+                    {id:'3',nombre:'Vendedor'},
+                ],
+                id: 'id',
+                formato: 'nombre'
+            }
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',
-            atributos: {
-                'required':true
-            }
+            requerido: true,
+            tipo: 'fecha'
     },{
             nombre : 'fechaModif',
-            titulo: 'Modificado'
+            titulo: 'Modificado',
+            tipo: 'fecha'
     },{
             nombre : 'anonimo',
             titulo: 'NN',
             ancho: 1,
+            tipo: 'booleano',
             formato: function(campo,row){
                     return campo=='S';
             },
-            atributos: {'type':'checkbox'}
     }],
     estado : function(item) {
             if (item['activo'] == 'S') {

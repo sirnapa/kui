@@ -1,26 +1,27 @@
-/* 
-    KGrid
-    Autor: Nelson Páez,
-    Mail: nelpa90@gmail.com,
-    Web: www.konecta.com.py
-    Versión: 2.3.4
-*/
-(function () {
+/*! 
+ *
+ *   +++++++++++++++++++++ kGrid +++++++++++++++++++++ 
+ *
+ */
+
+(function ($) {
+
     $.kGrids = {
         instances : {}
     };
     
+    // Collection method.
     $.fn.kGrid = function (dato,aux) {
         return this.each(function () {
-            if(typeof dato == 'string'){
+            if(typeof dato === 'string'){
                 var instancia = $.kGrids.instances[this.id];
-                if( instancia ==undefined || instancia == null){
+                if( instancia === undefined || instancia === null){
                     return;
                 }
                 switch(dato) {
                     case 'recargar':
                         // aux sirve para sobre-escribir el data
-                        if(aux!=undefined){
+                        if(aux!==undefined){
                             instancia.set_data(aux);
                         }
                         instancia.cargar();
@@ -28,7 +29,7 @@
                     case 'pagina':
                         // aux recibe la pagina de destino, tambien puede recibir
                         // estas opciones: primera, anterior, siguiente, ultima
-                        if(aux==undefined){
+                        if(aux===undefined){
                             return;
                         }
                         var pagina = parseInt(aux);
@@ -59,20 +60,20 @@
                         break;
                     case 'buscar':
                         // aux es la clave de búsqueda
-                        if(aux==undefined){
+                        if(aux===undefined){
                             return;
                         }
                         
-                        var groupOp = 'AND'
-                        if(aux.groupOp!=undefined){
+                        var groupOp = 'AND';
+                        if(aux.groupOp!==undefined){
                             groupOp=aux.groupOp;
                         }
                         var reglas = [];
                         $.each(aux.reglas,function(c,campo){
                             reglas.push({
                                 'field': campo.field,
-                                'data': (campo.data!=undefined)? campo.data : aux.data,
-                                'op': (campo.op!=undefined)? campo.op : 'cn'
+                                'data': (campo.data!==undefined)? campo.data : aux.data,
+                                'op': (campo.op!==undefined)? campo.op : 'cn'
                             });
                         });  
                         instancia.set_data({
@@ -90,6 +91,7 @@
                         break;
                     case 'agregar':
                         instancia.agregar(aux);
+                        break;
                     default:
                         return;
                 }	
@@ -108,10 +110,8 @@
     	 * no se puede continuar.
     	*/
 
-        if( dato.url==undefined
-            || dato.id==undefined
-            || dato.campos==undefined){
-            console.error('Los campos id, url y campos son obligatorios.');
+        if( dato.url===undefined || dato.id===undefined || dato.campos===undefined){
+            window.console.error('Los campos id, url y campos son obligatorios.');
             return;
         }
         
@@ -119,31 +119,31 @@
          * Se procesan los campos opcionales
          */
         
-        if(dato.ajax==undefined){
+        if(dato.ajax===undefined){
             dato.ajax = 'GET';
         }
 
-        if(dato.data==undefined){
+        if(dato.data===undefined){
             dato.data = {};
         }
 
-        if(dato.titulos==undefined){
+        if(dato.titulos===undefined){
             dato.titulos = true;
         }
         
-        if(dato.permisos==undefined){
+        if(dato.permisos===undefined){
             dato.permisos = {};
         }
         
-        if(dato.retorno==undefined){
+        if(dato.retorno===undefined){
             dato.retorno = {};
         }
         
-        if(dato.botones==undefined){
+        if(dato.botones===undefined){
             dato.botones = [];
         }
         
-        if(dato.paginador==undefined){
+        if(dato.paginador===undefined){
             dato.paginador = $('<div>').addClass('text-center')
                 .appendTo(div);
         }
@@ -192,14 +192,14 @@
             var campo_seleccion = {
                 nombre: 'kGrid_seleccionado',
                 titulo: '',
+                tipo: 'booleano',
                 ancho: 1,
                 atributos: {
-                    'type':'checkbox',
                     'readonly': 'false',
                     'disabled': 'false',
                     'class': div.id + '_seleccionar_row'
                 }
-            }
+            };
             dato.campos.unshift(campo_seleccion);
 
             if(!dato.seleccionados){
@@ -228,6 +228,7 @@
         this.seleccionados = {};
         this.preseleccionados = dato.seleccionados;
         this.nuevos = 0;
+        this.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
 
         this.cargar_estilos();
         this.cargar_paginador();
@@ -296,7 +297,7 @@
                                                                             
             $.each(kGrid.campos,function(c,campo){                       
                 var label = $('<h4>');
-                if(campo.titulo!=undefined){
+                if(campo.titulo!==undefined){
                     label.append(campo.titulo);
                 }else{
                     label.append(campo.nombre);
@@ -314,7 +315,7 @@
                     .addClass('col-md-'+campo.ancho)
                     .appendTo(columnas);
 
-                if(kGrid.seleccionable && c==0){
+                if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
                     var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
                         .attr('type','checkbox')
@@ -358,7 +359,7 @@
                         kGrid.pagina = retorno.respuesta.pagina;
                         kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
 
-                        kGrid.grilla = $('<div>').addClass('kGrid').prependTo(kGrid.contenido);;                        
+                        kGrid.grilla = $('<div>').addClass('kGrid').prependTo(kGrid.contenido);                       
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
@@ -383,8 +384,7 @@
                             });
                             
                             kGrid.grilla.find('.kacciones,.kscores').each(function(e,elemento){
-                                var top = $(elemento).parent().parent().height() 
-                                    - $(elemento).height();
+                                var top = $(elemento).parent().parent().height() - $(elemento).height();
                                 var siguiente = $(elemento).next();
                                 if(siguiente.hasClass('kscores') && !siguiente.is(':empty')){
                                     $(elemento).css('font-size','0.5em');
@@ -408,19 +408,19 @@
                         $('#kGrid_' + kGrid.div.id + '_totalPaginas')
                             .html(kGrid.totalPaginas);
                         $('#kGrid_' + kGrid.div.id + '_primera_pagina')
-                            .attr('disabled',kGrid.pagina==1);
+                            .attr('disabled',kGrid.pagina===1);
                         $('#kGrid_' + kGrid.div.id + '_pagina_anterior')
-                            .attr('disabled',kGrid.pagina==1);
+                            .attr('disabled',kGrid.pagina===1);
                         $('#kGrid_' + kGrid.div.id + '_ultima_pagina')
-                            .attr('disabled',kGrid.pagina==kGrid.totalPaginas);
+                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         $('#kGrid_' + kGrid.div.id + '_siguiente_pagina')
-                            .attr('disabled',kGrid.pagina==kGrid.totalPaginas);
+                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
                         kGrid.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
                     }
             
-                    if(typeof kGrid.load_complete == 'function'){
+                    if(typeof kGrid.load_complete === 'function'){
                         kGrid.load_complete.call(this,retorno);
                     }
                 },
@@ -431,7 +431,7 @@
         cargar_entrada: function(item){
 
             var kGrid = this;
-            var nueva_entrada = item==undefined;
+            var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
 
@@ -451,28 +451,22 @@
                 if(!kGrid.tarjetas && kGrid.permisos['guardar']){
                     item = {};
                 }else{
-                    console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "guardar"');
+                    window.console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "guardar"');
                     return;
                 }
             }
 
-            var setearValor = kGrid.tarjetas? function(columna,valor){
-                    columna.html(valor);
-                } : function(columna,valor){
-                    columna.val(valor);
-                };            
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kGrid.id])
-                .addClass('form-group' 
-                    + (kGrid.tarjetas? ' well' : ''));
+                .addClass('form-group' + (kGrid.tarjetas? ' well' : ''));
 
             var activo = nueva_entrada? true : false;
-            if(!nueva_entrada && typeof kGrid.estado == 'function'){
+            if(!nueva_entrada && typeof kGrid.estado === 'function'){
                 activo = kGrid.estado.call(this,item);
             }
             
             if(kGrid.onclick){
-                var onclick = typeof kGrid.onclick == 'function'?
+                var onclick = typeof kGrid.onclick === 'function'?
                     kGrid.onclick : function(){
                        window.open(kGrid.onclick,'_self');
                     };
@@ -481,9 +475,9 @@
                        onclick.call(this,item);
                     });
             }else if(kGrid.ondblclick){
-                if( (typeof kGrid.ondblclick == 'function') || 
-                    (activo && typeof kGrid.permisos['editar'] == 'function')){
-                    var ondblclick = typeof kGrid.ondblclick == 'function'?
+                if( (typeof kGrid.ondblclick === 'function') || 
+                    (activo && typeof kGrid.permisos['editar'] === 'function')){
+                    var ondblclick = typeof kGrid.ondblclick === 'function'?
                         kGrid.ondblclick : function(){
                             kGrid.permisos['editar'].call(this,item);
                         };
@@ -496,8 +490,7 @@
             var izquierda = $(kGrid.permisos['guardar']? '<form>' : '<div>')
                 .addClass('col-md-' + (kGrid.tarjetas? '7' : '11'))
                 .appendTo(formGroup);
-            var derecha = $('<div>').addClass('text-right col-md-'
-                + (kGrid.tarjetas? '5' : '1'))
+            var derecha = $('<div>').addClass('text-right col-md-' + (kGrid.tarjetas? '5' : '1'))
                 .appendTo(formGroup);
             var botones = $('<div>').addClass('pull-right')
                 .addClass('kacciones')
@@ -508,18 +501,17 @@
             $.each(kGrid.campos,function(c,campo){ 
                 var columna;
 
-                if(campo.tipo!='score'){
+                if(campo.tipo!=='score'){
                     var ancho_columna = campo.ancho;
                     var contenedor = '<div>';
 
                     if(kGrid.tarjetas){
                         ancho_columna = 6;
                         contenedor = '<p>';
-                        if(campo.tipo=='destacado' 
-                            || campo.tipo=='encabezado'){
+                        if(campo.tipo==='destacado' || campo.tipo==='encabezado'){
                             ancho_columna = 12;
                         }
-                        if(campo.tipo=='encabezado'){
+                        if(campo.tipo==='encabezado'){
                             contenedor = '<h2>';
                         }
                     }
@@ -536,55 +528,44 @@
                 }
 
                 if(!kGrid.tarjetas){
-                    var label = $('<label>').addClass('klabel')
+                    $('<label>').addClass('klabel')
                         .addClass('visible-xs visible-sm')
                         .html(kGrid.etiquetas[c])
                         .appendTo(columna);
                 }
 
-                var input = kGrid.tarjetas? columna : 
-                    $('<input>').addClass('form-control')
-                        .attr('readonly',true)
-                        .attr('name',campo.nombre)
-                        .appendTo(columna);
+                if(kGrid.tarjetas){
+                    columna.html(typeof campo.formato === 'function'?
+                        campo.formato.call(this,item[campo.nombre],item) : item[campo.nombre]);
 
-                if(typeof campo.formato == 'function'){
-                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
-                }
-                setearValor(input, item[campo.nombre]);
-                    
-                if(kGrid.tarjetas && campo.titulo && campo.titulo!=''){
-                    if(campo.tipo!='score'){
-                        $('<label>').addClass('text-muted')
-                            .html(campo.titulo + '&nbsp; &nbsp;')
-                            .prependTo(columna);
-                    }else{
-                        $('<br>').appendTo(columna);
-                        $('<small>').html(campo.titulo)
-                            .appendTo(columna);
+                    if(campo.titulo && campo.titulo!==''){
+                        if(campo.tipo!=='score'){
+                            $('<label>').addClass('text-muted')
+                                .html(campo.titulo + '&nbsp; &nbsp;')
+                                .prependTo(columna);
+                        }else{
+                            $('<br>').appendTo(columna);
+                            $('<small>').html(campo.titulo)
+                                .appendTo(columna);
+                        }
+                    } 
+                }else{
+
+                    if(campo.simple===undefined){
+                        campo.simple = true;
                     }
-                }                       
-                
-                if(campo.atributos!=undefined){
-                    $.each(campo.atributos,function(atributo,valor){
-                        input.attr(atributo,valor);
-                    });
+
+                    $.kui.formulario.nuevo_elemento(!nueva_entrada,columna,item,campo);
+
+                    var input = columna.find('[data-rol=input]');
                     
-                    var campos_especiales = ['disabled','readonly'];
-                    $.each(campos_especiales,function(e,especial){
-                        if(campo.atributos[especial]=='false'){
-                            input.removeAttr(especial);
-                        }
-                        input.attr('data-'+especial,campo.atributos[especial]);
-                    });
+                    if(!input.hasClass(kGrid.div.id + '_seleccionar_row')){
+                        input.attr('readonly',true);
+                    }
 
-                    if(!kGrid.tarjetas && campo.atributos['type']=='checkbox'){
-                        if(input.val()=='true') {
-                            input.attr('checked','checked');
-                        }
-
-                        input.removeClass('form-control')
-                            .attr('data-pk',item[kGrid.id])
+                    if(input.attr('type')==='checkbox'){
+                        
+                        input.attr('data-pk',item[kGrid.id])
                             .dblclick(function(e){
                                 e.stopPropagation();
                             });
@@ -595,7 +576,11 @@
                         
                         input.parent().addClass('text-center');
                     }
-                }                              
+                }
+
+                if(typeof campo.formato === 'function'){
+                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
+                }                         
             });                            
                                             
             var dimension = kGrid.tarjetas? 'fa-3x' : 'fa-lg';
@@ -604,12 +589,12 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href','JavaScript:void(0);')
+                        .attr('href',kGrid.enlace_dummy)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
-                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover)}, 
-                                function(){ $(this).addClass('text-muted').removeClass('text-'+hover)});
+                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
+                                function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
                     return boton;
-                }
+                };
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
@@ -617,13 +602,13 @@
 
                     // Habilitar edición inline
                      $('#'+pk+' form').find('input[readonly]').each(function(x,input){
-                        if(($(input).attr('data-disabled')!='true' && $(input).attr('data-readonly')!='true')
-                            || (nueva_entrada && $(input).attr('data-creable'))){
+                        if(($(input).attr('data-disabled')!=='true' && $(input).attr('data-readonly')!=='true') || 
+                            (nueva_entrada && $(input).attr('data-creable'))){
                             $(input).removeAttr('readonly')
                                 .removeAttr('disabled')
                                 .attr('data-editando',true)
                                 .keyup(function(e){
-                                    if(e.keyCode == 13){
+                                    if(e.keyCode === 13){
                                         e.preventDefault();
                                         $('#'+pk+' form').submit();
                                     }
@@ -646,11 +631,11 @@
             var deshabilitar_edicion = function(){
                 // Deshabilitar edición
                 $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
-                    $(input).attr('readonly',$(input).attr('data-readonly')!='false')
+                    $(input).attr('readonly',$(input).attr('data-readonly')!=='false')
                         .removeAttr('data-editando')
                         .unbind('keyup');
-                    if($(input).attr('type')=='checkbox'){
-                        $(input).attr('disabled',$(input).attr('data-disabled')!='false');
+                    if($(input).attr('type')==='checkbox'){
+                        $(input).attr('disabled',$(input).attr('data-disabled')!=='false');
                     }
                 });
 
@@ -666,7 +651,7 @@
                     var editados = $('#'+pk+' form').find('input[data-editando]');
                     deshabilitar_edicion();
                     editados.each(function(x,input){
-                        if($(input).attr('type')=='checkbox'){
+                        if($(input).attr('type')==='checkbox'){
                             $(input).prop('checked',original[$(input).attr('name')]);
                         }else{
                             $(input).val(original[$(input).attr('name')]);
@@ -679,7 +664,7 @@
                 if(kGrid.permisos['editar']){
                     var btn_editar = crear_boton('editar','Editar','pencil','primary');
 
-                    if(typeof kGrid.permisos['editar'] == 'function'){
+                    if(typeof kGrid.permisos['editar'] === 'function'){
                         btn_editar.click(function(e){
                             e.stopPropagation();
                             kGrid.permisos['editar'].call(this,item);
@@ -690,7 +675,7 @@
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
 
-                        var guardar_cambios = typeof kGrid.permisos['guardar'] == 'function'?
+                        var guardar_cambios = typeof kGrid.permisos['guardar'] === 'function'?
                             function(formulario){
                                 kGrid.permisos['guardar'].call(this,formulario);
                             } : function(formulario){
@@ -698,20 +683,20 @@
                                     type: 'POST',
                                     url: kGrid.permisos['guardar'],
                                     data: formulario,
-                                    success: function(retorno){  
+                                    success: function(/*retorno*/){  
                                         kGrid.cargar();
                                     }
                                 });
                             };
 
-                        $.kUI.validaciones.cargar();
+                        $.kui.formulario.validar.reglas();
 
                         $(izquierda).validate({
                             showErrors: function(errorMap, errorList) {
-                                $.kUI.validaciones.error(this, errorMap, errorList);
+                                $.kui.formulario.validar.error(this, errorMap, errorList);
                             },
                             submitHandler: function(form) {
-                                $.kUI.validaciones.fechas(form);
+                                $.kui.formulario.validar.fecha(form);
                                 
                                 deshabilitar_edicion();
                                 $.each($('#'+pk+' form').serializeArray(), function(_, it) {
@@ -750,7 +735,7 @@
                 if(kGrid.permisos['remover']){
                     var btn_remover = crear_boton('remover','Remover','times','danger');
 
-                    if(!nueva_entrada && typeof kGrid.permisos['remover'] == 'function'){
+                    if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
                             e.stopPropagation();
                             kGrid.permisos['remover'].call(this,item);
@@ -766,7 +751,7 @@
                 }
                 
             } else{                                    
-                if(typeof kGrid.permisos['activar'] == 'function'){
+                if(typeof kGrid.permisos['activar'] === 'function'){
                     formGroup.addClass('has-error');
                     var btn_activar = crear_boton('reactivar','Reactivar','check','success');
 
@@ -778,22 +763,22 @@
             }
             
             $.each(kGrid.botones,function(b,boton){
-                if(typeof boton.mostrar != 'function' || boton.mostrar.call(this,item)){
+                if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
                     var btn = $('<a>').attr('title',boton.comentario)
                         .addClass('text-muted kaccion')
-                        .attr('href', (boton.enlace!=undefined)? boton.enlace : 'Javascript:void(0);')
+                        .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
                         .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
-                        .hover( function(){ $(this).removeClass('text-muted') }, 
-                            function(){ $(this).addClass('text-muted')});
+                        .hover( function(){ $(this).removeClass('text-muted'); }, 
+                            function(){ $(this).addClass('text-muted'); });
                     
-                    if(boton.onclick!=undefined){
+                    if(boton.onclick!==undefined){
                         btn.click(function(e){
                             e.stopPropagation();
                             boton.onclick.call(this,item);
                         });
                     }
                     
-                    if(boton.atributos!=undefined){
+                    if(boton.atributos!==undefined){
                         $.each(boton.atributos,function(atributo,valor){
                             btn.attr(atributo,valor);
                         });
@@ -853,15 +838,14 @@
             .css('width',$('#'+pk+'pagina_anterior').outerWidth())
             .appendTo(centro)
             .keyup(function(e){
-                if(e.keyCode == 13){
+                if(e.keyCode === 13){
                     e.preventDefault();
                     var pagina = parseInt($('#'+pk+'pagina').val());
-                    if(isNaN(pagina) || pagina<0 
-                        || pagina > kGrid.totalPaginas){
+                    if(isNaN(pagina) || pagina<0 || pagina > kGrid.totalPaginas){
                         $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
                         return;
                     }
-                    if(pagina!=$('#'+pk+'pagina').data('pagina')){
+                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
                         $('#'+kGrid.div.id).kGrid('pagina',pagina);
                     }
                 }
@@ -944,7 +928,7 @@
                             'margin: 0 5px',
                             'text-align: center'
                         ]
-                }
+                };
 
             var estilo = '';
             $.each(reglas,function(elemento,regla){
@@ -1006,5 +990,5 @@
         }
 
     };
-})();
-
+    
+}(jQuery));
