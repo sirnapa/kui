@@ -1,24 +1,30 @@
 $('#simple').kForm({
     campos : [
-
-		{
-	            nombre : 'linea',
-	            titulo: 'Línea',
-	            requerido: true
-	    },
 	    {
 	            nombre : 'nombre',
-	            titulo: 'Nombre'
+	            titulo: 'Nombre',
+	            placeholder: 'Ejemplo de tipo texto',
+	            requerido: true
 	    },{
-	            nombre : 'apellido',
-	            titulo: 'Apellido'
+	    		nombre: 'activo',
+	    		titulo: 'Activo',
+	    		tipo: 'booleano',
+	    		placeholder: 'Ejemplo de tipo booleano'
 	    },{
-	            nombre : 'documento',
-	            titulo: 'Documento'
+	    		nombre: 'cantidad',
+	    		titulo: 'Cantidad',
+	    		tipo: 'numero',
+	    		placeholder: 'Ejemplo de tipo número'
+	    },{
+	    		nombre: 'porcentaje',
+	    		titulo: 'Porcentaje',
+	    		tipo: 'decimal',
+	    		placeholder: 'Ejemplo de tipo decimal'
 	    },{
 	            nombre : 'nombreRol',
 	            titulo: 'Rol',
 	            tipo: 'combo',
+	            placeholder: 'Ejemplo de tipo combo',
 	            opciones: {
 	            	origen: [
 	            		{id:'1',nombre:'Administrador'},
@@ -29,9 +35,20 @@ $('#simple').kForm({
 	            	formato: 'nombre'
 	            }
 	    },{
-	    		nombre: 'activo',
-	    		titulo: 'Activo',
-	    		tipo: 'Boolean'
+	    		nombre: 'nacimiento',
+	    		titulo: 'Nacimiento',
+	    		tipo: 'fecha',
+	    		placeholder: 'Ejemplo de tipo fecha'
+	    },{
+	    		nombre: 'entrada',
+	    		titulo: 'Entrada',
+	    		tipo: 'hora',
+	    		placeholder: 'Ejemplo de tipo hora'
+	    },{
+	    		nombre: 'alta',
+	    		titulo: 'Alta',
+	    		tipo: 'fecha-hora',
+	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
     submit: '/exito'

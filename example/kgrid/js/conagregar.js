@@ -23,10 +23,12 @@ $('#conagregar').kGrid({
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',
-            requerido: true
+            requerido: true,
+            tipo: 'fecha'
     },{
             nombre : 'fechaModif',
-            titulo: 'Modificado'
+            titulo: 'Modificado',
+            tipo: 'fecha'
     },{
             nombre : 'anonimo',
             titulo: 'NN',
