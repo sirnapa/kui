@@ -123,7 +123,6 @@
         })
         .show();
       this.shown = true;
-      console.log(this.$element);
       $('html, body').animate({'scrollTop': $(this.$element).offset().top - 75}, 900);
 
       return this;
@@ -397,7 +396,7 @@
   };
 
   $.fn.combobox.defaults = {
-  template: '<div class="combobox-container input-group"><input type="hidden" /><input type="text" autocomplete="off" /><span class="add-on input-group-addon btn dropdown-toggle" data-dropdown="dropdown"><span class="caret"/><span class="combobox-clear"><i class="fa fa-times"/></span></span></div>'
+  template: '<div class="combobox-container input-group"><input type="hidden" /><input type="text" autocomplete="off" /><span class="add-on input-group-addon btn dropdown-toggle" data-dropdown="dropdown"><span class="caret"/><span class="combobox-clear hidden"><i class="fa fa-times"/></span></span></div>'
   , menu: '<ul class="typeahead typeahead-long dropdown-menu"></ul>'
   , item: '<li><a href="#"></a></li>'
   };

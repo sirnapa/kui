@@ -1,10 +1,7 @@
-/*
- * kui
- * nelpa90@gmail.com,
- * www.konecta.com.py
+/*! 
  *
- * Copyright (c) 2015 Nelson Paez
- * Licensed under the MIT license.
+ *   +++++++++++++++++++++ Core +++++++++++++++++++++ 
+ *
  */
 
 (function ($) {

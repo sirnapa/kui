@@ -5,15 +5,15 @@
   "keywords": [
     "jquery-plugin"
   ],
-  "homepage": "https://github.com/sirnapa/kui",
+  "homepage": "https://github.com/konecta/kui",
   "author": {
     "name": "Nelson Paez",
     "email": "nelpa90@gmail.com",
-    "url": "https://github.com/sirnapa"
+    "url": "https://github.com/konecta"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sirnapa/kui.git"
+    "url": "https://github.com/konecta/kui.git"
   },
   "licenses": [
     {
@@ -23,6 +23,7 @@
   "devDependencies": {
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-qunit": "~0.5.1",
+    "grunt-contrib-concat": "~0.4.0",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-contrib-clean": "~0.5.0",

@@ -11,7 +11,6 @@
     <title>kGrid for Bootstrap</title>
 
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link id="hojaEstilo" href="../../assets/css/bootstrap-theme.css" rel="stylesheet">
     <link href="../../assets/css/font-awesome.min.css" rel="stylesheet">
 
     <style type="text/css">
@@ -33,7 +32,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../..">kGrid</a>
+          <a class="navbar-brand" href="../.."><i class="fa fa-puzzle-piece text-danger"></i> kGrid</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <div id="navbar-menu">
@@ -43,29 +42,13 @@
           <ul class="nav navbar-nav navbar-right">
             <li>
               <a href="../../doc/kgrid">
-                <i class="fa fa-lg fa-book"></i>
+                <i class="fa fa-book"></i> Documentación
               </a>
             </li>
             <li>
-              <a href="../../dist/jquery.kui.min.js">
-                <i class="fa fa-arrow-down"></i> Descargar
+              <a href="../../#descargas">
+                <i class="fa fa-download"></i> Descargar
               </a>
-            </li>
-            <li>
-                <a class="btn dropdown-toggle" id="estilos" data-toggle="dropdown">
-                  <i class="fa fa-file-o"></i> CSS <strong id="tema">Bootstrap</strong> <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="estilos">
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#" onclick="cambio_estilo(this)">Bootstrap</a>
-                  </li>
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#" onclick="cambio_estilo(this)">Konecta</a>
-                  </li>
-                  <li role="presentation">
-                    <a role="menuitem" tabindex="-1" href="#" onclick="cambio_estilo(this)">Personal</a>
-                  </li>
-                </ul>
             </li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -90,7 +73,8 @@
     <script src="../../assets/js/jquery.validation.js"></script>
     <!--/ Liberías requeridas -->
 
-    <script src="../../dist/jquery.kgrid.min.js"></script>
+    <script src="../../dist/jquery.kui.min.js"></script>
+    <script src="../../dist/jquery.kui.kgrid.min.js"></script>
     <script src="js/ejemplos.js"></script>
     
   </body>

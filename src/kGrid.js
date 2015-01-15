@@ -1,5 +1,7 @@
-/*
- * kGrid
+/*! 
+ *
+ *   +++++++++++++++++++++ kGrid +++++++++++++++++++++ 
+ *
  */
 
 (function ($) {
@@ -226,6 +228,7 @@
         this.seleccionados = {};
         this.preseleccionados = dato.seleccionados;
         this.nuevos = 0;
+        this.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
 
         this.cargar_estilos();
         this.cargar_paginador();
@@ -598,7 +601,7 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href','#')
+                        .attr('href',kGrid.enlace_dummy)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
@@ -775,7 +778,7 @@
                 if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
                     var btn = $('<a>').attr('title',boton.comentario)
                         .addClass('text-muted kaccion')
-                        .attr('href', (boton.enlace!==undefined)? boton.enlace : '#')
+                        .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
                         .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted'); }, 
                             function(){ $(this).addClass('text-muted'); });

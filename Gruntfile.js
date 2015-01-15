@@ -19,15 +19,30 @@ module.exports = function (grunt) {
     clean: {
       files: ['dist']
     },
-    uglify: {
+    concat: {
       options: {
-        banner: '<%= banner %>'
+        banner: '<%= banner %>',
+        stripBanners: true
       },
       dist: {
-         files: {
-              'dist/jquery.<%= pkg.name %>.min.js': ['src/<%= pkg.name %>.js','src/*.js'],
-              'dist/jquery.kgrid.min.js': ['src/<%= pkg.name %>.js','src/kgrid.js'],
-              'dist/jquery.kform.min.js': ['src/<%= pkg.name %>.js','src/kform.js']
+        files: {
+              'dist/jquery.<%= pkg.name %>.js': ['src/<%= pkg.name %>.js'],
+              'dist/jquery.<%= pkg.name %>.all.js': ['src/<%= pkg.name %>.js','src/*.js'],
+              'dist/jquery.<%= pkg.name %>.kgrid.js': ['src/kgrid.js'],
+              'dist/jquery.<%= pkg.name %>.kform.js': ['src/kform.js']
+         }
+      }
+    },
+    uglify: {
+      options: {
+        preserveComments: 'some'
+      },
+      build: {
+        files: {
+              'dist/jquery.<%= pkg.name %>.min.js': ['dist/jquery.<%= pkg.name %>.js'],
+              'dist/jquery.<%= pkg.name %>.all.min.js': ['dist/jquery.<%= pkg.name %>.all.js'],
+              'dist/jquery.<%= pkg.name %>.kgrid.min.js': ['dist/jquery.<%= pkg.name %>.kgrid.js'],
+              'dist/jquery.<%= pkg.name %>.kform.min.js': ['dist/jquery.<%= pkg.name %>.kform.js']
          }
       }
     },
@@ -68,7 +83,7 @@ module.exports = function (grunt) {
       },
       src: {
         files: '<%= jshint.src.src %>',
-        tasks: ['jshint:src', 'qunit']
+        tasks: ['jshint:src', 'qunit', 'concat', 'uglify']
       },
       test: {
         files: '<%= jshint.test.src %>',
@@ -86,7 +101,7 @@ module.exports = function (grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'connect', 'qunit', 'clean', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'connect', 'qunit', 'clean', 'concat', 'uglify']);
   grunt.registerTask('server', function () {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve']);

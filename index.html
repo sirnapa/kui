@@ -35,24 +35,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">KUI</a>
+          <a class="navbar-brand" href="#"><i class="fa fa-puzzle-piece text-danger"></i> KUI</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <div id="navbar-menu">
             <ul id="menu-secciones" class="nav navbar-nav">
-            	<li><a href="doc/kgrid">kGrid</a></li>
-            	<li><a href="doc/kform">kForm</a></li>
             </ul>
           </div>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="../../example/kgrid">
-                <i class="fa fa-desktop"></i> Ejemplos
+              <a href="mailto:nelpa90@gmail.com">
+                <i class="fa fa-envelope"></i> Contacto
               </a>
             </li>
             <li>
-              <a href="../../dist/jquery.kui.min.js">
-                <i class="fa fa-arrow-down"></i> Descargar
+              <a href="http://github.com/konecta/kui">
+                <i class="fa fa-github"></i> Github
               </a>
             </li>
           </ul>
@@ -64,14 +62,14 @@
 
 		<!-- ========================================================= -->
 		<div id="informacion" class="seccion">
-			<h1>kUI</h1>
+			<h1><i class="fa fa-puzzle-piece text-muted"></i> kUI</h1>
 			<p class="lead">Herramientas para aplicaciones web de Konecta SA.</p>
 			<p>
 				El proyecto kUI es una plataforma javascript que incluye grillas (listas), formularios y otras soluciones.
 			</p>
 			<br>
 
-			<h2>Información</h2>
+			<h2><i class="fa fa-info-circle text-muted"></i> Información</h2>
 			<div class="table-responsive">
 			  <table class="table table-bordered">
 			  	<tr>
@@ -98,12 +96,12 @@
 
 		<!-- ========================================================= -->
   	<div id="requerimientos" class="seccion">
-    	<h2>Requerimientos</h2>
+    	<h2><i class="fa fa-file-text-o text-muted"></i> Requerimientos</h2>
 	    <ul>
         <li>Jquery 1.11.2 o superior <a href="http://jquery.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
         <li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
         <li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
-        <li>Bootstrap.combobox.js <a href="assets/js/bootstrap.combobox.js" target="_blank"><i class="fa fa fa-cloud-download"></i></a></li>
+        <li>Bootstrap.combobox.js (versión modificada) <a href="assets/js/bootstrap.combobox.js" target="_blank"><i class="fa fa fa-cloud-download"></i></a></li>
         <li>Bootstrap.datetimepicker.js <a href="assets/js/bootstrap.datetimepicker.js" target="_blank"><i class="fa fa fa-cloud-download"></i></a></li>
         <li>delegate.js <a href="assets/js/delegate.js" target="_blank"><i class="fa fa fa-cloud-download"></i></a></li>
         <li>Jquery.validation.js <a href="assets/js/jquery.validation.js" target="_blank"><i class="fa fa fa-cloud-download"></i></a></li>
@@ -113,11 +111,59 @@
 
     <!-- ========================================================= -->
     <div id="herramientas" class="seccion">
-      <h2>Herramientas</h2>
-      <ul class="fa-ul" style="font-size:2em;">
-        <li><a href="doc/kgrid"><i class="fa-li fa fa-table"></i>kGrid</a></li>
-        <li><a href="doc/kform"><i class="fa-li fa fa-floppy-o"></i>kForm</a></li>
-      </ul>
+      <h2><i class="fa fa-puzzle-piece text-muted"></i> Herramientas</h2><br>
+      <div class="row">
+        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kgrid">
+          <a href="doc/kgrid">
+            <i class="fa fa-4x fa-table"></i><br><br>
+            <h3>kGrid</h3>
+          </a>
+        </div>
+        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kform">
+          <a href="doc/kform">
+            <i class="fa fa-4x fa-file-o"></i><br><br>
+            <h3>kForm</h3>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- ========================================================= -->
+
+    <!-- ========================================================= -->
+    <div id="descargas" class="seccion" style="border-bottom:none;">
+      <h2><i class="fa fa-download text-muted"></i> Descargar</h2>
+      <div class="row">
+        <div class="col-xs-4 text-center subseccion" data-enlace="dist/jquery.kui.min.js">
+          <a href="dist/jquery.kui.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kui</h3>
+          </a>
+        </div>
+        <div class="col-xs-4 text-center subseccion" data-enlace="dist/jquery.kui.kgrid.min.js">
+          <a href="dist/jquery.kui.kgrid.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kGrid</h3>
+          </a>
+        </div>
+        <div class="col-xs-4 text-center subseccion" data-enlace="dist/jquery.kui.kform.min.js">
+          <a href="dist/jquery.kui.kform.min.js">
+            <span class="fa-stack fa-4x text-muted">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-file-archive-o fa-stack-1x fa-inverse"></i>
+            </span>
+            <br>
+            <h3>kForm</h3>
+          </a>
+        </div>
+      </div>
     </div>
     <!-- ========================================================= -->
 

@@ -11,12 +11,6 @@ var datos_json = JSON.stringify($.parseJSON($.ajax({
       async: false
     }).responseText),null,4);
 
-var estilos = {
-    'Bootstrap' : 'bootstrap-theme',
-    'Konecta'   : 'k',
-    'Personal'  : 'personal' 
-}
-
 $(document).ready(function () {
     agregar_grilla('simple','Simple');
     agregar_grilla('seleccionable','Seleccionable');
@@ -25,11 +19,6 @@ $(document).ready(function () {
     agregar_grilla('tarjetasconscores','Tarjetas con score');
     agregar_grilla('tarjetasmixtas','Tarjetas mixtas');
 });
-
-function cambio_estilo(btn){
-    $('#tema').html($(btn).html());
-    $('#hojaEstilo').attr('href','../assets/css/'+estilos[$(btn).html()]+'.css');
-}
 
 function agregar_grilla(id,label){
     var wrapper = $('<div>').attr('id','div-'+id)

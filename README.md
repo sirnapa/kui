@@ -6,17 +6,18 @@ Utilidades para jQuery + Bootstrap: Grillas, Formularios, etc.
 
 Download the [production version][min] or the [development version][max].
 
-[min]: https://raw.githubusercontent.com/sirnapa/jquery-kui/master/dist/jquery.kui.min.js
-[max]: https://raw.githubusercontent.com/sirnapa/jquery-kui/master/dist/jquery.kui.js
+[min]: https://raw.githubusercontent.com/konecta/jquery-kui/master/dist/jquery.kui.min.js
+[max]: https://raw.githubusercontent.com/konecta/jquery-kui/master/dist/jquery.kui.js
 
 In your web page:
 
 ```html
 <script src="jquery.js"></script>
-<script src="dist/kui.min.js"></script>
+<script src="dist/jquery.kui.min.js"></script>
 <script>
 jQuery(function($) {
-  $.awesome(); // "awesome"
+  $.kgrid(); // "kGrid Plugin"
+  $.kform(); // "kForm Plugin"
 });
 </script>
 ```
