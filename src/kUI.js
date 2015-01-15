@@ -74,6 +74,7 @@
 
        var crear_input_select = function(tipo){
           return $('<'+tipo+'>').addClass('form-control')
+              .attr('data-rol','input')
               .attr('name',campo.nombre)
               .attr('placeholder',
                   campo.placeholder===undefined?
@@ -91,15 +92,20 @@
               icono=campo.icono;
           }
 
-          var inputGroup = $('<div>').addClass('input-group')
+          var nuevo_input = crear_input_select('input');
+
+          if(campo.simple){
+            nuevo_input.appendTo(elemento);
+          }else{
+            var inputGroup = $('<div>').addClass('input-group')
               .appendTo(elemento);
 
-          $('<span>').addClass('input-group-addon')
-              .html('<i class="fa fa-' + icono + '"></i>')
-              .appendTo(inputGroup);
+            $('<span>').addClass('input-group-addon')
+                .html('<i class="fa fa-' + icono + '"></i>')
+                .appendTo(inputGroup);
 
-          var nuevo_input = crear_input_select('input');
-          nuevo_input.appendTo(inputGroup);
+            nuevo_input.appendTo(inputGroup);
+          }
 
           return nuevo_input;
        };
@@ -263,6 +269,14 @@
       if(campo.atributos!==undefined){
           $.each(campo.atributos,function(atributo,valor){
               input.attr(atributo,valor);
+          });
+          
+          var campos_especiales = ['disabled','readonly'];
+          $.each(campos_especiales,function(e,especial){
+              if(campo.atributos[especial]==='false'){
+                  input.removeAttr(especial);
+              }
+              input.attr('data-'+especial,campo.atributos[especial]);
           });
       }
     },

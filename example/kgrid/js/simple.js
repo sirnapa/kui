@@ -18,10 +18,10 @@ $('#simple').kGrid({
             nombre : 'anonimo',
             titulo: 'NN',
             ancho: 1,
+            tipo: 'booleano',
             formato: function(campo,row){
                     return campo=='S';
-            },
-            atributos: {'type':'checkbox'}
+            }
     }],
     estado : function(item) {
             if (item['activo'] == 'S') {

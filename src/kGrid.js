@@ -192,9 +192,9 @@
             var campo_seleccion = {
                 nombre: 'kGrid_seleccionado',
                 titulo: '',
+                tipo: 'booleano',
                 ancho: 1,
                 atributos: {
-                    'type':'checkbox',
                     'readonly': 'false',
                     'disabled': 'false',
                     'class': div.id + '_seleccionar_row'
@@ -456,11 +456,6 @@
                 }
             }
 
-            var setearValor = kGrid.tarjetas? function(columna,valor){
-                    columna.html(valor);
-                } : function(columna,valor){
-                    columna.val(valor);
-                };            
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kGrid.id])
                 .addClass('form-group' + (kGrid.tarjetas? ' well' : ''));
@@ -539,49 +534,38 @@
                         .appendTo(columna);
                 }
 
-                var input = kGrid.tarjetas? columna : 
-                    $('<input>').addClass('form-control')
-                        .attr('readonly',true)
-                        .attr('name',campo.nombre)
-                        .appendTo(columna);
+                if(kGrid.tarjetas){
+                    columna.html(typeof campo.formato === 'function'?
+                        campo.formato.call(this,item[campo.nombre],item) : item[campo.nombre]);
 
-                if(typeof campo.formato === 'function'){
-                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
-                }
-                setearValor(input, item[campo.nombre]);
-                    
-                if(kGrid.tarjetas && campo.titulo && campo.titulo!==''){
-                    if(campo.tipo!=='score'){
-                        $('<label>').addClass('text-muted')
-                            .html(campo.titulo + '&nbsp; &nbsp;')
-                            .prependTo(columna);
-                    }else{
-                        $('<br>').appendTo(columna);
-                        $('<small>').html(campo.titulo)
-                            .appendTo(columna);
+                    if(campo.titulo && campo.titulo!==''){
+                        if(campo.tipo!=='score'){
+                            $('<label>').addClass('text-muted')
+                                .html(campo.titulo + '&nbsp; &nbsp;')
+                                .prependTo(columna);
+                        }else{
+                            $('<br>').appendTo(columna);
+                            $('<small>').html(campo.titulo)
+                                .appendTo(columna);
+                        }
+                    } 
+                }else{
+
+                    if(campo.simple===undefined){
+                        campo.simple = true;
                     }
-                }                       
-                
-                if(campo.atributos!==undefined){
-                    $.each(campo.atributos,function(atributo,valor){
-                        input.attr(atributo,valor);
-                    });
+
+                    $.kui.formulario.nuevo_elemento(!nueva_entrada,columna,item,campo);
+
+                    var input = columna.find('[data-rol=input]');
                     
-                    var campos_especiales = ['disabled','readonly'];
-                    $.each(campos_especiales,function(e,especial){
-                        if(campo.atributos[especial]==='false'){
-                            input.removeAttr(especial);
-                        }
-                        input.attr('data-'+especial,campo.atributos[especial]);
-                    });
+                    if(!input.hasClass(kGrid.div.id + '_seleccionar_row')){
+                        input.attr('readonly',true);
+                    }
 
-                    if(!kGrid.tarjetas && campo.atributos['type']==='checkbox'){
-                        if(input.val()==='true') {
-                            input.attr('checked','checked');
-                        }
-
-                        input.removeClass('form-control')
-                            .attr('data-pk',item[kGrid.id])
+                    if(input.attr('type')==='checkbox'){
+                        
+                        input.attr('data-pk',item[kGrid.id])
                             .dblclick(function(e){
                                 e.stopPropagation();
                             });
@@ -592,7 +576,11 @@
                         
                         input.parent().addClass('text-center');
                     }
-                }                              
+                }
+
+                if(typeof campo.formato === 'function'){
+                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
+                }                         
             });                            
                                             
             var dimension = kGrid.tarjetas? 'fa-3x' : 'fa-lg';
