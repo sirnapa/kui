@@ -167,6 +167,7 @@
         });
 
         var permisos_finales = {
+            agregar:null,
             editar:null,
             guardar: null,
             activar:null,
@@ -434,6 +435,8 @@
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
+            var guardar = (nueva_entrada && kGrid.permisos['agregar'])?
+                kGrid.permisos['agregar'] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
                 if($('#'+pk).is(':visible')){
@@ -448,10 +451,10 @@
                     return;
                 }
 
-                if(!kGrid.tarjetas && kGrid.permisos['guardar']){
+                if(!kGrid.tarjetas && guardar){
                     item = {};
                 }else{
-                    window.console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "guardar"');
+                    window.console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "agregar" o "guardar"');
                     return;
                 }
             }
@@ -487,7 +490,7 @@
                 }
             }
                                         
-            var izquierda = $(kGrid.permisos['guardar']? '<form>' : '<div>')
+            var izquierda = $(guardar? '<form>' : '<div>')
                 .addClass('col-md-' + (kGrid.tarjetas? '7' : '11'))
                 .appendTo(formGroup);
             var derecha = $('<div>').addClass('text-right col-md-' + (kGrid.tarjetas? '5' : '1'))
@@ -669,19 +672,19 @@
                             e.stopPropagation();
                             kGrid.permisos['editar'].call(this,item);
                         });
-                    }else if(kGrid.permisos['guardar']){
+                    }else if(guardar){
 
                         // Guardar cambios
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
 
-                        var guardar_cambios = typeof kGrid.permisos['guardar'] === 'function'?
+                        var guardar_cambios = typeof guardar === 'function'?
                             function(formulario){
-                                kGrid.permisos['guardar'].call(this,formulario);
+                                guardar.call(this,formulario);
                             } : function(formulario){
                                 $.ajax({
                                     type: 'POST',
-                                    url: kGrid.permisos['guardar'],
+                                    url: guardar,
                                     data: formulario,
                                     success: function(/*retorno*/){  
                                         kGrid.cargar();
