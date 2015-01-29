@@ -14,3 +14,7 @@ function guardar(item){
 	console.log(item);
 	alert('Guardar');
 }
+function agregar(item){
+	console.log(item);
+	alert('Agregar');
+}

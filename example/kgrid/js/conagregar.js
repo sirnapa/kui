@@ -48,7 +48,8 @@ $('#conagregar').kGrid({
         remover: true,
         activar: activar,
         editar: true,
-        guardar: guardar
+        guardar: guardar,
+        agregar: agregar
     },
     ondblclick: true,
     loadComplete: function(){

@@ -10,8 +10,8 @@
 
     <title>kGrid for Bootstrap</title>
 
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet">
 
     <style>
     	.seccion{
@@ -229,6 +229,7 @@
 {
    editar: null,  // Acción predeterminada: Habilitar la edición rápida "inline"
    guardar: null, // Función para guardar tras la edición inline. También puede ser un string con la URL a un servicio POST.
+   agregar: null, // Función o URL de un servicio POST para guardar nuevas entradas, en caso de omisión se llama al permiso de guardar.
    activar: null, // No tiene acción predeterminada
    remover: null  // Acción predeterminada: Remueve el objeto solo de la vista actual (no persiste el cambio),
 }</pre>
@@ -590,7 +591,7 @@
  </div>
 
     <script src="../../bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="../../assets/js/bootstrap.min.js"></script>
+    <script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="../../assets/js/secciones.js"></script>
     	
     </script>
