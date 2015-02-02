@@ -74,12 +74,13 @@ function agregar_ejemplo(id,label){
         $('<pre>').html(datos_json)
                 .appendTo(datos);   
 
-        // Menú y código requerido
-         $('<a>').attr('href','#div-'+id)
-            .html(label)
-            .appendTo(
-                    $('<li>').appendTo('#navbar-menu ul')
-                );
     }
+
+    // Menú y código requerido
+    $('<a>').attr('href','#div-'+id)
+        .html(label)
+        .appendTo(
+                $('<li>').appendTo('#navbar-menu ul')
+            );
 
 }
