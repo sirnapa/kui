@@ -10,8 +10,8 @@
 
     <title>kUI</title>
 
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet">
 
     <style>
     	.seccion{
@@ -102,25 +102,30 @@
         <li>Bootstrap 3.x <a href="http://getbootstrap.com" target="_blank"><i class="fa fa-external-link"></i></a></li>
         <li>Font Awesome  4.x <a href="http://fontawesome.io" target="_blank"><i class="fa fa-external-link"></i></a></li>
         <li>Bootstrap.datetimepicker.js <a href="http://tarruda.github.io/bootstrap-datetimepicker/" target="_blank"><i class="fa fa-external-link"></i></a></li>
-        <li>Bootstrap.combobox.js (versión modificada) <a href="assets/js/bootstrap.combobox.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
-        <li>delegate.js <a href="assets/js/delegate.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
-        <li>Jquery.validation.js <a href="assets/js/jquery.validation.js" target="_blank"><i class="fa fa-cloud-download"></i></a></li>
+        <li>Bootstrap.combobox.js <a href="https://github.com/danielfarrell/bootstrap-combobox" target="_blank"><i class="fa fa-external-link"></i></a></li>
+        <li>Jquery.validation.js <a href="http://jqueryvalidation.org" target="_blank"><i class="fa fa-external-link"></i></a></li>
       </ul>
 		</div>
     <!-- ========================================================= -->
 
     <!-- ========================================================= -->
-    <div id="herramientas" class="seccion">
-      <h2><i class="fa fa-puzzle-piece text-muted"></i> Herramientas</h2><br>
+     <div class="seccion hidden" data-enlace="https://github.com/konecta/kui/wiki/">
+      <h2><i class="fa fa-book text-muted"></i> Documentación</h2>
+    </div>
+    <!-- ========================================================= -->
+
+    <!-- ========================================================= -->
+    <div id="ejemplos" class="seccion">
+      <h2><i class="fa fa-desktop text-muted"></i> Ejemplos</h2><br>
       <div class="row">
-        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kgrid">
-          <a href="doc/kgrid">
+        <div class="col-xs-6 text-center subseccion" data-enlace="example/kgrid">
+          <a href="example/kgrid">
             <i class="fa fa-4x fa-table"></i><br><br>
             <h3>kGrid</h3>
           </a>
         </div>
-        <div class="col-xs-6 text-center subseccion" data-enlace="doc/kform">
-          <a href="doc/kform">
+        <div class="col-xs-6 text-center subseccion" data-enlace="example/kform">
+          <a href="example/kform">
             <i class="fa fa-4x fa-file-o"></i><br><br>
             <h3>kForm</h3>
           </a>
@@ -182,7 +187,7 @@
 	</div>
 
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="assets/js/secciones.js"></script>
 
   </body>

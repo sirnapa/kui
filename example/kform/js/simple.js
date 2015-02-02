@@ -51,5 +51,9 @@ $('#simple').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    submit: '/exito'
+    //submit: '/exito'
+    submit: function(datos,original){
+    	console.log(datos,original);
+    	alert('Guardar');
+    }
 });

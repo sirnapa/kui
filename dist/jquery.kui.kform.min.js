@@ -1,4 +1,4 @@
-/*! kui - v0.0.1 - 2015-01-16
+/*! kui - v0.0.2 - 2015-01-30
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 

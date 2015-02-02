@@ -1,4 +1,4 @@
-/*! kui - v0.0.1 - 2015-01-16
+/*! kui - v0.0.2 - 2015-01-30
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -292,9 +292,10 @@
 
           $.validator.methods["date"] = function(value, element) {
               var check = false;
-              var re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-              if( re.test(value)){
-                  var adata = value.split('/');
+              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
+              var es_fecha = function(separador){
+                  var adata = value.split(separador);
                   var gg = parseInt(adata[0],10);
                   var mm = parseInt(adata[1],10);
                   var aaaa = parseInt(adata[2],10);
@@ -306,6 +307,12 @@
                   } else{
                     check = false;
                   }
+              };
+
+              if(re_con_barras.test(value)){
+                  es_fecha('/');
+              } else if(re_con_guiones.test(value)){
+                  es_fecha('-');
               } else{
                   check = false;
               }
