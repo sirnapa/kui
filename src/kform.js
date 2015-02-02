@@ -119,14 +119,14 @@
             var kForm = this;
             var item = kForm.dato;
 
-            var fieldset = $('<fieldset>').appendTo(kForm.form);
+            kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
             if(kForm.solo_lectura){
-                fieldset.attr('disabled',true);
+                kForm.fieldset.attr('disabled',true);
             }
             
             $.each(kForm.campos,function(c,campo){ 
                 var formGroup = $('<div>').addClass('form-group')
-                    .appendTo(fieldset);
+                    .appendTo(kForm.fieldset);
 
                 if(campo.titulo===undefined){
                     campo.titulo = campo.nombre;
@@ -172,13 +172,14 @@
                     .html('Guardar')
                     .appendTo(
                         $('<div>').addClass('form-group text-right')
-                            .appendTo(kForm.form)
+                            .appendTo(kForm.fieldset)
                     );
             }else{
                 kForm.boton_submit = $(kForm.boton_submit);
             }
 
-            kForm.boton_submit.click(function(){
+            kForm.boton_submit.click(function(e){
+                e.preventDefault();
                 kForm.form.submit();
             });
 
@@ -218,7 +219,19 @@
 
         contenido: function(){
             var kForm = this;
-            return kForm.form.serialize();
+            var dato = {};
+
+            // Serialize Array para todos los inputs excepto checkbox
+            $.each(kForm.form.serializeArray(),function(_, it) {
+                dato[it.name] = it.value;
+            });
+
+            // Checkboxs
+            $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
+                dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
+            });
+
+            return dato;
         }
         
     };
