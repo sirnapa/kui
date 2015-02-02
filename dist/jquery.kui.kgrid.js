@@ -1,4 +1,4 @@
-/*! kui - v0.0.2 - 2015-01-30
+/*! kui - v0.0.3 - 2015-02-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -705,10 +705,19 @@
                                 $.kui.formulario.validar.fecha(form);
                                 
                                 deshabilitar_edicion();
+                                var dato = {};
+
+                                // Serialize Array para todos los inputs excepto checkbox
                                 $.each($('#'+pk+' form').serializeArray(), function(_, it) {
-                                    item[it.name] = it.value;
+                                    dato[it.name] = it.value;
                                 });
-                                guardar_cambios(item);
+
+                                // Checkboxs
+                                $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
+                                    dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
+                                });
+
+                                guardar_cambios(dato);
 
                                 return false;
                             }
