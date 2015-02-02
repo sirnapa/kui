@@ -1,4 +1,13 @@
-$('#simple').kForm({
+$('#solo_lectura').kForm({
+	soloLectura: true,
+	origen:{
+		nombre: 'Nelson Páez',
+		activo: true,
+		cantidad: 23,
+		porcentaje: 24.5,
+		rol: 2,
+		nacimiento: '08-07-1990'
+	},
     campos : [
 	    {
 	            nombre : 'nombre',
@@ -51,9 +60,5 @@ $('#simple').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    //submit: '/exito'
-    submit: function(datos,original){
-    	console.log(datos,original);
-    	alert('Guardar');
-    }
+    submit: '/exito'
 });

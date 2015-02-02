@@ -1,4 +1,4 @@
-/*! kui - v0.0.3 - 2015-02-02
+/*! kui - v0.0.4 - 2015-02-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -42,6 +42,7 @@
         this.boton_submit = dato.botonSubmit;
         this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
+        this.after_save = dato.afterSave;
         
         this.cargar();
         
@@ -112,6 +113,8 @@
                     async: false
                 });
 
+            }else{
+                kForm.dato = kForm.origen;
             }
 
             kForm.cargar_campos();
@@ -193,14 +196,20 @@
                     kForm.submit.call(this,kForm.contenido(),kForm.dato);
                 } : function(){
 
+                    var afterSave = typeof kForm.after_save === 'function'?
+                        function(retorno){
+                            kForm.after_save.call(this,retorno);
+                        }:function(){};
+
                     $.ajax({
                         type: kForm.ajax_submit,
                         url: kForm.submit,
                         data: kForm.contenido(),
-                        success: function(retorno){ 
+                        success: function(retorno){
                             if(retorno.mensaje){
                                 kForm.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
                             }
+                            afterSave(retorno);
                         },
                         async: false
                     });
@@ -233,6 +242,8 @@
             $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
+
+            dato = $.extend({}, kForm.dato, dato);
 
             return dato;
         }

@@ -714,6 +714,8 @@
                                     dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
                                 });
 
+                                dato = $.extend({}, item, dato);
+
                                 guardar_cambios(dato);
 
                                 return false;

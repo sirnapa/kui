@@ -1,4 +1,4 @@
-/*! kui - v0.0.3 - 2015-02-02
+/*! kui - v0.0.4 - 2015-02-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -716,6 +716,8 @@
                                 $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
                                     dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
                                 });
+
+                                dato = $.extend({}, item, dato);
 
                                 guardar_cambios(dato);
 
