@@ -1,5 +1,16 @@
-$('#edicion').kForm({
-    campos : [
+$('#editar').kForm({
+    origen:{
+		nombre: 'Nelson Páez',
+		activo: true,
+		cantidad: 23,
+		porcentaje: 24.5,
+		rol: {
+			id: 2,
+			nombre: 'Supervisor'
+		},
+		nacimiento: '08-07-1990'
+	},
+	campos : [
 	    {
 	            nombre : 'nombre',
 	            titulo: 'Nombre',
@@ -21,7 +32,7 @@ $('#edicion').kForm({
 	    		tipo: 'decimal',
 	    		placeholder: 'Ejemplo de tipo decimal'
 	    },{
-	            nombre : 'nombreRol',
+	            nombre : 'rol',
 	            titulo: 'Rol',
 	            tipo: 'combo',
 	            placeholder: 'Ejemplo de tipo combo',

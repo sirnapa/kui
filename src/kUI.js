@@ -66,6 +66,14 @@
 
        var input;
 
+       if(campo.tipo==='combo' && !campo.formato){
+          var identificador = solo_lectura? campo.opciones.formato : campo.opciones.id;
+          campo.formato = typeof campo.opciones.formato==='function'?
+            campo.opciones.formato : function(){
+              return item[campo.nombre]? item[campo.nombre][identificador] : '';
+            };
+       }
+
        var valor_input = function(){
           return typeof campo.formato === 'function'? 
               campo.formato.call(this,item[campo.nombre],item)
@@ -73,6 +81,7 @@
        };
 
        var crear_input_select = function(tipo){
+
           return $('<'+tipo+'>').addClass('form-control')
               .attr('data-rol','input')
               .attr('name',campo.nombre)
@@ -154,7 +163,8 @@
                           : opcion[campo.opciones.formato]
                       )
                       .appendTo(nuevo_input);
-                  if(valor_input()===opcion[campo.opciones.id]){
+                  
+                  if(valor_input().toString()===opcion[campo.opciones.id].toString()){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
