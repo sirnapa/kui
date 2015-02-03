@@ -35,7 +35,7 @@ $('#seleccionable').kGrid({
             }
             return false;
     },
-     permisos: {
+    permisos: {
         remover: remover,
         activar: activar,
         editar: editar

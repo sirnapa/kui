@@ -31,5 +31,23 @@ $('#tarjetas').kGrid({
         activar: activar,
         editar: editar
     },
+    botones: [
+        {
+            comentario: 'Ejemplo de botón personalizado',
+            icono: 'link',
+            onclick: function(){
+                alert('Acción personalizada');
+            }
+        },{
+            comentario: 'Botón que sale solo cuando el nombre empieza con A',
+            icono: 'at',
+            onclick: function(){
+                alert('Esta tarjeta tiene un nombre que empieza con A.')
+            },
+            mostrar: function(item){
+                return item.nombre.charAt(0)=='A';
+            }
+        }
+    ],
     onclick: click
 });
