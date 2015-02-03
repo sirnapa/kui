@@ -72,13 +72,26 @@
             campo.formato.call(this,item[campo.nombre],item);
           };
        }else if(campo.tipo==='combo'){
-          var identificador = solo_lectura? campo.opciones.formato : campo.opciones.id;
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
 
-          valor_input = typeof campo.opciones.formato==='function'?
-            campo.opciones.formato : function(){
-              return item[campo.nombre]? item[campo.nombre][identificador] : 
-              (item[campo.nombre+'.'+identificador]? item[campo.nombre+'.'+identificador]: '');
+          if(solo_lectura){
+            valor_input = function(){
+              return typeof campo.opciones.formato==='function'? 
+                campo.opciones.formato.call(this,
+                  item[campo.nombre]?
+                  item[campo.nombre] : 
+                  item[campo.nombre+'.'+campo.opciones.id]) :
+                subvalor(item,campo.nombre,campo.opciones.formato);
             };
+          }else{
+            valor_input = function(){
+              return subvalor(item,campo.nombre,campo.opciones.id);
+            };
+          }
 
        }else{
           valor_input = function(){

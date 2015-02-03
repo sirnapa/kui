@@ -1,6 +1,6 @@
 {
   "name": "kui",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "dependencies": {
     "bootstrap-combobox": "~1.1.6",
     "bootstrap-datetimepicker": "~0.0.11",
