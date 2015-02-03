@@ -781,7 +781,7 @@
                     var btn = $('<a>').attr('title',boton.comentario)
                         .addClass('text-muted kaccion')
                         .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
-                        .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
+                        .html('<i class="fa ' + dimension + ' fa-' + boton.icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted'); }, 
                             function(){ $(this).addClass('text-muted'); });
                     

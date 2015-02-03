@@ -1,4 +1,4 @@
-/*! kui - v0.0.4 - 2015-02-02
+/*! kui - v0.0.4 - 2015-02-03
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -784,7 +784,7 @@
                     var btn = $('<a>').attr('title',boton.comentario)
                         .addClass('text-muted kaccion')
                         .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
-                        .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
+                        .html('<i class="fa ' + dimension + ' fa-' + boton.icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted'); }, 
                             function(){ $(this).addClass('text-muted'); });
                     
