@@ -51,9 +51,11 @@ $('#edicion').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    //submit: '/exito'
     submit: function(datos,original){
     	console.log(datos,original);
     	alert('Guardar');
+    },
+    afterSubmit: function(){
+    	console.log('Este evento se dispara después de guardar.');
     }
 });
