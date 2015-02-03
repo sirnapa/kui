@@ -39,7 +39,7 @@
         this.boton_submit = dato.botonSubmit;
         this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
-        this.after_save = dato.afterSave;
+        this.after_submit = dato.afterSubmit;
         
         this.cargar();
         
@@ -188,15 +188,15 @@
 
             $.kui.formulario.validar.reglas();
 
+            var afterSubmit = typeof kForm.after_submit === 'function'?
+                function(retorno){
+                    kForm.after_submit.call(this,retorno);
+                }:function(){};
+
             var on_submit = typeof kForm.submit === 'function'?
                 function(){
-                    kForm.submit.call(this,kForm.contenido(),kForm.dato);
+                    afterSubmit(kForm.submit.call(this,kForm.contenido(),kForm.dato));
                 } : function(){
-
-                    var afterSave = typeof kForm.after_save === 'function'?
-                        function(retorno){
-                            kForm.after_save.call(this,retorno);
-                        }:function(){};
 
                     $.ajax({
                         type: kForm.ajax_submit,
@@ -206,7 +206,7 @@
                             if(retorno.mensaje){
                                 kForm.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
                             }
-                            afterSave(retorno);
+                            afterSubmit(retorno);
                         },
                         async: false
                     });
