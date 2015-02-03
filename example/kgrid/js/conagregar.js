@@ -9,25 +9,30 @@ $('#conagregar').kGrid({
             atributos: {
                 'readonly':true,
                 'data-creable': true
+            }
+    },{
+            nombre : 'empresa',
+            titulo: 'Empresa',
+            ancho: 4,
+            requerido: true,
+            atributos: {
+                'readonly':true,
+                'data-creable': true
                 },
             tipo: 'combo',
             opciones: {
                 origen: [
-                    {id:'1',nombre:'Administrador'},
-                    {id:'2',nombre:'Supervisor'},
-                    {id:'3',nombre:'Vendedor'},
+                    {pkEmpresa:'1',nombre:'Konecta'},
+                    {pkEmpresa:'2',nombre:'Documenta'},
+                    {pkEmpresa:'3',nombre:'Otra empresa'},
                 ],
-                id: 'id',
+                id: 'pkEmpresa',
                 formato: 'nombre'
             }
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',
             requerido: true,
-            tipo: 'fecha'
-    },{
-            nombre : 'fechaModif',
-            titulo: 'Modificado',
             tipo: 'fecha'
     },{
             nombre : 'anonimo',
