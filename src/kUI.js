@@ -65,20 +65,27 @@
        */
 
        var input;
+       var valor_input;
 
-       if(campo.tipo==='combo' && !campo.formato){
+       if(typeof campo.formato === 'function'){
+          valor_input = function(){
+            campo.formato.call(this,item[campo.nombre],item);
+          };
+       }else if(campo.tipo==='combo'){
           var identificador = solo_lectura? campo.opciones.formato : campo.opciones.id;
-          campo.formato = typeof campo.opciones.formato==='function'?
+
+          valor_input = typeof campo.opciones.formato==='function'?
             campo.opciones.formato : function(){
-              return item[campo.nombre]? item[campo.nombre][identificador] : '';
+              return item[campo.nombre]? item[campo.nombre][identificador] : 
+              (item[campo.nombre+'.'+identificador]? item[campo.nombre+'.'+identificador]: '');
             };
+
+       }else{
+          valor_input = function(){
+            return item[campo.nombre];
+          };
        }
 
-       var valor_input = function(){
-          return typeof campo.formato === 'function'? 
-              campo.formato.call(this,item[campo.nombre],item)
-              :  item[campo.nombre];
-       };
 
        var crear_input_select = function(tipo){
 
@@ -122,6 +129,7 @@
        var crear_select = function(){
           var nuevo_input = crear_input_select(solo_lectura?
               'input' : 'select');
+          nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
           nuevo_input.appendTo(elemento);
 
           if(!solo_lectura){
@@ -273,7 +281,7 @@
               /* Tipo texto */
               input = crear_input('align-right');
               input.attr('type','text');
-              return;
+          break;
       }
 
       if(campo.atributos!==undefined){
