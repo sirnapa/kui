@@ -1,4 +1,4 @@
-/*! kui - v0.0.4 - 2015-02-03
+/*! kui - v0.0.5 - 2015-02-09
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -131,7 +131,8 @@
             }
             
             $.each(kForm.campos,function(c,campo){ 
-                var formGroup = $('<div>').addClass('form-group')
+                var formGroup = $('<div>')
+                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
                     .appendTo(kForm.fieldset);
 
                 if(campo.titulo===undefined){
