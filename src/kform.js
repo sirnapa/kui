@@ -128,7 +128,8 @@
             }
             
             $.each(kForm.campos,function(c,campo){ 
-                var formGroup = $('<div>').addClass('form-group')
+                var formGroup = $('<div>')
+                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
                     .appendTo(kForm.fieldset);
 
                 if(campo.titulo===undefined){

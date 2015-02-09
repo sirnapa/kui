@@ -1,5 +1,6 @@
 $('#editar').kForm({
     origen:{
+    	id: 90,
 		nombre: 'Nelson Páez',
 		activo: true,
 		cantidad: 23,
@@ -12,6 +13,9 @@ $('#editar').kForm({
 	},
 	campos : [
 	    {
+	            nombre : 'id',
+	            oculto: true
+	    },{
 	            nombre : 'nombre',
 	            titulo: 'Nombre',
 	            placeholder: 'Ejemplo de tipo texto',
