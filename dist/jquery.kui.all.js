@@ -1,4 +1,4 @@
-/*! kui - v0.0.5 - 2015-02-09
+/*! kui - v0.0.7 - 2015-02-10
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 /*! 
@@ -34,6 +34,28 @@
   $.expr[':'].kui = function (elem) {
     // Does this element contain the name of your plugin?
     return $(elem).text().indexOf('kui') !== -1;
+  };
+
+  // Mensajes
+  $.kui.mensaje = function(div,caja,tipo,mensaje){
+      
+      if(div){
+          div.remove();
+      }
+
+      div = $('<div>')
+          .attr('role','alert')
+          .addClass('alert')
+          .addClass(tipo? tipo : 'alert-info')
+          .html(mensaje)
+          .prependTo(caja);
+
+      $('<button>').attr('data-dismiss','alert')
+          .addClass('close')
+          .attr('type','button')
+          .html('<i class="fa fa-times"></i>')
+          .appendTo(div);
+      
   };
 
   // Formularios
@@ -75,13 +97,26 @@
             campo.formato.call(this,item[campo.nombre],item);
           };
        }else if(campo.tipo==='combo'){
-          var identificador = solo_lectura? campo.opciones.formato : campo.opciones.id;
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
 
-          valor_input = typeof campo.opciones.formato==='function'?
-            campo.opciones.formato : function(){
-              return item[campo.nombre]? item[campo.nombre][identificador] : 
-              (item[campo.nombre+'.'+identificador]? item[campo.nombre+'.'+identificador]: '');
+          if(solo_lectura){
+            valor_input = function(){
+              return typeof campo.opciones.formato==='function'? 
+                campo.opciones.formato.call(this,
+                  item[campo.nombre]?
+                  item[campo.nombre] : 
+                  item[campo.nombre+'.'+campo.opciones.id]) :
+                subvalor(item,campo.nombre,campo.opciones.formato);
             };
+          }else{
+            valor_input = function(){
+              return subvalor(item,campo.nombre,campo.opciones.id);
+            };
+          }
 
        }else{
           valor_input = function(){
@@ -205,12 +240,15 @@
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
-                  icono: 'clock-o',
+                  icono: 'calendar-o',
                   formato: 'dd/MM/yyyy hh:mm:ss'
               }
        };
 
        var crear_combo_fecha_hora = function(tipo){
+          // Los datetimepicker siempre deberán tener íconos
+          campo.simple = false;
+
           var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
           var inputGroup = nuevo_input.parent();
           inputGroup.addClass('date');
@@ -224,11 +262,23 @@
           }
 
           if(!solo_lectura){
-              inputGroup.find('.input-group-addon').addClass('add-on');
+              inputGroup.find('.input-group-addon').addClass('add-on')
+                .find('i').attr({
+                  'data-time-icon': 'fa fa-clock-o',
+                  'data-date-icon': 'fa fa-calendar'
+                });
 
               var constructor = {language: "es",autoclose: true};
               $.extend(constructor,conf_fecha_hora[tipo].constructor);
               inputGroup.datetimepicker(constructor);
+
+              var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
+
+              widgets.find('ul').addClass('list-unstyled');
+              widgets.find('.icon-chevron-up').addClass('fa fa-chevron-up');
+              widgets.find('.icon-chevron-down').addClass('fa fa-chevron-down');
+              widgets.find('th.prev').html($('<i>').addClass('fa fa-chevron-left').css('font-size','0.5em'));
+              widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
           return nuevo_input;
@@ -391,6 +441,235 @@
 
 }(jQuery));
 
+/*! 
+ *
+ *   +++++++++++++++++++++ kForm +++++++++++++++++++++ 
+ *
+ */
+
+(function ($) {
+
+    $.kForms = {
+        instances : {}
+    };
+    
+    // Collection method.
+    $.fn.kForm = function (dato) {
+        return this.each(function () {
+            $.kForms.instances[this.id] = new KForm(this,dato);
+        });
+    };
+    
+    var KForm = function(div,dato){
+        
+        /* 
+         * Si no se provee algun campo obligatorio, 
+         * no se puede continuar.
+        */
+
+        if( dato.campos===undefined || dato.submit===undefined){
+            window.console.error('Los parámetros "campos" y "submit" son obligatorios.');
+            return;
+        }        
+                
+        this.div = div;
+        this.campos = dato.campos;        
+        this.submit = dato.submit;
+        this.origen = dato.origen;
+        this.ajax_origen = dato.ajaxOrigen===undefined? 'GET' : dato.ajaxOrigen;
+        this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
+        this.load_complete = dato.loadComplete;
+        this.boton_submit = dato.botonSubmit;
+        this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.data_origen = dato.dataOrigen;
+        this.after_submit = dato.afterSubmit;
+        
+        this.cargar();
+        
+    };
+    
+    KForm.prototype = {
+
+        nuevo_form : function(){
+            var kForm = this;
+            kForm.form = $('<form>').attr('id',kForm.div.id + '_form')
+                    .addClass('kform form-horizontal')
+                    .attr('action','#')
+                    .prependTo(kForm.div);
+
+            if(kForm.seleccionable){
+                kForm.seleccionar(kForm.preseleccionados);
+            }
+        },
+        
+        cargar : function() {
+            
+            var kForm = this;
+            if(kForm.form){
+                kForm.form.empty();
+            }else{
+                kForm.nuevo_form();
+            }
+
+            if(kForm.origen===undefined){
+                
+                /*
+                 * En kForm.dato está la entidad con la que rellenaremos el formulario.
+                 */
+                kForm.dato = {};
+            }else if(typeof kForm.origen === 'string'){
+            
+                $.ajax({
+                    type: kForm.ajax_origen,
+                    url: kForm.origen,
+                    data: kForm.data_origen,
+                    success: function(retorno){ 
+                        if (!retorno.error) {
+                            kForm.dato = retorno.objeto;
+                        }
+                    },
+                    async: false
+                });
+
+            }else{
+                kForm.dato = kForm.origen;
+            }
+
+            kForm.cargar_campos();
+        },
+
+        cargar_campos : function(){
+            
+            var kForm = this;
+            var item = kForm.dato;
+
+            kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
+            if(kForm.solo_lectura){
+                kForm.fieldset.attr('disabled',true);
+            }
+            
+            $.each(kForm.campos,function(c,campo){ 
+                var formGroup = $('<div>')
+                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
+                    .appendTo(kForm.fieldset);
+
+                if(campo.titulo===undefined){
+                    campo.titulo = campo.nombre;
+                }
+
+                /* 
+                 * Lado izquierdo: Label 
+                 */
+                $('<label>').addClass('klabel col-md-3 control-label')
+                    .html(campo.titulo)
+                    .appendTo(formGroup);
+
+                /* 
+                 * En el centro: Input 
+                 */
+                var centro = $('<div>').addClass('col-md-6')
+                    .appendTo(formGroup);
+
+                /* 
+                 * Lado derecho: Vacío de momento 
+                 */
+                $('<div>').addClass('col-md-3')
+                    .appendTo(formGroup);
+
+                $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
+            });
+            
+            $(kForm.div).data('dato',kForm.dato);
+
+            kForm.funcion_submit();
+                
+            if(typeof kForm.load_complete === 'function'){
+                kForm.load_complete.call(this,kForm.dato);
+            }
+        
+        },
+
+        funcion_submit: function(){
+            var kForm = this;
+
+            if(kForm.boton_submit===undefined){
+                kForm.boton_submit = $('<button>').addClass('btn btn-primary')
+                    .html('Guardar')
+                    .appendTo(
+                        $('<div>').addClass('form-group text-right')
+                            .appendTo(kForm.fieldset)
+                    );
+            }else{
+                kForm.boton_submit = $(kForm.boton_submit);
+            }
+
+            kForm.boton_submit.click(function(e){
+                e.preventDefault();
+                kForm.form.submit();
+            });
+
+            $.kui.formulario.validar.reglas();
+
+            var afterSubmit = typeof kForm.after_submit === 'function'?
+                function(retorno){
+                    kForm.after_submit.call(this,retorno);
+                }:function(){};
+
+            var on_submit = typeof kForm.submit === 'function'?
+                function(){
+                    afterSubmit(kForm.submit.call(this,kForm.contenido(),kForm.dato));
+                } : function(){
+
+                    $.ajax({
+                        type: kForm.ajax_submit,
+                        url: kForm.submit,
+                        data: kForm.contenido(),
+                        success: function(retorno){
+                            if(retorno.mensaje){
+                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
+                            }
+                            afterSubmit(retorno);
+                        },
+                        async: false
+                    });
+
+                };
+
+            $(kForm.form).validate({
+                showErrors: function(errorMap, errorList) {
+                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                },
+                submitHandler: function(form) {
+                    $.kui.formulario.validar.fecha(form);
+                    on_submit();
+                    return false;
+                }
+            });
+
+        },
+
+        contenido: function(){
+            var kForm = this;
+            var dato = {};
+
+            // Serialize Array para todos los inputs excepto checkbox
+            $.each(kForm.form.serializeArray(),function(_, it) {
+                dato[it.name] = it.value;
+            });
+
+            // Checkboxs
+            $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
+                dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
+            });
+
+            dato = $.extend({}, kForm.dato, dato);
+
+            return dato;
+        }
+        
+    };
+
+}(jQuery));
 /*! 
  *
  *   +++++++++++++++++++++ kGrid +++++++++++++++++++++ 
@@ -599,6 +878,8 @@
             if(!dato.seleccionados){
                 dato.seleccionados = [];
             }
+
+            this.checkall = $('<input>');
         }   
                 
         this.div = div;
@@ -655,28 +936,6 @@
             }
         },
 
-        nuevo_mensaje: function(tipo,mensaje){
-            var kGrid = this;
-
-            if(kGrid.mensaje){
-                kGrid.mensaje.remove();
-            }
-
-            kGrid.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kGrid.contenido);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kGrid.mensaje);
-            
-        },
-
         titulos: function(){
             var kGrid = this;
 
@@ -711,7 +970,8 @@
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
-                    var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
+
+                    kGrid.checkall.attr('id',kGrid.div.id+'_seleccionar_todo')
                         .attr('type','checkbox')
                         .change(function(){
                             var todos = $(this).is(':checked');
@@ -720,7 +980,8 @@
                                 $(item).trigger('change');
                             });
                         });
-                    label.html(checkall);
+                    label.html(kGrid.checkall);
+
                 }
             });                            
             
@@ -811,7 +1072,7 @@
                             .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
-                        kGrid.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.mensaje(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -1389,6 +1650,14 @@
                 }
             });
             $(kGrid.div).data('seleccionados',seleccionados);
+
+            var seleccionados_pagina_actual = $(kGrid.div)
+                .find('.' + kGrid.div.id + '_seleccionar_row:checked').length;
+
+            kGrid.checkall.prop('checked',
+                seleccionados_pagina_actual>0 &&
+                ($(kGrid.div).find('.' + kGrid.div.id + '_seleccionar_row').length ===
+                seleccionados_pagina_actual));
         },
 
         agregar: function(nuevo){
@@ -1398,255 +1667,4 @@
 
     };
     
-}(jQuery));
-/*! 
- *
- *   +++++++++++++++++++++ kForm +++++++++++++++++++++ 
- *
- */
-
-(function ($) {
-
-    $.kForms = {
-        instances : {}
-    };
-    
-    // Collection method.
-    $.fn.kForm = function (dato) {
-        return this.each(function () {
-            $.kForms.instances[this.id] = new KForm(this,dato);
-        });
-    };
-    
-    var KForm = function(div,dato){
-        
-        /* 
-         * Si no se provee algun campo obligatorio, 
-         * no se puede continuar.
-        */
-
-        if( dato.campos===undefined || dato.submit===undefined){
-            window.console.error('Los parámetros "campos" y "submit" son obligatorios.');
-            return;
-        }        
-                
-        this.div = div;
-        this.campos = dato.campos;        
-        this.submit = dato.submit;
-        this.origen = dato.origen;
-        this.ajax_origen = dato.ajaxOrigen===undefined? 'GET' : dato.ajaxOrigen;
-        this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
-        this.load_complete = dato.loadComplete;
-        this.boton_submit = dato.botonSubmit;
-        this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
-        this.data_origen = dato.dataOrigen;
-        this.after_submit = dato.afterSubmit;
-        
-        this.cargar();
-        
-    };
-    
-    KForm.prototype = {
-
-        nuevo_form : function(){
-            var kForm = this;
-            kForm.form = $('<form>').attr('id',kForm.div.id + '_form')
-                    .addClass('kform form-horizontal')
-                    .attr('action','#')
-                    .prependTo(kForm.div);
-
-            if(kForm.seleccionable){
-                kForm.seleccionar(kForm.preseleccionados);
-            }
-        },
-
-        nuevo_mensaje: function(tipo,mensaje){
-            var kForm = this;
-
-            if(kForm.mensaje){
-                kForm.mensaje.remove();
-            }
-
-            kForm.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kForm.div);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kForm.mensaje);
-            
-        },
-        
-        cargar : function() {
-            
-            var kForm = this;
-            if(kForm.form){
-                kForm.form.empty();
-            }else{
-                kForm.nuevo_form();
-            }
-
-            if(kForm.origen===undefined){
-                
-                /*
-                 * En kForm.dato está la entidad con la que rellenaremos el formulario.
-                 */
-                kForm.dato = {};
-            }else if(typeof kForm.origen === 'string'){
-            
-                $.ajax({
-                    type: kForm.ajax_origen,
-                    url: kForm.origen,
-                    data: kForm.data_origen,
-                    success: function(retorno){ 
-                        if (!retorno.error) {
-                            kForm.dato = retorno.objeto;
-                        }
-                    },
-                    async: false
-                });
-
-            }else{
-                kForm.dato = kForm.origen;
-            }
-
-            kForm.cargar_campos();
-        },
-
-        cargar_campos : function(){
-            
-            var kForm = this;
-            var item = kForm.dato;
-
-            kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.solo_lectura){
-                kForm.fieldset.attr('disabled',true);
-            }
-            
-            $.each(kForm.campos,function(c,campo){ 
-                var formGroup = $('<div>')
-                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
-                    .appendTo(kForm.fieldset);
-
-                if(campo.titulo===undefined){
-                    campo.titulo = campo.nombre;
-                }
-
-                /* 
-                 * Lado izquierdo: Label 
-                 */
-                $('<label>').addClass('klabel col-md-3 control-label')
-                    .html(campo.titulo)
-                    .appendTo(formGroup);
-
-                /* 
-                 * En el centro: Input 
-                 */
-                var centro = $('<div>').addClass('col-md-6')
-                    .appendTo(formGroup);
-
-                /* 
-                 * Lado derecho: Vacío de momento 
-                 */
-                $('<div>').addClass('col-md-3')
-                    .appendTo(formGroup);
-
-                $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
-            });
-            
-            $(kForm.div).data('dato',kForm.dato);
-
-            kForm.funcion_submit();
-                
-            if(typeof kForm.load_complete === 'function'){
-                kForm.load_complete.call(this,kForm.dato);
-            }
-        
-        },
-
-        funcion_submit: function(){
-            var kForm = this;
-
-            if(kForm.boton_submit===undefined){
-                kForm.boton_submit = $('<button>').addClass('btn btn-primary')
-                    .html('Guardar')
-                    .appendTo(
-                        $('<div>').addClass('form-group text-right')
-                            .appendTo(kForm.fieldset)
-                    );
-            }else{
-                kForm.boton_submit = $(kForm.boton_submit);
-            }
-
-            kForm.boton_submit.click(function(e){
-                e.preventDefault();
-                kForm.form.submit();
-            });
-
-            $.kui.formulario.validar.reglas();
-
-            var afterSubmit = typeof kForm.after_submit === 'function'?
-                function(retorno){
-                    kForm.after_submit.call(this,retorno);
-                }:function(){};
-
-            var on_submit = typeof kForm.submit === 'function'?
-                function(){
-                    afterSubmit(kForm.submit.call(this,kForm.contenido(),kForm.dato));
-                } : function(){
-
-                    $.ajax({
-                        type: kForm.ajax_submit,
-                        url: kForm.submit,
-                        data: kForm.contenido(),
-                        success: function(retorno){
-                            if(retorno.mensaje){
-                                kForm.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
-                            }
-                            afterSubmit(retorno);
-                        },
-                        async: false
-                    });
-
-                };
-
-            $(kForm.form).validate({
-                showErrors: function(errorMap, errorList) {
-                    $.kui.formulario.validar.error(this, errorMap, errorList);
-                },
-                submitHandler: function(form) {
-                    $.kui.formulario.validar.fecha(form);
-                    on_submit();
-                    return false;
-                }
-            });
-
-        },
-
-        contenido: function(){
-            var kForm = this;
-            var dato = {};
-
-            // Serialize Array para todos los inputs excepto checkbox
-            $.each(kForm.form.serializeArray(),function(_, it) {
-                dato[it.name] = it.value;
-            });
-
-            // Checkboxs
-            $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
-                dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
-            });
-
-            dato = $.extend({}, kForm.dato, dato);
-
-            return dato;
-        }
-        
-    };
-
 }(jQuery));
