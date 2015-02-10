@@ -33,6 +33,28 @@
     return $(elem).text().indexOf('kui') !== -1;
   };
 
+  // Mensajes
+  $.kui.mensaje = function(div,caja,tipo,mensaje){
+      
+      if(div){
+          div.remove();
+      }
+
+      div = $('<div>')
+          .attr('role','alert')
+          .addClass('alert')
+          .addClass(tipo? tipo : 'alert-info')
+          .html(mensaje)
+          .prependTo(caja);
+
+      $('<button>').attr('data-dismiss','alert')
+          .addClass('close')
+          .attr('type','button')
+          .html('<i class="fa fa-times"></i>')
+          .appendTo(div);
+      
+  };
+
   // Formularios
   $.kui.formulario = {
 
@@ -72,13 +94,26 @@
             campo.formato.call(this,item[campo.nombre],item);
           };
        }else if(campo.tipo==='combo'){
-          var identificador = solo_lectura? campo.opciones.formato : campo.opciones.id;
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
 
-          valor_input = typeof campo.opciones.formato==='function'?
-            campo.opciones.formato : function(){
-              return item[campo.nombre]? item[campo.nombre][identificador] : 
-              (item[campo.nombre+'.'+identificador]? item[campo.nombre+'.'+identificador]: '');
+          if(solo_lectura){
+            valor_input = function(){
+              return typeof campo.opciones.formato==='function'? 
+                campo.opciones.formato.call(this,
+                  item[campo.nombre]?
+                  item[campo.nombre] : 
+                  item[campo.nombre+'.'+campo.opciones.id]) :
+                subvalor(item,campo.nombre,campo.opciones.formato);
             };
+          }else{
+            valor_input = function(){
+              return subvalor(item,campo.nombre,campo.opciones.id);
+            };
+          }
 
        }else{
           valor_input = function(){
@@ -202,12 +237,15 @@
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
-                  icono: 'clock-o',
+                  icono: 'calendar-o',
                   formato: 'dd/MM/yyyy hh:mm:ss'
               }
        };
 
        var crear_combo_fecha_hora = function(tipo){
+          // Los datetimepicker siempre deberán tener íconos
+          campo.simple = false;
+
           var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
           var inputGroup = nuevo_input.parent();
           inputGroup.addClass('date');
@@ -221,11 +259,23 @@
           }
 
           if(!solo_lectura){
-              inputGroup.find('.input-group-addon').addClass('add-on');
+              inputGroup.find('.input-group-addon').addClass('add-on')
+                .find('i').attr({
+                  'data-time-icon': 'fa fa-clock-o',
+                  'data-date-icon': 'fa fa-calendar'
+                });
 
               var constructor = {language: "es",autoclose: true};
               $.extend(constructor,conf_fecha_hora[tipo].constructor);
               inputGroup.datetimepicker(constructor);
+
+              var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
+
+              widgets.find('ul').addClass('list-unstyled');
+              widgets.find('.icon-chevron-up').addClass('fa fa-chevron-up');
+              widgets.find('.icon-chevron-down').addClass('fa fa-chevron-down');
+              widgets.find('th.prev').html($('<i>').addClass('fa fa-chevron-left').css('font-size','0.5em'));
+              widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
           return nuevo_input;
