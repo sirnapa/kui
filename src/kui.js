@@ -33,6 +33,28 @@
     return $(elem).text().indexOf('kui') !== -1;
   };
 
+  // Mensajes
+  $.kui.mensaje = function(div,caja,tipo,mensaje){
+      
+      if(div){
+          div.remove();
+      }
+
+      div = $('<div>')
+          .attr('role','alert')
+          .addClass('alert')
+          .addClass(tipo? tipo : 'alert-info')
+          .html(mensaje)
+          .prependTo(caja);
+
+      $('<button>').attr('data-dismiss','alert')
+          .addClass('close')
+          .attr('type','button')
+          .html('<i class="fa fa-times"></i>')
+          .appendTo(div);
+      
+  };
+
   // Formularios
   $.kui.formulario = {
 
@@ -215,12 +237,15 @@
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
-                  icono: 'clock-o',
+                  icono: 'calendar-o',
                   formato: 'dd/MM/yyyy hh:mm:ss'
               }
        };
 
        var crear_combo_fecha_hora = function(tipo){
+          // Los datetimepicker siempre deberán tener íconos
+          campo.simple = false;
+
           var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
           var inputGroup = nuevo_input.parent();
           inputGroup.addClass('date');
@@ -234,11 +259,23 @@
           }
 
           if(!solo_lectura){
-              inputGroup.find('.input-group-addon').addClass('add-on');
+              inputGroup.find('.input-group-addon').addClass('add-on')
+                .find('i').attr({
+                  'data-time-icon': 'fa fa-clock-o',
+                  'data-date-icon': 'fa fa-calendar'
+                });
 
               var constructor = {language: "es",autoclose: true};
               $.extend(constructor,conf_fecha_hora[tipo].constructor);
               inputGroup.datetimepicker(constructor);
+
+              var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
+
+              widgets.find('ul').addClass('list-unstyled');
+              widgets.find('.icon-chevron-up').addClass('fa fa-chevron-up');
+              widgets.find('.icon-chevron-down').addClass('fa fa-chevron-down');
+              widgets.find('th.prev').html($('<i>').addClass('fa fa-chevron-left').css('font-size','0.5em'));
+              widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
           return nuevo_input;

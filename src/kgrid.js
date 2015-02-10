@@ -264,28 +264,6 @@
             }
         },
 
-        nuevo_mensaje: function(tipo,mensaje){
-            var kGrid = this;
-
-            if(kGrid.mensaje){
-                kGrid.mensaje.remove();
-            }
-
-            kGrid.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kGrid.contenido);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kGrid.mensaje);
-            
-        },
-
         titulos: function(){
             var kGrid = this;
 
@@ -422,7 +400,7 @@
                             .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
-                        kGrid.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.mensaje(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){

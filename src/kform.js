@@ -58,28 +58,6 @@
                 kForm.seleccionar(kForm.preseleccionados);
             }
         },
-
-        nuevo_mensaje: function(tipo,mensaje){
-            var kForm = this;
-
-            if(kForm.mensaje){
-                kForm.mensaje.remove();
-            }
-
-            kForm.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kForm.div);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kForm.mensaje);
-            
-        },
         
         cargar : function() {
             
@@ -205,7 +183,7 @@
                         data: kForm.contenido(),
                         success: function(retorno){
                             if(retorno.mensaje){
-                                kForm.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
+                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
                             }
                             afterSubmit(retorno);
                         },
