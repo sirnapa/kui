@@ -39,6 +39,7 @@
         this.boton_submit = dato.botonSubmit;
         this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
+        this.after_submit = dato.afterSubmit;
         
         this.cargar();
         
@@ -56,28 +57,6 @@
             if(kForm.seleccionable){
                 kForm.seleccionar(kForm.preseleccionados);
             }
-        },
-
-        nuevo_mensaje: function(tipo,mensaje){
-            var kForm = this;
-
-            if(kForm.mensaje){
-                kForm.mensaje.remove();
-            }
-
-            kForm.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kForm.div);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kForm.mensaje);
-            
         },
         
         cargar : function() {
@@ -109,6 +88,8 @@
                     async: false
                 });
 
+            }else{
+                kForm.dato = kForm.origen;
             }
 
             kForm.cargar_campos();
@@ -125,7 +106,8 @@
             }
             
             $.each(kForm.campos,function(c,campo){ 
-                var formGroup = $('<div>').addClass('form-group')
+                var formGroup = $('<div>')
+                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
                     .appendTo(kForm.fieldset);
 
                 if(campo.titulo===undefined){
@@ -185,19 +167,25 @@
 
             $.kui.formulario.validar.reglas();
 
+            var afterSubmit = typeof kForm.after_submit === 'function'?
+                function(retorno){
+                    kForm.after_submit.call(this,retorno);
+                }:function(){};
+
             var on_submit = typeof kForm.submit === 'function'?
                 function(){
-                    kForm.submit.call(this,kForm.contenido(),kForm.dato);
+                    afterSubmit(kForm.submit.call(this,kForm.contenido(),kForm.dato));
                 } : function(){
 
                     $.ajax({
                         type: kForm.ajax_submit,
                         url: kForm.submit,
                         data: kForm.contenido(),
-                        success: function(retorno){ 
+                        success: function(retorno){
                             if(retorno.mensaje){
-                                kForm.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
+                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
                             }
+                            afterSubmit(retorno);
                         },
                         async: false
                     });
@@ -230,6 +218,8 @@
             $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
+
+            dato = $.extend({}, kForm.dato, dato);
 
             return dato;
         }

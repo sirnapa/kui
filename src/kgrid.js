@@ -206,6 +206,8 @@
             if(!dato.seleccionados){
                 dato.seleccionados = [];
             }
+
+            this.checkall = $('<input>');
         }   
                 
         this.div = div;
@@ -262,28 +264,6 @@
             }
         },
 
-        nuevo_mensaje: function(tipo,mensaje){
-            var kGrid = this;
-
-            if(kGrid.mensaje){
-                kGrid.mensaje.remove();
-            }
-
-            kGrid.mensaje = $('<div>')
-                .attr('role','alert')
-                .addClass('alert')
-                .addClass(tipo? tipo : 'alert-info')
-                .html(mensaje)
-                .prependTo(kGrid.contenido);
-
-            $('<button>').attr('data-dismiss','alert')
-                .addClass('close')
-                .attr('type','button')
-                .html('<i class="fa fa-times"></i>')
-                .appendTo(kGrid.mensaje);
-            
-        },
-
         titulos: function(){
             var kGrid = this;
 
@@ -318,7 +298,8 @@
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
-                    var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
+
+                    kGrid.checkall.attr('id',kGrid.div.id+'_seleccionar_todo')
                         .attr('type','checkbox')
                         .change(function(){
                             var todos = $(this).is(':checked');
@@ -327,7 +308,8 @@
                                 $(item).trigger('change');
                             });
                         });
-                    label.html(checkall);
+                    label.html(kGrid.checkall);
+
                 }
             });                            
             
@@ -418,7 +400,7 @@
                             .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
-                        kGrid.nuevo_mensaje(retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.mensaje(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -714,6 +696,8 @@
                                     dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
                                 });
 
+                                dato = $.extend({}, item, dato);
+
                                 guardar_cambios(dato);
 
                                 return false;
@@ -779,7 +763,7 @@
                     var btn = $('<a>').attr('title',boton.comentario)
                         .addClass('text-muted kaccion')
                         .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
-                        .html('<i class="fa ' + dimension + ' ' + boton.icono+'"></i>')
+                        .html('<i class="fa ' + dimension + ' fa-' + boton.icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted'); }, 
                             function(){ $(this).addClass('text-muted'); });
                     
@@ -994,6 +978,14 @@
                 }
             });
             $(kGrid.div).data('seleccionados',seleccionados);
+
+            var seleccionados_pagina_actual = $(kGrid.div)
+                .find('.' + kGrid.div.id + '_seleccionar_row:checked').length;
+
+            kGrid.checkall.prop('checked',
+                seleccionados_pagina_actual>0 &&
+                ($(kGrid.div).find('.' + kGrid.div.id + '_seleccionar_row').length ===
+                seleccionados_pagina_actual));
         },
 
         agregar: function(nuevo){
