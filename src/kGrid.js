@@ -206,6 +206,8 @@
             if(!dato.seleccionados){
                 dato.seleccionados = [];
             }
+
+            this.checkall = $('<input>');
         }   
                 
         this.div = div;
@@ -318,7 +320,8 @@
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
-                    var checkall = $('<input>').attr('id',kGrid.div.id+'_seleccionar_todo')
+
+                    kGrid.checkall.attr('id',kGrid.div.id+'_seleccionar_todo')
                         .attr('type','checkbox')
                         .change(function(){
                             var todos = $(this).is(':checked');
@@ -327,7 +330,8 @@
                                 $(item).trigger('change');
                             });
                         });
-                    label.html(checkall);
+                    label.html(kGrid.checkall);
+
                 }
             });                            
             
@@ -996,6 +1000,14 @@
                 }
             });
             $(kGrid.div).data('seleccionados',seleccionados);
+
+            var seleccionados_pagina_actual = $(kGrid.div)
+                .find('.seleccionable_seleccionar_row:checked').length;
+
+            kGrid.checkall.prop('checked',
+                seleccionados_pagina_actual>0 &&
+                ($(kGrid.div).find('.seleccionable_seleccionar_row').length ===
+                seleccionados_pagina_actual));
         },
 
         agregar: function(nuevo){
