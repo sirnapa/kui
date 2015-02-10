@@ -1002,11 +1002,11 @@
             $(kGrid.div).data('seleccionados',seleccionados);
 
             var seleccionados_pagina_actual = $(kGrid.div)
-                .find('.seleccionable_seleccionar_row:checked').length;
+                .find('.' + kGrid.div.id + '_seleccionar_row:checked').length;
 
             kGrid.checkall.prop('checked',
                 seleccionados_pagina_actual>0 &&
-                ($(kGrid.div).find('.seleccionable_seleccionar_row').length ===
+                ($(kGrid.div).find('.' + kGrid.div.id + '_seleccionar_row').length ===
                 seleccionados_pagina_actual));
         },
 
