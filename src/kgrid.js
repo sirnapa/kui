@@ -271,8 +271,8 @@
                 return;
             }
 
-            var formGroup = $('<div>').addClass('form-group hidden-xs hidden-sm');
-            var columnas = $('<div>').addClass('col-md-11').appendTo(formGroup);
+            var formGroup = $('<div>').addClass('form-group hidden-xs');
+            var columnas = $('<div>').addClass('col-sm-11').appendTo(formGroup);
 
             kGrid.nueva_grilla();
                                                                             
@@ -293,7 +293,7 @@
                 }
 
                 var titulo = $('<div>').html(label)
-                    .addClass('col-md-'+campo.ancho)
+                    .addClass('col-sm-'+campo.ancho)
                     .appendTo(columnas);
 
                 if(kGrid.seleccionable && c===0){
@@ -473,9 +473,9 @@
             }
                                         
             var izquierda = $(guardar? '<form>' : '<div>')
-                .addClass('col-md-' + (kGrid.tarjetas? '7' : '11'))
+                .addClass('col-sm-' + (kGrid.tarjetas? '7' : '11'))
                 .appendTo(formGroup);
-            var derecha = $('<div>').addClass('text-right col-md-' + (kGrid.tarjetas? '5' : '1'))
+            var derecha = $('<div>').addClass('text-right col-sm-' + (kGrid.tarjetas? '5' : '1'))
                 .appendTo(formGroup);
             var botones = $('<div>').addClass('pull-right')
                 .addClass('kacciones')
@@ -502,7 +502,7 @@
                     }
                     
                     columna = $(contenedor)
-                        .addClass('col-md-'+ancho_columna)
+                        .addClass('col-sm-'+ancho_columna)
                         .appendTo(izquierda);
                 }else{
                     columna = $('<p>').appendTo(
@@ -514,7 +514,7 @@
 
                 if(!kGrid.tarjetas){
                     $('<label>').addClass('klabel')
-                        .addClass('visible-xs visible-sm')
+                        .addClass('visible-xs')
                         .html(kGrid.etiquetas[c])
                         .appendTo(columna);
                 }
@@ -758,30 +758,68 @@
                 }
             }
             
-            $.each(kGrid.botones,function(b,boton){
-                if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                    var btn = $('<a>').attr('title',boton.comentario)
-                        .addClass('text-muted kaccion')
-                        .attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy)
-                        .html('<i class="fa ' + dimension + ' fa-' + boton.icono+'"></i>')
-                        .hover( function(){ $(this).removeClass('text-muted'); }, 
-                            function(){ $(this).addClass('text-muted'); });
-                    
-                    if(boton.onclick!==undefined){
-                        btn.click(function(e){
-                            e.stopPropagation();
-                            boton.onclick.call(this,item);
-                        });
-                    }
-                    
-                    if(boton.atributos!==undefined){
-                        $.each(boton.atributos,function(atributo,valor){
-                            btn.attr(atributo,valor);
-                        });
-                    }                                   
-                    btn.appendTo(botones);
-                }   
-            });
+            if(kGrid.botones.length){
+                $(kGrid.div).bind("contextmenu",function(e){
+                    e.stopPropagation();
+                    window.console.log("En el click derecho");
+                    return false;
+                });
+                
+                var ubicar_boton;
+
+                if(kGrid.botones.length===1){
+                    ubicar_boton = function(btn){
+                        $(btn).appendTo(botones);
+                    };
+                }else{
+                    var btn = crear_boton($.kui.generar_id(),'Acciones','bars','primary');
+                    btn.attr('data-toggle','dropdown')
+                        .attr('aria-expanded',true)
+                        .appendTo(botones);
+
+                    var ul = $('<ul>')
+                        .attr('role','menu')
+                        .attr('aria-labelledby',btn.attr('id'))
+                        .addClass('dropdown-menu')
+                        .appendTo(botones);
+
+                    ubicar_boton = function(btn){
+                        btn.find('i.fa').addClass('fa-fw')
+                            .removeClass('fa-lg');
+
+                        $('<span>').html(' ' + btn.attr('title'))
+                            .appendTo(btn);
+
+                        $(btn).appendTo(
+                            $('<li>').attr('role','presentation')
+                                .appendTo(ul)
+                            );
+                    };
+                }
+
+                $.each(kGrid.botones,function(b,boton){
+                    if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
+                        var btn = crear_boton($.kui.generar_id(),boton.comentario,boton.icono,'primary');
+
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy);
+                        
+                        if(boton.onclick!==undefined){
+                            btn.click(function(e){
+                                e.stopPropagation();
+                                boton.onclick.call(this,item);
+                            });
+                        }
+                        
+                        if(boton.atributos!==undefined){
+                            $.each(boton.atributos,function(atributo,valor){
+                                btn.attr(atributo,valor);
+                            });
+                        }
+
+                        ubicar_boton(btn);
+                    }   
+                });
+            }
 
             if(nueva_entrada){
                 formGroup.prependTo(kGrid.grilla);
@@ -791,7 +829,7 @@
             }
 
             if(!kGrid.tarjetas){
-                formGroup.after($('<hr>').addClass('visible-xs visible-sm'));
+                formGroup.after($('<hr>').addClass('visible-xs'));
             }
         },
         

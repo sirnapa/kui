@@ -33,6 +33,16 @@
     return $(elem).text().indexOf('kui') !== -1;
   };
 
+  // Generador de ID
+  $.kui.generar_id = function() {
+    return 'xxxx-xxxx-xxxx'.replace(/[x]/g,
+      function(c) {
+        var r = Math.random() * 16 | 0,
+          v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      }).toUpperCase();
+  };
+
   // Mensajes
   $.kui.mensaje = function(div,caja,tipo,mensaje){
       
