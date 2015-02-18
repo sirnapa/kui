@@ -43,6 +43,33 @@
       }).toUpperCase();
   };
 
+  // Posiciones en la ventana
+  $.kui.posicion_izquierda = function(e,elemento) {
+      var mouseWidth = e.pageX;
+      var pageWidth = $(window).width();
+      var menuWidth = $(elemento).width();
+      
+      // opening menu would pass the side of the page
+      if (mouseWidth + menuWidth > pageWidth &&
+          menuWidth < mouseWidth) {
+          return mouseWidth - menuWidth;
+      } 
+      return mouseWidth;
+  };     
+  
+  $.kui.posicion_arriba = function(e,elemento) {
+      var mouseHeight = e.pageY;
+      var pageHeight = $(window).height();
+      var menuHeight = $(elemento).height();
+
+      // opening menu would pass the bottom of the page
+      if (mouseHeight + menuHeight > pageHeight &&
+          menuHeight < mouseHeight) {
+          return mouseHeight - menuHeight;
+      } 
+      return mouseHeight;
+  };
+
   // Mensajes
   $.kui.mensaje = function(div,caja,tipo,mensaje){
       
