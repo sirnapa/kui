@@ -46,19 +46,19 @@ $('#conbotones').kGrid({
                 comentario: 'Botón 2',
                 icono: 'mobile',
                 onclick: function(item){
-                    alert('Acabas de hacer click en el botón 1');
+                    alert('Acabas de hacer click en el botón 2');
                 }
             },{
                 comentario: 'Botón 3',
                 icono: 'gear',
                 onclick: function(item){
-                    alert('Acabas de hacer click en el botón 1');
+                    alert('Acabas de hacer click en el botón 3');
                 }
             },{
                 comentario: 'Botón 4',
                 icono: 'lock',
                 onclick: function(item){
-                    alert('Acabas de hacer click en el botón 1');
+                    alert('Acabas de hacer click en el botón 4');
                 }
             }
         ]

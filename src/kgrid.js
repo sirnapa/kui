@@ -767,9 +767,14 @@
                         $(btn).appendTo(botones);
                     };
                 }else{
-                    var ul = $('<ul>')
-                        .addClass('dropdown-menu')
+                    var div_context = $('<div>')
+                        .attr('id',$.kui.generar_id())
                         .appendTo('body');
+
+                    var ul = $('<ul>')
+                        .attr('role','menu')
+                        .addClass('dropdown-menu')
+                        .appendTo(div_context);
 
                     var btn = crear_boton($.kui.generar_id(),'Acciones','bars','primary');
                     btn.appendTo(botones)
@@ -791,29 +796,8 @@
                     };
 
                     // Open context menu
-                    $(formGroup).on("contextmenu", function (e) {
-                        window.console.log("En el click derecho", e, e.pageX, e.pageY);
-
-                        //open menu
-                        ul.data("invokedOn", $(e.target))
-                            .show()
-                            .css({
-                                position: "absolute",
-                                left: $.kui.posicion_izquierda(e,ul),
-                                top: $.kui.posicion_arriba(e,ul)
-                            })
-                            .off('click')
-                            .on('click', function (e) {
-                                $(this).hide();
-                        
-                                var $invokedOn = $(this).data("invokedOn");
-                                var $selectedMenu = $(e.target);
-                                
-                                ul[0].menuSelected.call(this, $invokedOn, $selectedMenu);
-                        });
-                        
-                        return false;
-                    });
+                    $(formGroup).attr('data-toggle','context')
+                        .attr('data-target','#'+div_context.attr('id'));
                 }
 
                 $.each(kGrid.botones,function(b,boton){
