@@ -1,4 +1,4 @@
-/*! 
+/*
  *
  *   +++++++++++++++++++++ kForm +++++++++++++++++++++ 
  *
@@ -183,7 +183,7 @@
                         data: kForm.contenido(),
                         success: function(retorno){
                             if(retorno.mensaje){
-                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
+                                $.kui.messages(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
                             }
                             afterSubmit(retorno);
                         },

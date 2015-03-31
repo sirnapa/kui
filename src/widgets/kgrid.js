@@ -1,4 +1,4 @@
-/*! 
+/*
  *
  *   +++++++++++++++++++++ kGrid +++++++++++++++++++++ 
  *
@@ -11,96 +11,16 @@
     };
     
     // Collection method.
-    $.fn.kGrid = function (dato,aux) {
+    $.fn.kGrid = function (data,aux) {
         return this.each(function () {
-            if(typeof dato === 'string'){
-                var instancia = $.kGrids.instances[this.id];
-                if( instancia === undefined || instancia === null){
-                    return;
-                }
-                switch(dato) {
-                    case 'recargar':
-                        // aux sirve para sobre-escribir el data
-                        if(aux!==undefined){
-                            instancia.set_data(aux);
-                        }
-                        instancia.cargar();
-                        break;
-                    case 'pagina':
-                        // aux recibe la pagina de destino, tambien puede recibir
-                        // estas opciones: primera, anterior, siguiente, ultima
-                        if(aux===undefined){
-                            return;
-                        }
-                        var pagina = parseInt(aux);
-                        if(isNaN(pagina)){
-                            pagina = 0;
-                            switch(aux) {
-                                case 'primera':
-                                    pagina = 1;
-                                    break;
-                                case 'anterior':
-                                    pagina = parseInt(instancia.pagina) - 1;
-                                    break;
-                                case 'siguiente':
-                                    pagina = parseInt(instancia.pagina) + 1;
-                                    break;
-                                case 'ultima':
-                                    pagina = instancia.totalPaginas;
-                                    break;
-                                default:
-                                    return;
-                            }
-                        }
-                        if(pagina<1 || pagina>parseInt(instancia.totalPaginas)){
-                            return;
-                        }
-                        instancia.set_data({page:pagina});
-                        instancia.cargar();
-                        break;
-                    case 'buscar':
-                        // aux es la clave de búsqueda
-                        if(aux===undefined){
-                            return;
-                        }
-                        
-                        var groupOp = 'AND';
-                        if(aux.groupOp!==undefined){
-                            groupOp=aux.groupOp;
-                        }
-                        var reglas = [];
-                        $.each(aux.reglas,function(c,campo){
-                            reglas.push({
-                                'field': campo.field,
-                                'data': (campo.data!==undefined)? campo.data : aux.data,
-                                'op': (campo.op!==undefined)? campo.op : 'cn'
-                            });
-                        });  
-                        instancia.set_data({
-                            _search: true,
-                            filters: JSON.stringify({
-                                "groupOp":groupOp,
-                                "rules": reglas
-                                })
-                        });
-                        instancia.set_data({page:1});
-                        instancia.cargar();
-                        break;
-                    case 'seleccionar':
-                        instancia.seleccionar(aux);
-                        break;
-                    case 'agregar':
-                        instancia.agregar(aux);
-                        break;
-                    default:
-                        return;
-                }	
-            }else{
-                var newKGrid = new KGrid(this,dato);
-                $.kGrids.instances[this.id] = newKGrid;
-            }
+            $.kui.list.actions({
+                element: this,
+                constructor: KGrid,
+                instances: $.kGrids.instances,
+                data: data,
+                aux: aux
+            });
         });
-    
     };
     
     var KGrid = function(div,dato){
@@ -400,7 +320,7 @@
                             .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
-                        $.kui.mensaje(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.messages(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -768,19 +688,26 @@
                     };
                 }else{
                     var div_context = $('<div>')
-                        .attr('id',$.kui.generar_id())
+                        .attr('id',$.kui.random_id())
                         .appendTo('body');
 
-                    var ul = $('<ul>')
+                    var ul_context = $('<ul>')
                         .attr('role','menu')
                         .addClass('dropdown-menu')
                         .appendTo(div_context);
 
-                    var btn = crear_boton($.kui.generar_id(),'Acciones','bars','primary');
-                    btn.appendTo(botones)
-                        .click(function(){
-                            ul.dropdown('toggle');
-                        });
+                    var btn = crear_boton($.kui.random_id(),'Acciones','bars','primary');
+                    
+                    btn.attr('data-toggle','dropdown')
+                        .attr('aria-haspopup',true)
+                        .attr('aria-expanded',false)
+                        .appendTo(botones);
+                    
+                    var ul = ul_context.clone()
+                        .attr('aria-labelledby',btn.attr('id'))
+                        .appendTo(btn.parent());
+
+                    btn.parent().addClass('dropdown');
 
                     ubicar_boton = function(btn){
                         btn.find('i.fa').addClass('fa-fw')
@@ -789,10 +716,12 @@
                         $('<span>').html(' ' + btn.attr('title'))
                             .appendTo(btn);
 
-                        $(btn).appendTo(
-                            $('<li>').attr('role','presentation')
-                                .appendTo(ul)
-                            );
+                        var li = $('<li>').attr('role','presentation')
+                                .appendTo(ul);
+
+                        $(btn).appendTo(li);
+
+                        li.clone().appendTo(ul_context);
                     };
 
                     // Open context menu
@@ -802,7 +731,7 @@
 
                 $.each(kGrid.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.generar_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
 
                         btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy);
                         
@@ -950,6 +879,10 @@
                 '.kgrid .klabel':
                         [
                             'margin-top: 20px'
+                        ],
+                '.kgrid .kacciones':
+                        [
+                            'white-space: nowrap'
                         ],
                 '.kgrid .kaccion':
                         [
