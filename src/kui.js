@@ -7,10 +7,14 @@
 (function ($) {
 
   // Collection method.
-  $.fn.kui = function () {
-    return this.each(function (i) {
-      // Do something to each selected element.
-      $(this).html('kui' + i);
+  $.fn.kui = function (widget,data,aux) {
+    return this.each(function () {
+        $(this).attr('data-kui',true);
+
+        if(widget){
+          $(this).attr('data-widget',widget);
+          $.kui.widgets[widget].call(this,data,aux);
+        }
     });
   };
 
@@ -32,5 +36,11 @@
     // Does this element contain the name of your plugin?
     return $(elem).text().indexOf('kui') !== -1;
   };
+
+  // Widgets
+  $.kui.widgets = {};
+
+  // Widgets instances
+  $.kui.instances = {};
 
 }(jQuery));

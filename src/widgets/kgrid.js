@@ -6,162 +6,32 @@
 
 (function ($) {
 
-    $.kGrids = {
-        instances : {}
-    };
+    // Instances
+    $.kui.instances.kgrid = {};
     
     // Collection method.
     $.fn.kGrid = function (data,aux) {
-        return this.each(function () {
-            $.kui.list.actions({
-                element: this,
-                constructor: KGrid,
-                instances: $.kGrids.instances,
-                data: data,
-                aux: aux
-            });
+        return $(this).kui('grid',data,aux);
+    };
+
+    // Widget definition
+    $.kui.widgets['grid'] = function (data,aux) {
+        return $.kui.list.actions({
+            element: this,
+            constructor: KGrid,
+            instances: $.kui.instances.kgrid,
+            data: data,
+            aux: aux
         });
     };
     
-    var KGrid = function(div,dato){
-    	
-        /* 
-    	 * Si no se provee algun campo obligatorio, 
-    	 * no se puede continuar.
-    	*/
-
-        if( dato.url===undefined || dato.id===undefined || dato.campos===undefined){
-            window.console.error('Los campos id, url y campos son obligatorios.');
-            return;
-        }
-        
-        /*
-         * Se procesan los campos opcionales
-         */
-        
-        if(dato.ajax===undefined){
-            dato.ajax = 'GET';
-        }
-
-        if(dato.data===undefined){
-            dato.data = {};
-        }
-
-        if(dato.titulos===undefined){
-            dato.titulos = true;
-        }
-        
-        if(dato.permisos===undefined){
-            dato.permisos = {};
-        }
-        
-        if(dato.retorno===undefined){
-            dato.retorno = {};
-        }
-        
-        if(dato.botones===undefined){
-            dato.botones = [];
-        }
-        
-        if(dato.paginador===undefined){
-            dato.paginador = $('<div>').addClass('text-center')
-                .appendTo(div);
-        }
-        
-        var data_final = {
-            _search:false,
-            filters:null,
-            page:1,
-            rows:10,
-            sidx:dato.id,
-            sord:'asc', 
-            todos:false
-        };
-
-        if(dato.tarjetas){
-            data_final.rows = 5;
-        }
-
-        $.each(dato.data,function(key,value){
-            data_final[key] = value;
+    var KGrid = function(div,params){
+    	$.kui.list.params({
+            list: this,
+            div: div,
+            params: params,
+            rows: 10
         });
-
-        var permisos_finales = {
-            agregar:null,
-            editar:null,
-            guardar: null,
-            activar:null,
-            remover:null
-        };
-
-        $.each(dato.permisos,function(key,value){
-            permisos_finales[key] = value;
-        });
-                
-        /*var retorno_final = {
-            lista: 'lista',                    
-            pagina: 'pagina',
-            totalDatos: 'totalDatos'
-        }
-        
-        $.each(dato.retorno,function(key,value){
-            retorno_final[key] = value;
-        });*/
-
-        if(dato.seleccionable){
-            // Agregar campo de selección al principio;
-            var campo_seleccion = {
-                nombre: 'kGrid_seleccionado',
-                titulo: '',
-                tipo: 'booleano',
-                ancho: 1,
-                atributos: {
-                    'readonly': 'false',
-                    'disabled': 'false',
-                    'class': div.id + '_seleccionar_row'
-                }
-            };
-            dato.campos.unshift(campo_seleccion);
-
-            if(!dato.seleccionados){
-                dato.seleccionados = [];
-            }
-
-            this.checkall = $('<input>');
-        }   
-                
-        this.div = div;
-        this.url = dato.url;
-        this.data = data_final;
-        this.id = dato.id;
-        this.tarjetas = dato.tarjetas;
-        this.mostrar_titulos = dato.titulos;
-        this.etiquetas = [];
-        this.campos = dato.campos;
-        this.ajax = dato.ajax;
-        this.permisos = permisos_finales;
-        this.botones = dato.botones;
-        this.estado = dato.estado;
-        //this.retorno = retorno_final;
-        this.load_complete = dato.loadComplete;
-        this.paginador = dato.paginador;
-        this.onclick = dato.onclick;
-        this.ondblclick = dato.ondblclick;
-        this.seleccionable = dato.seleccionable;
-        this.seleccionados = {};
-        this.preseleccionados = dato.seleccionados;
-        this.nuevos = 0;
-        this.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
-
-        this.cargar_estilos();
-        this.cargar_paginador();
-        this.titulos();
-        this.cargar();
-        
-        $(div).on('reloadGrid',function(){
-            $.kGrids.instances[this.id].cargar();
-        });
-        
     };
     
     KGrid.prototype = {
@@ -186,11 +56,6 @@
 
         titulos: function(){
             var kGrid = this;
-
-            if(kGrid.tarjetas){
-                return;
-            }
-
             var formGroup = $('<div>').addClass('form-group hidden-xs');
             var columnas = $('<div>').addClass('col-sm-11').appendTo(formGroup);
 
@@ -279,27 +144,6 @@
                                 });
                             });
 
-                        if(kGrid.tarjetas){
-                            kGrid.grilla.find('.kscore').each(function(s,score){
-                                var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
-                                $(score).css('width',lado);
-                                $(score).css('height',lado);
-                            });
-                            
-                            kGrid.grilla.find('.kacciones,.kscores').each(function(e,elemento){
-                                var top = $(elemento).parent().parent().height() - $(elemento).height();
-                                var siguiente = $(elemento).next();
-                                if(siguiente.hasClass('kscores') && !siguiente.is(':empty')){
-                                    $(elemento).css('font-size','0.5em');
-                                }else{
-                                    top = top/2;
-                                }
-                                if(top > 0){
-                                    $(elemento).css('padding-top',top);
-                                }
-                            });
-                        }
-
                         $(kGrid.div).data('datos',datos);
                         $(kGrid.div).data('totalDatos',kGrid.totalDatos);
                         $(kGrid.div).data('pagina',kGrid.pagina);
@@ -353,17 +197,17 @@
                     return;
                 }
 
-                if(!kGrid.tarjetas && guardar){
+                if(guardar){
                     item = {};
                 }else{
-                    window.console.error('Para agregar entradas vacías la grilla no debe ser tipo tarjeta y debe configurar el permiso "agregar" o "guardar"');
+                    window.console.error('Para agregar entradas vacías debe configurar el permiso "agregar" o "guardar"');
                     return;
                 }
             }
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kGrid.id])
-                .addClass('form-group' + (kGrid.tarjetas? ' well' : ''));
+                .addClass('form-group');
 
             var activo = nueva_entrada? true : false;
             if(!nueva_entrada && typeof kGrid.estado === 'function'){
@@ -393,9 +237,9 @@
             }
                                         
             var izquierda = $(guardar? '<form>' : '<div>')
-                .addClass('col-sm-' + (kGrid.tarjetas? '7' : '11'))
+                .addClass('col-sm-11')
                 .appendTo(formGroup);
-            var derecha = $('<div>').addClass('text-right col-sm-' + (kGrid.tarjetas? '5' : '1'))
+            var derecha = $('<div>').addClass('text-right col-sm-1')
                 .appendTo(formGroup);
             var botones = $('<div>').addClass('pull-right')
                 .addClass('kacciones')
@@ -409,17 +253,6 @@
                 if(campo.tipo!=='score'){
                     var ancho_columna = campo.ancho;
                     var contenedor = '<div>';
-
-                    if(kGrid.tarjetas){
-                        ancho_columna = 6;
-                        contenedor = '<p>';
-                        if(campo.tipo==='destacado' || campo.tipo==='encabezado'){
-                            ancho_columna = 12;
-                        }
-                        if(campo.tipo==='encabezado'){
-                            contenedor = '<h2>';
-                        }
-                    }
                     
                     columna = $(contenedor)
                         .addClass('col-sm-'+ancho_columna)
@@ -432,55 +265,35 @@
                         );
                 }
 
-                if(!kGrid.tarjetas){
-                    $('<label>').addClass('klabel')
-                        .addClass('visible-xs')
-                        .html(kGrid.etiquetas[c])
-                        .appendTo(columna);
+                $('<label>').addClass('klabel')
+                    .addClass('visible-xs')
+                    .html(kGrid.etiquetas[c])
+                    .appendTo(columna);
+
+                if(campo.simple===undefined){
+                    campo.simple = true;
                 }
 
-                if(kGrid.tarjetas){
-                    columna.html(typeof campo.formato === 'function'?
-                        campo.formato.call(this,item[campo.nombre],item) : item[campo.nombre]);
+                $.kui.formulario.nuevo_elemento(!nueva_entrada,columna,item,campo);
 
-                    if(campo.titulo && campo.titulo!==''){
-                        if(campo.tipo!=='score'){
-                            $('<label>').addClass('text-muted')
-                                .html(campo.titulo + '&nbsp; &nbsp;')
-                                .prependTo(columna);
-                        }else{
-                            $('<br>').appendTo(columna);
-                            $('<small>').html(campo.titulo)
-                                .appendTo(columna);
-                        }
-                    } 
-                }else{
+                var input = columna.find('[data-rol=input]');
+                
+                if(!input.hasClass(kGrid.div.id + '_seleccionar_row')){
+                    input.attr('readonly',true);
+                }
 
-                    if(campo.simple===undefined){
-                        campo.simple = true;
-                    }
-
-                    $.kui.formulario.nuevo_elemento(!nueva_entrada,columna,item,campo);
-
-                    var input = columna.find('[data-rol=input]');
+                if(input.attr('type')==='checkbox'){
                     
-                    if(!input.hasClass(kGrid.div.id + '_seleccionar_row')){
-                        input.attr('readonly',true);
-                    }
+                    input.attr('data-pk',item[kGrid.id])
+                        .dblclick(function(e){
+                            e.stopPropagation();
+                        });
 
-                    if(input.attr('type')==='checkbox'){
-                        
-                        input.attr('data-pk',item[kGrid.id])
-                            .dblclick(function(e){
-                                e.stopPropagation();
-                            });
-
-                        if(input.attr('readonly')){
-                            input.attr('disabled','disabled');
-                        }
-                        
-                        input.parent().addClass('text-center');
+                    if(input.attr('readonly')){
+                        input.attr('disabled','disabled');
                     }
+                    
+                    input.parent().addClass('text-center');
                 }
 
                 if(typeof campo.formato === 'function'){
@@ -488,7 +301,7 @@
                 }                         
             });                            
                                             
-            var dimension = kGrid.tarjetas? 'fa-3x' : 'fa-lg';
+            var dimension = 'fa-lg';
 
             var crear_boton = function(id,titulo,icono,hover){
                     var boton = $('<a>').attr('id', pk + '_' + id)
@@ -760,9 +573,7 @@
                 formGroup.appendTo(kGrid.grilla);
             }
 
-            if(!kGrid.tarjetas){
-                formGroup.after($('<hr>').addClass('visible-xs'));
-            }
+            formGroup.after($('<hr>').addClass('visible-xs'));
         },
         
         cargar_paginador : function(){

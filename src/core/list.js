@@ -109,7 +109,152 @@
                 o.instances[o.element.id] = newList;
             }
 
-    	}
+    	},
+
+        params: function(o){
+
+            /*
+             *  Params params:
+             *  - list
+             *  - div
+             *  - params
+             *  - rows
+             *
+             */
+        
+            /* 
+             * Si no se provee algun campo obligatorio, 
+             * no se puede continuar.
+            */
+
+            if( o.params.url===undefined || o.params.id===undefined || o.params.campos===undefined){
+                window.console.error('Los campos id, url y campos son obligatorios.');
+                return;
+            }
+            
+            /*
+             * Se procesan los campos opcionales
+             */
+            
+            if(o.params.ajax===undefined){
+                o.params.ajax = 'GET';
+            }
+
+            if(o.params.data===undefined){
+                o.params.data = {};
+            }
+
+            if(o.params.titulos===undefined){
+                o.params.titulos = true;
+            }
+            
+            if(o.params.permisos===undefined){
+                o.params.permisos = {};
+            }
+            
+            if(o.params.retorno===undefined){
+                o.params.retorno = {};
+            }
+            
+            if(o.params.botones===undefined){
+                o.params.botones = [];
+            }
+            
+            if(o.params.paginador===undefined){
+                o.params.paginador = $('<div>').addClass('text-center')
+                    .appendTo(o.div);
+            }
+            
+            var data_final = {
+                _search:false,
+                filters:null,
+                page:1,
+                rows:o.rows,
+                sidx:o.params.id,
+                sord:'asc', 
+                todos:false
+            };
+
+            $.each(o.params.data,function(key,value){
+                data_final[key] = value;
+            });
+
+            var permisos_finales = {
+                agregar:null,
+                editar:null,
+                guardar: null,
+                activar:null,
+                remover:null
+            };
+
+            $.each(o.params.permisos,function(key,value){
+                permisos_finales[key] = value;
+            });
+                    
+            /*var retorno_final = {
+                lista: 'lista',                    
+                pagina: 'pagina',
+                totalDatos: 'totalDatos'
+            }
+            
+            $.each(o.params.retorno,function(key,value){
+                retorno_final[key] = value;
+            });*/
+
+            if(o.params.seleccionable){
+                // Agregar campo de selección al principio;
+                var campo_seleccion = {
+                    nombre: 'kGrid_seleccionado',
+                    titulo: '',
+                    tipo: 'booleano',
+                    ancho: 1,
+                    atributos: {
+                        'readonly': 'false',
+                        'disabled': 'false',
+                        'class': o.div.id + '_seleccionar_row'
+                    }
+                };
+                o.params.campos.unshift(campo_seleccion);
+
+                if(!o.params.seleccionados){
+                    o.params.seleccionados = [];
+                }
+
+                o.list.checkall = $('<input>');
+            } 
+                    
+            o.list.div = o.div;
+            o.list.url = o.params.url;
+            o.list.data = data_final;
+            o.list.id = o.params.id;
+            o.list.mostrar_titulos = o.params.titulos;
+            o.list.etiquetas = [];
+            o.list.campos = o.params.campos;
+            o.list.ajax = o.params.ajax;
+            o.list.permisos = permisos_finales;
+            o.list.botones = o.params.botones;
+            o.list.estado = o.params.estado;
+            //o.list.retorno = retorno_final;
+            o.list.load_complete = o.params.loadComplete;
+            o.list.paginador = o.params.paginador;
+            o.list.onclick = o.params.onclick;
+            o.list.ondblclick = o.params.ondblclick;
+            o.list.seleccionable = o.params.seleccionable;
+            o.list.seleccionados = {};
+            o.list.preseleccionados = o.params.seleccionados;
+            o.list.nuevos = 0;
+            o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
+
+            o.list.cargar_estilos();
+            o.list.cargar_paginador();
+            o.list.titulos();
+            o.list.cargar();
+            
+            $(o.div).on('reloadGrid',function(){
+                $.kui.instances.kgrid[o.list.id].cargar();
+            });
+            
+        }
 
     };
 
