@@ -45,9 +45,19 @@
 
         nueva_grilla : function(){
             var kGrid = this;
-            $(kGrid.div).addClass('kgrid form-horizontal');
-            kGrid.contenido = $('<div>').attr('id',kGrid.div.id + '_grilla')
-                    .prependTo(kGrid.div);
+
+            $(kGrid.div).addClass('kgrid');
+
+            kGrid.table = $('<table>')
+                .addClass('table table-bordered table-striped')
+                .prependTo(
+                    $('<div>').addClass('table-responsive')
+                        .prependTo(kGrid.div)
+                    );
+
+            kGrid.tbody = $('<tbody>')
+                .attr('id',kGrid.div.id + '_grilla')
+                .prependTo(kGrid.table);
 
             if(kGrid.seleccionable){
                 kGrid.seleccionar(kGrid.preseleccionados);
@@ -56,30 +66,34 @@
 
         titulos: function(){
             var kGrid = this;
-            var formGroup = $('<div>').addClass('form-group hidden-xs');
-            var columnas = $('<div>').addClass('col-sm-11').appendTo(formGroup);
-
             kGrid.nueva_grilla();
+
+            if(!kGrid.mostrar_titulos){
+                return;
+            }
+
+            var row = $('<tr>');
+            kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
             $.each(kGrid.campos,function(c,campo){                       
                 var label = $('<h4>');
+
                 if(campo.titulo!==undefined){
                     label.append(campo.titulo);
                 }else{
                     label.append(campo.nombre);
                 }
 
-                kGrid.etiquetas.push(label.html());
                 $('<i>').addClass('fa fa-fw fa-arrow-down text-muted')
                     .prependTo(label);
 
-                if(!campo.ancho){
-                    campo.ancho = parseInt(12/kGrid.campos.length);
-                }
+                // if(!campo.ancho){
+                //     campo.ancho = parseInt(12/kGrid.campos.length);
+                // }
 
-                var titulo = $('<div>').html(label)
-                    .addClass('col-sm-'+campo.ancho)
-                    .appendTo(columnas);
+                var titulo = $('<th>')
+                    .html(label)
+                    .appendTo(row);
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
@@ -96,20 +110,18 @@
                     label.html(kGrid.checkall);
 
                 }
-            });                            
-            
-            formGroup.prependTo(kGrid.div);
+            });
 
-            if(!kGrid.mostrar_titulos){
-                formGroup.hide();
-            }
+            $('<th>').addClass('kacciones').appendTo(row);
+            row.appendTo(kGrid.thead);
         },
         
         cargar : function() {
             
             var kGrid = this;
-            if(kGrid.contenido){
-                kGrid.contenido.empty();
+
+            if(kGrid.tbody){
+                kGrid.tbody.empty();
             }else{
                 kGrid.nueva_grilla();
             }
@@ -126,15 +138,13 @@
                         kGrid.totalDatos = retorno.respuesta.totalDatos;
                         kGrid.pagina = retorno.respuesta.pagina;
                         kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
-
-                        kGrid.grilla = $('<div>').addClass('kGrid').prependTo(kGrid.contenido);                       
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
                             kGrid.cargar_entrada(item);                          
                         });
 
-                        $(kGrid.grilla).find('.' + kGrid.div.id + '_seleccionar_row')
+                        $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
                             .each(function(i,item){
                                 if(kGrid.seleccionados[$(item).data('pk')]){
                                     $(item).attr('checked','checked');
@@ -164,7 +174,7 @@
                             .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
                         
                     }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.contenido,retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -205,11 +215,11 @@
                 }
             }
 
-            var formGroup = $('<div>').attr('id',pk)
-                .attr('data-pk',item[kGrid.id])
-                .addClass('form-group');
+            var row = $('<tr>').attr('id',pk)
+                .attr('data-pk',item[kGrid.id]);
 
             var activo = nueva_entrada? true : false;
+
             if(!nueva_entrada && typeof kGrid.estado === 'function'){
                 activo = kGrid.estado.call(this,item);
             }
@@ -219,7 +229,7 @@
                     kGrid.onclick : function(){
                        window.open(kGrid.onclick,'_self');
                     };
-                formGroup.addClass('kbtn')
+                row.addClass('kbtn')
                     .click(function(){
                        onclick.call(this,item);
                     });
@@ -230,57 +240,26 @@
                         kGrid.ondblclick : function(){
                             kGrid.permisos['editar'].call(this,item);
                         };
-                    formGroup.dblclick(function(){
+                    row.dblclick(function(){
                         ondblclick.call(this,item);
                     });
                 }
             }
-                                        
-            var izquierda = $(guardar? '<form>' : '<div>')
-                .addClass('col-sm-11')
-                .appendTo(formGroup);
-            var derecha = $('<div>').addClass('text-right col-sm-1')
-                .appendTo(formGroup);
-            var botones = $('<div>').addClass('pull-right')
-                .addClass('kacciones')
-                .appendTo(derecha);
-            var scores = $('<div>').addClass('kscores pull-right')
-                .appendTo(derecha);
-                            
-            $.each(kGrid.campos,function(c,campo){ 
-                var columna;
 
-                if(campo.tipo!=='score'){
-                    var ancho_columna = campo.ancho;
-                    var contenedor = '<div>';
-                    
-                    columna = $(contenedor)
-                        .addClass('col-sm-'+ancho_columna)
-                        .appendTo(izquierda);
-                }else{
-                    columna = $('<p>').appendTo(
-                            $('<div>')
-                                .addClass('text-center pull-left kscore')
-                                .appendTo(scores)
-                        );
+            $.each(kGrid.campos,function(c,campo){
+                var cell = $('<td>')
+                    .appendTo(row);
+
+                var formItem = $('<div>').addClass('kedit')
+                    .appendTo(cell);
+
+                $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
+
+                if(typeof campo.formato === 'function'){
+                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
                 }
 
-                $('<label>').addClass('klabel')
-                    .addClass('visible-xs')
-                    .html(kGrid.etiquetas[c])
-                    .appendTo(columna);
-
-                if(campo.simple===undefined){
-                    campo.simple = true;
-                }
-
-                $.kui.formulario.nuevo_elemento(!nueva_entrada,columna,item,campo);
-
-                var input = columna.find('[data-rol=input]');
-                
-                if(!input.hasClass(kGrid.div.id + '_seleccionar_row')){
-                    input.attr('readonly',true);
-                }
+                var input = cell.find('[data-rol=input]');
 
                 if(input.attr('type')==='checkbox'){
                     
@@ -294,12 +273,19 @@
                     }
                     
                     input.parent().addClass('text-center');
-                }
+                }else{
+                    formItem.addClass('hidden');
 
-                if(typeof campo.formato === 'function'){
-                    item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
-                }                         
-            });                            
+                    $('<div>').addClass('kread')
+                        .html(item[campo.nombre])
+                        .appendTo(cell);
+                }
+                
+            });
+
+            var botones = $('<td>')
+                .addClass('kacciones')
+                .appendTo(row);                         
                                             
             var dimension = 'fa-lg';
 
@@ -319,7 +305,7 @@
                     //kGrid.cargar();
 
                     // Habilitar edición inline
-                     $('#'+pk+' form').find('input[readonly]').each(function(x,input){
+                     $('#'+pk).find('input[readonly]').each(function(x,input){
                         if(($(input).attr('data-disabled')!=='true' && $(input).attr('data-readonly')!=='true') || 
                             (nueva_entrada && $(input).attr('data-creable'))){
                             $(input).removeAttr('readonly')
@@ -348,7 +334,7 @@
 
             var deshabilitar_edicion = function(){
                 // Deshabilitar edición
-                $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
+                $('#'+pk).find('input[data-editando]').each(function(x,input){
                     $(input).attr('readonly',$(input).attr('data-readonly')!=='false')
                         .removeAttr('data-editando')
                         .unbind('keyup');
@@ -366,7 +352,7 @@
 
             var deshacer_cambios = function(){
                     var original = $(kGrid.div).data('datos')[$('#'+pk).attr('data-pk')];
-                    var editados = $('#'+pk+' form').find('input[data-editando]');
+                    var editados = $('#'+pk).find('input[data-editando]');
                     deshabilitar_edicion();
                     editados.each(function(x,input){
                         if($(input).attr('type')==='checkbox'){
@@ -393,49 +379,49 @@
                         var btn_guardar = crear_boton('guardar','Guardar','save','primary');
                         btn_guardar.hide();
 
-                        var guardar_cambios = typeof guardar === 'function'?
-                            function(formulario){
-                                guardar.call(this,formulario);
-                            } : function(formulario){
-                                $.ajax({
-                                    type: 'POST',
-                                    url: guardar,
-                                    data: formulario,
-                                    success: function(/*retorno*/){  
-                                        kGrid.cargar();
-                                    }
-                                });
-                            };
+                        // var guardar_cambios = typeof guardar === 'function'?
+                        //     function(formulario){
+                        //         guardar.call(this,formulario);
+                        //     } : function(formulario){
+                        //         $.ajax({
+                        //             type: 'POST',
+                        //             url: guardar,
+                        //             data: formulario,
+                        //             success: function(/*retorno*/){  
+                        //                 kGrid.cargar();
+                        //             }
+                        //         });
+                        //     };
 
-                        $.kui.formulario.validar.reglas();
+                        // $.kui.formulario.validar.reglas();
 
-                        $(izquierda).validate({
-                            showErrors: function(errorMap, errorList) {
-                                $.kui.formulario.validar.error(this, errorMap, errorList);
-                            },
-                            submitHandler: function(form) {
-                                $.kui.formulario.validar.fecha(form);
+                        // $('#TODO-CAMBIAR').validate({
+                        //     showErrors: function(errorMap, errorList) {
+                        //         $.kui.formulario.validar.error(this, errorMap, errorList);
+                        //     },
+                        //     submitHandler: function(form) {
+                        //         $.kui.formulario.validar.fecha(form);
                                 
-                                deshabilitar_edicion();
-                                var dato = {};
+                        //         deshabilitar_edicion();
+                        //         var dato = {};
 
-                                // Serialize Array para todos los inputs excepto checkbox
-                                $.each($('#'+pk+' form').serializeArray(), function(_, it) {
-                                    dato[it.name] = it.value;
-                                });
+                        //         // Serialize Array para todos los inputs excepto checkbox
+                        //         $.each($('#'+pk+' form').serializeArray(), function(_, it) {
+                        //             dato[it.name] = it.value;
+                        //         });
 
-                                // Checkboxs
-                                $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
-                                    dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
-                                });
+                        //         // Checkboxs
+                        //         $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
+                        //             dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
+                        //         });
 
-                                dato = $.extend({}, item, dato);
+                        //         dato = $.extend({}, item, dato);
 
-                                guardar_cambios(dato);
+                        //         guardar_cambios(dato);
 
-                                return false;
-                            }
-                        });
+                        //         return false;
+                        //     }
+                        // });
 
                         btn_guardar.click(function(e){
                             e.stopPropagation();
@@ -481,7 +467,7 @@
                 
             } else{                                    
                 if(typeof kGrid.permisos['activar'] === 'function'){
-                    formGroup.addClass('has-error');
+                    row.addClass('has-error');
                     var btn_activar = crear_boton('reactivar','Reactivar','check','success');
 
                     btn_activar.click(function(e){
@@ -538,7 +524,7 @@
                     };
 
                     // Open context menu
-                    $(formGroup).attr('data-toggle','context')
+                    $(row).attr('data-toggle','context')
                         .attr('data-target','#'+div_context.attr('id'));
                 }
 
@@ -567,13 +553,12 @@
             }
 
             if(nueva_entrada){
-                formGroup.prependTo(kGrid.grilla);
+                row.prependTo(kGrid.tbody);
                 habilitar_edicion();
             }else{
-                formGroup.appendTo(kGrid.grilla);
+                row.appendTo(kGrid.tbody);
             }
 
-            formGroup.after($('<hr>').addClass('visible-xs'));
         },
         
         cargar_paginador : function(){
