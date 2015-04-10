@@ -76,16 +76,13 @@
             kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
             $.each(kGrid.campos,function(c,campo){                       
-                var label = $('<h4>');
+                var label = $('<strong>');
 
                 if(campo.titulo!==undefined){
                     label.append(campo.titulo);
                 }else{
                     label.append(campo.nombre);
                 }
-
-                $('<i>').addClass('fa fa-fw fa-arrow-down text-muted')
-                    .prependTo(label);
 
                 // if(!campo.ancho){
                 //     campo.ancho = parseInt(12/kGrid.campos.length);
@@ -488,6 +485,7 @@
                 }else{
                     var div_context = $('<div>')
                         .attr('id',$.kui.random_id())
+                        .addClass('kui-dropdown')
                         .appendTo('body');
 
                     var ul_context = $('<ul>')
@@ -495,18 +493,20 @@
                         .addClass('dropdown-menu')
                         .appendTo(div_context);
 
-                    var btn = crear_boton($.kui.random_id(),'Acciones','bars','primary');
+                    var btn = crear_boton($.kui.random_id(),'Acciones','angle-down','primary');
                     
                     btn.attr('data-toggle','dropdown')
                         .attr('aria-haspopup',true)
                         .attr('aria-expanded',false)
                         .appendTo(botones);
                     
+                    var div_dropdown = btn.parent()
+                        .attr('id',$.kui.random_id())
+                        .addClass('dropdown kui-dropdown');
+
                     var ul = ul_context.clone()
                         .attr('aria-labelledby',btn.attr('id'))
-                        .appendTo(btn.parent());
-
-                    btn.parent().addClass('dropdown');
+                        .appendTo(div_dropdown);
 
                     ubicar_boton = function(btn){
                         btn.find('i.fa').addClass('fa-fw')
@@ -526,6 +526,18 @@
                     // Open context menu
                     $(row).attr('data-toggle','context')
                         .attr('data-target','#'+div_context.attr('id'));
+
+                    var close_other_dropdown = function(){
+                        var current = this.id;
+                        $('.kui-dropdown.open').each(function(d,dropdown){
+                            if(dropdown.id!==current){
+                                $(dropdown).removeClass('open');
+                            }
+                        });
+                    };
+
+                    div_context.on('show.bs.context',close_other_dropdown);
+                    div_dropdown.on('show.bs.dropdown',close_other_dropdown);
                 }
 
                 $.each(kGrid.botones,function(b,boton){

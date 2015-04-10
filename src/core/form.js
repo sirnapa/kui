@@ -240,8 +240,7 @@
               if(input.val()==='true' || input.val().toUpperCase()==='S') {
                   input.attr('checked','checked');
               }
-              input.removeClass('form-control')
-                  .css('margin-top','10px');
+              input.removeClass('form-control');
           break;
 
           case 'numero':
