@@ -40,7 +40,7 @@
 
         nueva_grilla : function(){
             var kCard = this;
-            $(kCard.div).addClass('kcard form-horizontal');
+            $(kCard.div).addClass('kui-list form-horizontal');
             kCard.contenido = $('<div>').attr('id',kCard.div.id + '_grilla')
                     .prependTo(kCard.div);
 
@@ -218,8 +218,7 @@
                         );
                 }
 
-                columna.html(typeof campo.formato === 'function'?
-                    campo.formato.call(this,item[campo.nombre],item) : item[campo.nombre]);
+                columna.html($.kui.list.formatear(item,campo.nombre,campo.formato));
 
                 if(campo.titulo && campo.titulo!==''){
                     if(campo.tipo!=='score'){
@@ -538,87 +537,6 @@
                 .click(function(){
                     $('#'+kCard.div.id).kCard('pagina','ultima');
                 });
-        },
-
-        cargar_estilos: function(){
-            if($('#kcard_estilos').length){
-                return;
-            }
-            var reglas = {
-                '.kcard .kbtn': 
-                        [
-                            'cursor: pointer'
-                        ],
-                '.kcard .kbtn:hover':
-                        [
-                            'background: #ECECF0',
-                            'border: 1px solid #cacaca'
-                        ],
-                '.kcard h2':
-                        [
-                            'padding-bottom: 10px'
-                        ],
-                '.kcard .kscore':
-                        [
-                            'width: 0',
-                            'height: 0',
-                            'border: 1px solid #999999',
-                            'background: #ECECF0',
-                            'font-size: 1.7em',
-                            'margin-left: 10px',
-                            'overflow: hidden',
-                            'border-radius: 50%'
-                        ],
-                '.kcard .kscore p':
-                        [
-                            'margin-top: 25%'
-                        ],
-                '.kcard .kscore small':
-                        [
-                            'font-size: 0.5em'
-                        ],
-                '.kcard .klabel':
-                        [
-                            'margin-top: 20px'
-                        ],
-                '.kcard .kacciones':
-                        [
-                            'white-space: nowrap'
-                        ],
-                '.kcard .kaccion':
-                        [
-                            'margin-left: 15px'
-                        ],
-                '.kcard .kpagina':
-                        [
-                            'overflow: hidden',
-                            'padding-top: 2px'
-                        ],
-                '.kcard .kpagina input':
-                        [
-                            'margin: 0 5px',
-                            'text-align: center'
-                        ]
-                };
-
-            var estilo = '';
-            $.each(reglas,function(elemento,regla){
-                estilo += elemento+'{';
-                $.each(regla,function(l,linea){
-                    estilo += linea + ';';
-                });
-                estilo += '}';
-            });
-
-            var primer_estilo = $('head').find('link,style').first();
-            var estilos_k = $('<style>').attr('id','kcard_estilos')
-                .html(estilo);
-
-            if(primer_estilo.length){
-                primer_estilo.before(estilos_k);
-            }else{
-                estilos_k.prependTo('head');
-            }
         },
 
         cambiar_seleccion: function(codigo,estado){

@@ -10,10 +10,12 @@ $('#conbotones').kGrid({
                 }
     },{
             nombre : 'fechaAlta',
-            titulo: 'Creado'
+            titulo: 'Creado',
+            tipo: 'fecha'
     },{
             nombre : 'fechaModif',
-            titulo: 'Modificado'
+            titulo: 'Modificado',
+            tipo: 'fecha'
     },{
             nombre : 'anonimo',
             titulo: 'NN',

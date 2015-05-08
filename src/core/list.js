@@ -208,9 +208,8 @@
                     titulo: '',
                     tipo: 'booleano',
                     ancho: 1,
+                    editonly: true,
                     atributos: {
-                        'readonly': 'false',
-                        'disabled': 'false',
                         'class': o.div.id + '_seleccionar_row'
                     }
                 };
@@ -245,7 +244,7 @@
             o.list.nuevos = 0;
             o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
 
-            o.list.cargar_estilos();
+            $.kui.list.cargar_estilos();
             o.list.cargar_paginador();
             o.list.titulos();
             o.list.cargar();
@@ -254,6 +253,113 @@
                 $.kui.instances.kgrid[o.list.id].cargar();
             });
             
+        },
+
+        formatear: function(item,nombre,formato){
+            return typeof formato === 'function'?
+                formato.call(this,item[nombre],item) : item[nombre];
+        },
+
+        cargar_estilos: function(){
+            if($('#kcard_estilos').length){
+                return;
+            }
+            var reglas = {
+                '.kui-list .kbtn': 
+                        [
+                            'cursor: pointer'
+                        ],
+                '.kui-list .kbtn:hover':
+                        [
+                            'background: #ECECF0',
+                            'border: 1px solid #cacaca'
+                        ],
+                '.kui-list h2':
+                        [
+                            'padding-bottom: 10px'
+                        ],
+                '.kui-list .kscore':
+                        [
+                            'width: 0',
+                            'height: 0',
+                            'border: 1px solid #999999',
+                            'background: #ECECF0',
+                            'font-size: 1.7em',
+                            'margin-left: 10px',
+                            'overflow: hidden',
+                            'border-radius: 50%'
+                        ],
+                '.kui-list .kscore p':
+                        [
+                            'margin-top: 25%'
+                        ],
+                '.kui-list .kscore small':
+                        [
+                            'font-size: 0.5em'
+                        ],
+                '.kui-list .klabel':
+                        [
+                            'margin-top: 20px'
+                        ],
+                '.kui-list .kacciones':
+                        [
+                            'white-space: nowrap'
+                        ],
+                '.kui-list .kaccion':
+                        [
+                            'margin-left: 15px'
+                        ],
+                '.kui-list .kpagina':
+                        [
+                            'overflow: hidden',
+                            'padding-top: 2px'
+                        ],
+                '.kui-list .kpagina input':
+                        [
+                            'margin: 0 5px',
+                            'text-align: center'
+                        ],
+                '.kui-list .writing td':
+                        [
+                            'background: #777777'
+                        ],
+                '.kui-list .writing td:not(.kacciones)':
+                        [
+                            'vertical-align: middle',
+                            'padding: 0 !important'
+                        ],
+                '.kui-list .writing .form-control, .kui-list .writing .input-group-addon':
+                        [
+                            'background: none',
+                            'box-shadow: none',
+                            'border-radius: 0',
+                            'border: none',
+                            'color: #FFFFFF'
+                        ],
+                '.kui-list .writing .kacciones a':
+                        [
+                            'color: #FFFFFF'
+                        ]
+                };
+
+            var estilo = '';
+            $.each(reglas,function(elemento,regla){
+                estilo += elemento+'{';
+                $.each(regla,function(l,linea){
+                    estilo += linea + ';';
+                });
+                estilo += '}';
+            });
+
+            var primer_estilo = $('head').find('link,style').first();
+            var estilos_k = $('<style>').attr('id','kcard_estilos')
+                .html(estilo);
+
+            if(primer_estilo.length){
+                primer_estilo.before(estilos_k);
+            }else{
+                estilos_k.prependTo('head');
+            }
         }
 
     };

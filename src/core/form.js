@@ -39,11 +39,7 @@
        var input;
        var valor_input;
 
-       if(typeof campo.formato === 'function'){
-          valor_input = function(){
-            campo.formato.call(this,item[campo.nombre],item);
-          };
-       }else if(campo.tipo==='combo'){
+       if(campo.tipo==='combo'){
           var subvalor = function(dato,nivel_1,nivel_2){
             return dato[nivel_1]? dato[nivel_1][nivel_2] : 
                    (dato[nivel_1+'.'+nivel_2]? 
@@ -67,7 +63,7 @@
 
        }else{
           valor_input = function(){
-            return item[campo.nombre];
+            return $.kui.list.formatear(item,campo.nombre,campo.formato);
           };
        }
 
@@ -237,9 +233,7 @@
               input = crear_input_select('input');
               input.appendTo(elemento);
               input.prop('type','checkbox');
-              if(input.val()==='true' || input.val().toUpperCase()==='S') {
-                  input.attr('checked','checked');
-              }
+              input.prop('checked',valor_input());
               input.removeClass('form-control');
           break;
 
