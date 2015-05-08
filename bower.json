@@ -1,12 +1,13 @@
 {
   "name": "kui",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "dependencies": {
     "bootstrap-combobox": "~1.1.6",
     "bootstrap-datetimepicker": "~0.0.11",
     "bootstrap": "~3.3.2",
     "fontawesome": "~4.3.0",
-    "jquery-validation": "~1.13.1"
+    "jquery-validation": "~1.13.1",
+    "bootstrap-contextmenu": "~0.3.2"
   },
   "devDependencies": {
     "qunit": "~1.12.0",

@@ -1,4 +1,4 @@
-/*! 
+/*
  *
  *   +++++++++++++++++++++ kForm +++++++++++++++++++++ 
  *
@@ -9,12 +9,15 @@
     $.kForms = {
         instances : {}
     };
-    
+
     // Collection method.
-    $.fn.kForm = function (dato) {
-        return this.each(function () {
-            $.kForms.instances[this.id] = new KForm(this,dato);
-        });
+    $.fn.kForm = function (data) {
+        return $(this).kui('form',data);
+    };
+
+    // Widget definition
+    $.kui.widgets['form'] = function (data) {
+        return $.kForms.instances[this.id] = new KForm(this,data);
     };
     
     var KForm = function(div,dato){
@@ -183,7 +186,7 @@
                         data: kForm.contenido(),
                         success: function(retorno){
                             if(retorno.mensaje){
-                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
+                                $.kui.messages(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
                             }
                             afterSubmit(retorno);
                         },

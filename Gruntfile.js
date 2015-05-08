@@ -26,10 +26,15 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-              'dist/jquery.<%= pkg.name %>.js': ['src/<%= pkg.name %>.js'],
-              'dist/jquery.<%= pkg.name %>.all.js': ['src/<%= pkg.name %>.js','src/*.js'],
-              'dist/jquery.<%= pkg.name %>.kgrid.js': ['src/kgrid.js'],
-              'dist/jquery.<%= pkg.name %>.kform.js': ['src/kform.js']
+              'dist/jquery.<%= pkg.name %>.core.js': [
+                'src/<%= pkg.name %>.js',
+                'src/core/*.js'
+              ],
+              'dist/jquery.<%= pkg.name %>.js': [
+                'src/<%= pkg.name %>.js',
+                'src/core/*.js',
+                'src/widgets/*.js'
+              ]
          }
       }
     },
@@ -38,12 +43,18 @@ module.exports = function (grunt) {
         preserveComments: 'some'
       },
       build: {
-        files: {
-              'dist/jquery.<%= pkg.name %>.min.js': ['dist/jquery.<%= pkg.name %>.js'],
-              'dist/jquery.<%= pkg.name %>.all.min.js': ['dist/jquery.<%= pkg.name %>.all.js'],
-              'dist/jquery.<%= pkg.name %>.kgrid.min.js': ['dist/jquery.<%= pkg.name %>.kgrid.js'],
-              'dist/jquery.<%= pkg.name %>.kform.min.js': ['dist/jquery.<%= pkg.name %>.kform.js']
-         }
+        files: [
+          {
+                'dist/jquery.<%= pkg.name %>.core.min.js': ['dist/jquery.<%= pkg.name %>.core.js'],
+                'dist/jquery.<%= pkg.name %>.min.js': ['dist/jquery.<%= pkg.name %>.js']
+          },{
+              expand: true,
+              src: '*.js',
+              dest: 'dist/widgets',
+              cwd: 'src/widgets',
+              rename: function(dest, src) { return dest + '/jquery.<%= pkg.name %>.' + src.replace('.js', '.min.js'); }
+          }
+        ]
       }
     },
     qunit: {
