@@ -35,7 +35,7 @@
 
   test('is kui', function() {
     expect(1);
-    strictEqual(this.elems.kui().text(), 'kui0kui1kui2', 'should be kui');
+    strictEqual(this.elems.kui().data('kui').toString(), 'true', 'should be kui');
   });
 
   module('jQuery.kui');

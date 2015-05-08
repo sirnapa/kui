@@ -1,7 +1,6 @@
-$('#tarjetas').kGrid({
+$('#tarjetasconscores').kui('cards',{
     url : 'js/datos.json',
     id : 'pkEncuesta',
-    tarjetas: true,
     campos : [{
             nombre : 'nombre',
             titulo: '',
@@ -19,6 +18,21 @@ $('#tarjetas').kGrid({
                 return campo + ' al ' + row['vigenciaFin']
             },
             tipo: 'destacado'
+    },{
+            nombre : 'pkEncuesta',
+            titulo: 'Completas',
+            tipo: 'score'
+    },{
+            nombre : 'empresa.pkEmpresa',
+            titulo: 'Parciales',
+            tipo: 'score'
+    },{
+            nombre : 'total',
+            titulo: 'Total',
+            tipo: 'score',
+            formato: function(campo,row){
+                return row['pkEncuesta'] + row['empresa.pkEmpresa'];
+            }
     }],
     estado : function(item) {
             if (item['activo'] == 'S') {
@@ -26,28 +40,5 @@ $('#tarjetas').kGrid({
             }
             return false;
     },
-    permisos: {
-        remover: remover,
-        activar: activar,
-        editar: editar
-    },
-    botones: [
-        {
-            comentario: 'Ejemplo de botón personalizado',
-            icono: 'link',
-            onclick: function(){
-                alert('Acción personalizada');
-            }
-        },{
-            comentario: 'Botón que sale solo cuando el nombre empieza con A',
-            icono: 'at',
-            onclick: function(){
-                alert('Esta tarjeta tiene un nombre que empieza con A.')
-            },
-            mostrar: function(item){
-                return item.nombre.charAt(0)=='A';
-            }
-        }
-    ],
     onclick: click
 });
