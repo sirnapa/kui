@@ -1,16 +1,16 @@
 {
   "name": "kui",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "dependencies": {
-    "bootstrap-combobox": "~1.1.6",
-    "bootstrap-datetimepicker": "~0.0.11",
+    "jquery": "~1.11.2",
     "bootstrap": "~3.3.2",
+    "bootstrap-combobox": "~1.1.6",
+    "bootstrap-contextmenu": "~0.3.2",
+    "bootstrap-datetimepicker": "~0.0.11",
     "fontawesome": "~4.3.0",
-    "jquery-validation": "~1.13.1",
-    "bootstrap-contextmenu": "~0.3.2"
+    "jquery-validation": "~1.13.1"
   },
   "devDependencies": {
-    "qunit": "~1.12.0",
-    "jquery": "~1.11.2"
+    "qunit": "~1.12.0"
   }
 }
