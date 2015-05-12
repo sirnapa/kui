@@ -6,9 +6,7 @@
 
 (function ($) {
 
-    $.kForms = {
-        instances : {}
-    };
+    $.kui.instances.kform = {};
 
     // Collection method.
     $.fn.kForm = function (data) {
@@ -17,7 +15,7 @@
 
     // Widget definition
     $.kui.widgets['form'] = function (data) {
-        return $.kForms.instances[this.id] = new KForm(this,data);
+        return $.kui.instances.kform[this.id] = new KForm(this,data);
     };
     
     var KForm = function(div,dato){
