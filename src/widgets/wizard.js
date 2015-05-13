@@ -77,8 +77,6 @@
                 var step = parseInt(wizard.attr('data-step'));
                 if(kWizard.validar(step)){
                     kWizard.mostrarPaso(step+1);
-                }else{
-                    window.alert('Algo en este paso no es válido.');
                 }
             });
             
@@ -95,10 +93,10 @@
 
             var kWizard = this;
             var success = true;
-            var stepContent = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
+            var currentStep = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
 
             if(typeof kWizard.validacion === 'function'){
-                success = kWizard.validacion.call(this,stepContent);
+                success = kWizard.validacion.call(this,currentStep);
             }
 
             return success;
@@ -108,14 +106,15 @@
             
             var kWizard = this;
             var wizard = $(kWizard.div);
-            var stepContent = wizard.find('[data-wizard-step][data-step="'+step+'"]');
+            var currentStep = wizard.find('[data-wizard-step][data-step="'+step+'"]');
 
-            if(!stepContent.length){
+            if(!currentStep.length){
                 return;
             }
 
+            var prevStep = wizard.find('[data-wizard-step]:visible');
+            prevStep.trigger('hide').hide().trigger('hidden');
             wizard.find('[data-wizard-index]').removeClass('active');
-            wizard.find('[data-wizard-step]:visible').hide();
             wizard.find('[data-wizard-index][data-index="'+step+'"]')
                 .addClass('active');
 
@@ -124,7 +123,11 @@
             kWizard.control.next.prop('disabled',
                 step===wizard.find('[data-wizard-step]').length);
 
-            stepContent.fadeIn();
+
+            currentStep.trigger('show')
+                .fadeIn('slow',function(){
+                    currentStep.trigger('shown');
+                });
 
         }
 
