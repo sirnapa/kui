@@ -1,4 +1,4 @@
-/*! kui - v0.0.9 - 2015-05-12
+/*! kui - v0.1.0 - 2015-05-13
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -273,6 +273,7 @@
               input.prop('type','checkbox');
               input.prop('checked',valor_input());
               input.removeClass('form-control');
+              elemento.addClass('checkbox');
           break;
 
           case 'numero':
@@ -1516,20 +1517,14 @@
                 /* 
                  * Lado izquierdo: Label 
                  */
-                $('<label>').addClass('klabel col-md-3 control-label')
+                $('<label>').addClass('klabel col-sm-4 control-label')
                     .html(campo.titulo)
                     .appendTo(formGroup);
 
                 /* 
                  * En el centro: Input 
                  */
-                var centro = $('<div>').addClass('col-md-6')
-                    .appendTo(formGroup);
-
-                /* 
-                 * Lado derecho: Vacío de momento 
-                 */
-                $('<div>').addClass('col-md-3')
+                var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
                 $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
@@ -2433,8 +2428,6 @@
                 var step = parseInt(wizard.attr('data-step'));
                 if(kWizard.validar(step)){
                     kWizard.mostrarPaso(step+1);
-                }else{
-                    window.alert('Algo en este paso no es válido.');
                 }
             });
             
@@ -2451,10 +2444,10 @@
 
             var kWizard = this;
             var success = true;
-            var stepContent = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
+            var currentStep = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
 
             if(typeof kWizard.validacion === 'function'){
-                success = kWizard.validacion.call(this,stepContent);
+                success = kWizard.validacion.call(this,currentStep);
             }
 
             return success;
@@ -2464,14 +2457,15 @@
             
             var kWizard = this;
             var wizard = $(kWizard.div);
-            var stepContent = wizard.find('[data-wizard-step][data-step="'+step+'"]');
+            var currentStep = wizard.find('[data-wizard-step][data-step="'+step+'"]');
 
-            if(!stepContent.length){
+            if(!currentStep.length){
                 return;
             }
 
+            var prevStep = wizard.find('[data-wizard-step]:visible');
+            prevStep.trigger('hide').hide().trigger('hidden');
             wizard.find('[data-wizard-index]').removeClass('active');
-            wizard.find('[data-wizard-step]:visible').hide();
             wizard.find('[data-wizard-index][data-index="'+step+'"]')
                 .addClass('active');
 
@@ -2480,7 +2474,11 @@
             kWizard.control.next.prop('disabled',
                 step===wizard.find('[data-wizard-step]').length);
 
-            stepContent.fadeIn();
+
+            currentStep.trigger('show')
+                .fadeIn('slow',function(){
+                    currentStep.trigger('shown');
+                });
 
         }
 
