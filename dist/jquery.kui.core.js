@@ -1,4 +1,4 @@
-/*! kui - v0.0.9 - 2015-05-12
+/*! kui - v0.1.0 - 2015-05-13
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -273,6 +273,7 @@
               input.prop('type','checkbox');
               input.prop('checked',valor_input());
               input.removeClass('form-control');
+              elemento.addClass('checkbox');
           break;
 
           case 'numero':
