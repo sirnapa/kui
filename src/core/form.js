@@ -235,6 +235,7 @@
               input.prop('type','checkbox');
               input.prop('checked',valor_input());
               input.removeClass('form-control');
+              elemento.addClass('checkbox');
           break;
 
           case 'numero':

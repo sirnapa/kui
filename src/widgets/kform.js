@@ -118,20 +118,14 @@
                 /* 
                  * Lado izquierdo: Label 
                  */
-                $('<label>').addClass('klabel col-md-3 control-label')
+                $('<label>').addClass('klabel col-sm-4 control-label')
                     .html(campo.titulo)
                     .appendTo(formGroup);
 
                 /* 
                  * En el centro: Input 
                  */
-                var centro = $('<div>').addClass('col-md-6')
-                    .appendTo(formGroup);
-
-                /* 
-                 * Lado derecho: Vacío de momento 
-                 */
-                $('<div>').addClass('col-md-3')
+                var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
                 $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
