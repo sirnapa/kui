@@ -35,6 +35,8 @@
     };
     
     KGrid.prototype = {
+
+        name: 'grid',
     		
         set_data: function(data){
             var kGrid = this;
@@ -134,8 +136,8 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
-                        kGrid.totalDatos = retorno.respuesta.totalDatos;
-                        kGrid.pagina = retorno.respuesta.pagina;
+                        kGrid.totalDatos = parseInt(retorno.respuesta.totalDatos);
+                        kGrid.pagina = parseInt(retorno.respuesta.pagina);
                         kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
                         
                         $.each(lista,function(i,item){
@@ -158,19 +160,7 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $('#kGrid_' + kGrid.div.id + '_pagina')
-                            .val(kGrid.pagina)
-                            .data('pagina',kGrid.pagina);
-                        $('#kGrid_' + kGrid.div.id + '_totalPaginas')
-                            .html(kGrid.totalPaginas);
-                        $('#kGrid_' + kGrid.div.id + '_primera_pagina')
-                            .attr('disabled',kGrid.pagina===1);
-                        $('#kGrid_' + kGrid.div.id + '_pagina_anterior')
-                            .attr('disabled',kGrid.pagina===1);
-                        $('#kGrid_' + kGrid.div.id + '_ultima_pagina')
-                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
-                        $('#kGrid_' + kGrid.div.id + '_siguiente_pagina')
-                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
+                        $.kui.list.refrescar_paginador(kGrid);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
@@ -616,80 +606,6 @@
 
         },
         
-        cargar_paginador : function(){
-            var kGrid = this;    
-            if(!$(kGrid.paginador).length){
-                return;
-            }
-            var pk = 'kGrid_' + kGrid.div.id + '_';
-            var contenedor = $('<div>').attr('id',pk+'paginador')
-                .addClass('kGrid-paginador btn-group')
-                .appendTo(kGrid.paginador);
-            
-            $('<button>').attr('id',pk+'primera_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','primera');
-                });
-                
-           $('<button>').attr('id',pk+'pagina_anterior')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','anterior');
-                });
-                
-          var centro = $('<div>').addClass('btn btn-default kpagina')
-                .css('height',$('#'+pk+'pagina_anterior').outerHeight())
-                .appendTo(contenedor);
-                
-          $('<label>').html('Página ').appendTo(centro);
-          $('<input>').attr('id',pk+'pagina')
-            .attr('type','text')
-            .addClass('pagina')
-            .css('width',$('#'+pk+'pagina_anterior').outerWidth())
-            .appendTo(centro)
-            .keyup(function(e){
-                if(e.keyCode === 13){
-                    e.preventDefault();
-                    var pagina = parseInt($('#'+pk+'pagina').val());
-                    if(isNaN(pagina) || pagina<0 || pagina > kGrid.totalPaginas){
-                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
-                        return;
-                    }
-                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
-                        $('#'+kGrid.div.id).kGrid('pagina',pagina);
-                    }
-                }
-            });
-          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
-          $('<span>').attr('id',pk+'totalPaginas')
-            .appendTo(totalPaginas);
-                
-          $('<button>').attr('id',pk+'siguiente_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html( $('<i>').addClass('fa fa-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','siguiente');
-                });
-                
-           $('<button>').attr('id',pk+'ultima_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','ultima');
-                });
-        },
-
         cambiar_seleccion: function(codigo,estado){
             var kGrid = this;
             kGrid.seleccionados[codigo] = estado;
