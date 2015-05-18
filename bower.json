@@ -1,6 +1,6 @@
 {
   "name": "kui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "jquery": "~1.11.2",
     "bootstrap": "~3.3.2",
