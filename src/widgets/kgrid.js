@@ -265,6 +265,7 @@
                         });
                     
                     cell.addClass('text-center');
+                    view.removeClass('checkbox');
 
                 }else{
                     view.html(data);
@@ -311,7 +312,8 @@
                             $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
 
                             if(campo.tipo==='booleano'){
-                                formItem.find('[data-rol=input]')
+                                formItem.removeClass('checkbox')
+                                    .find('[data-rol=input]')
                                     .attr('data-pk',item[kGrid.id])
                                     .dblclick(function(e){
                                         e.stopPropagation();
