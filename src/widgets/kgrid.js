@@ -248,7 +248,7 @@
                 var cell = $('<td>').attr('data-cell',true)
                     .data('campo',campo)
                     .appendTo(row);
-                var data = $.kui.list.formatear(item,campo.nombre,campo.formato);
+                var data = $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,true);
                 var view = $('<div>').attr('data-view',true)
                     .data('original',data)
                     .appendTo(cell);
@@ -265,6 +265,7 @@
                         });
                     
                     cell.addClass('text-center');
+                    view.removeClass('checkbox');
 
                 }else{
                     view.html(data);
@@ -311,7 +312,8 @@
                             $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
 
                             if(campo.tipo==='booleano'){
-                                formItem.find('[data-rol=input]')
+                                formItem.removeClass('checkbox')
+                                    .find('[data-rol=input]')
                                     .attr('data-pk',item[kGrid.id])
                                     .dblclick(function(e){
                                         e.stopPropagation();
@@ -352,7 +354,7 @@
                     $('#'+ pk + '_guardar').fadeIn();
 
                     // Focus
-                    $('#'+pk).find('input[data-rol="input"]:not([disabled],[readonly])').first().focus();
+                    $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])').first().focus();
                 };
 
             var deshabilitar_edicion = function(){
@@ -437,11 +439,11 @@
                                             valor = dato[it.name] = it.value;
                                         });
                                     }else{
-                                        valor = $(form).find('input[data-rol=input]').val();
+                                        valor = $(form).find('[data-rol=input]').val();
                                     }
 
                                     $(form).parent().find('[data-view]').each(function(_,view) {
-                                        var input = $(view).parent().find('[data-edit] input[data-rol=input]');
+                                        var input = $(view).parent().find('[data-edit] [data-rol=input]');
                                         $(view).empty();
 
                                         if($(input).is('[type=checkbox]')){
@@ -451,12 +453,12 @@
                                                 .prop('disabled',true)
                                                 .attr('data-pk',$(view).parent().parent().data('pk'))
                                                 .appendTo(view);
+                                        }else if($(input).is('select')){
+                                            $(view).html($(input).find('option[value="'+valor+'"]').text());
                                         }else{
                                             $(view).html(valor);
                                         }
                                     });
-
-                                    dato = $.extend({}, item, dato);
                                 });
 
                                 guardar_cambios(dato);

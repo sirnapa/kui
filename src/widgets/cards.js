@@ -218,7 +218,7 @@
                         );
                 }
 
-                columna.html($.kui.list.formatear(item,campo.nombre,campo.formato));
+                columna.html($.kui.data.format(item,campo.nombre,campo.formato));
 
                 if(campo.titulo && campo.titulo!==''){
                     if(campo.tipo!=='score'){
