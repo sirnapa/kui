@@ -37,36 +37,9 @@
        */
 
        var input;
-       var valor_input;
-
-       if(campo.tipo==='combo'){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
-
-          if(solo_lectura){
-            valor_input = function(){
-              return typeof campo.opciones.formato==='function'? 
-                campo.opciones.formato.call(this,
-                  item[campo.nombre]?
-                  item[campo.nombre] : 
-                  item[campo.nombre+'.'+campo.opciones.id]) :
-                subvalor(item,campo.nombre,campo.opciones.formato);
-            };
-          }else{
-            valor_input = function(){
-              return subvalor(item,campo.nombre,campo.opciones.id);
-            };
-          }
-
-       }else{
-          valor_input = function(){
-            return $.kui.list.formatear(item,campo.nombre,campo.formato);
-          };
-       }
-
+       var valor_input  = function(){
+          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
+       };
 
        var crear_input_select = function(tipo){
 

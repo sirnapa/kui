@@ -255,11 +255,6 @@
             
         },
 
-        formatear: function(item,nombre,formato){
-            return typeof formato === 'function'?
-                formato.call(this,item[nombre],item) : item[nombre];
-        },
-
         cargar_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
