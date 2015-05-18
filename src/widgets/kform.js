@@ -214,8 +214,6 @@
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
 
-            dato = $.extend({}, kForm.dato, dato);
-
             return dato;
         }
         
