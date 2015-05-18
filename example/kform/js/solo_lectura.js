@@ -1,16 +1,6 @@
 $('#solo_lectura').kForm({
 	soloLectura: true,
-	origen:{
-		nombre: 'Nelson Páez',
-		activo: true,
-		cantidad: 23,
-		porcentaje: 24.5,
-		rol: {
-			id: 2,
-			nombre: 'Supervisor'
-		},
-		nacimiento: '08-07-1990'
-	},
+	origen: 'js/datos.json',
     campos : [
 	    {
 	            nombre : 'nombre',
