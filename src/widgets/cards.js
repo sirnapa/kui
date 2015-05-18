@@ -30,6 +30,8 @@
     };
     
     KCard.prototype = {
+
+        name: 'cards',
     		
         set_data: function(data){
             var kCard = this;
@@ -71,8 +73,8 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
-                        kCard.totalDatos = retorno.respuesta.totalDatos;
-                        kCard.pagina = retorno.respuesta.pagina;
+                        kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
+                        kCard.pagina = parseInt(retorno.respuesta.pagina);
                         kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
 
                         kCard.grilla = $('<div>').addClass('kCard').prependTo(kCard.contenido);                       
@@ -116,19 +118,7 @@
                         $(kCard.div).data('pagina',kCard.pagina);
                         $(kCard.div).data('totalPaginas',kCard.totalPaginas);
                                                 
-                        $('#kCard_' + kCard.div.id + '_pagina')
-                            .val(kCard.pagina)
-                            .data('pagina',kCard.pagina);
-                        $('#kCard_' + kCard.div.id + '_totalPaginas')
-                            .html(kCard.totalPaginas);
-                        $('#kCard_' + kCard.div.id + '_primera_pagina')
-                            .attr('disabled',kCard.pagina===1);
-                        $('#kCard_' + kCard.div.id + '_pagina_anterior')
-                            .attr('disabled',kCard.pagina===1);
-                        $('#kCard_' + kCard.div.id + '_ultima_pagina')
-                            .attr('disabled',kCard.pagina===kCard.totalPaginas);
-                        $('#kCard_' + kCard.div.id + '_siguiente_pagina')
-                            .attr('disabled',kCard.pagina===kCard.totalPaginas);
+                        $.kui.list.refrescar_paginador(kCard);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
@@ -465,80 +455,6 @@
             }
         },
         
-        cargar_paginador : function(){
-            var kCard = this;    
-            if(!$(kCard.paginador).length){
-                return;
-            }
-            var pk = 'kCard_' + kCard.div.id + '_';
-            var contenedor = $('<div>').attr('id',pk+'paginador')
-                .addClass('kCard-paginador btn-group')
-                .appendTo(kCard.paginador);
-            
-            $('<button>').attr('id',pk+'primera_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','primera');
-                });
-                
-           $('<button>').attr('id',pk+'pagina_anterior')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','anterior');
-                });
-                
-          var centro = $('<div>').addClass('btn btn-default kpagina')
-                .css('height',$('#'+pk+'pagina_anterior').outerHeight())
-                .appendTo(contenedor);
-                
-          $('<label>').html('Página ').appendTo(centro);
-          $('<input>').attr('id',pk+'pagina')
-            .attr('type','text')
-            .addClass('pagina')
-            .css('width',$('#'+pk+'pagina_anterior').outerWidth())
-            .appendTo(centro)
-            .keyup(function(e){
-                if(e.keyCode === 13){
-                    e.preventDefault();
-                    var pagina = parseInt($('#'+pk+'pagina').val());
-                    if(isNaN(pagina) || pagina<0 || pagina > kCard.totalPaginas){
-                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
-                        return;
-                    }
-                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
-                        $('#'+kCard.div.id).kCard('pagina',pagina);
-                    }
-                }
-            });
-          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
-          $('<span>').attr('id',pk+'totalPaginas')
-            .appendTo(totalPaginas);
-                
-          $('<button>').attr('id',pk+'siguiente_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html( $('<i>').addClass('fa fa-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','siguiente');
-                });
-                
-           $('<button>').attr('id',pk+'ultima_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','ultima');
-                });
-        },
-
         cambiar_seleccion: function(codigo,estado){
             var kCard = this;
             kCard.seleccionados[codigo] = estado;

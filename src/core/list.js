@@ -204,7 +204,7 @@
             if(o.params.seleccionable){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
-                    nombre: 'kGrid_seleccionado',
+                    nombre: 'kui_seleccionado',
                     titulo: '',
                     tipo: 'booleano',
                     ancho: 1,
@@ -245,7 +245,7 @@
             o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
 
             $.kui.list.cargar_estilos();
-            o.list.cargar_paginador();
+            $.kui.list.cargar_paginador(o.list);
             o.list.titulos();
             o.list.cargar();
             
@@ -253,6 +253,105 @@
                 $.kui.instances.kgrid[o.list.id].cargar();
             });
             
+        },
+
+        cargar_paginador : function(list){
+            if(!$(list.paginador).length){
+                return;
+            }
+            var pk = 'kui_' + list.div.id + '_';
+            var contenedor = $('<div>').attr('id',pk+'paginador')
+                .addClass('kui-paginador btn-group')
+                .appendTo(list.paginador);
+            
+            $('<button>').attr('id',pk+'primera_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-step-backward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','primera');
+                });
+                
+           $('<button>').attr('id',pk+'pagina_anterior')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-backward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','anterior');
+                });
+        
+          var alto = $('#'+pk+'pagina_anterior').outerHeight();
+          var ancho = $('#'+pk+'pagina_anterior').outerWidth();
+          
+          var centro = $('<div>').addClass('btn btn-default kpagina')
+                .css('height',alto>0? alto : 34)
+                .appendTo(contenedor);
+
+          $('<label>').html('Página ').appendTo(centro);
+          $('<input>').attr('id',pk+'pagina')
+            .attr('type','text')
+            .addClass('pagina')
+            .css('width',ancho>0? ancho : 39)
+            .appendTo(centro)
+            .keyup(function(e){
+                if(e.keyCode === 13){
+                    e.preventDefault();
+                    var pagina = parseInt($('#'+pk+'pagina').val());
+                    if(isNaN(pagina) || pagina<0 || pagina > list.totalPaginas){
+                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
+                        return;
+                    }
+                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
+                        $('#'+list.div.id).kui(list.name,'pagina',pagina);
+                    }
+                }
+            });
+          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
+          $('<span>').attr('id',pk+'totalPaginas')
+            .appendTo(totalPaginas);
+                
+          $('<button>').attr('id',pk+'siguiente_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html( $('<i>').addClass('fa fa-forward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','siguiente');
+                });
+                
+           $('<button>').attr('id',pk+'ultima_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-step-forward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','ultima');
+                });
+        },
+
+        refrescar_paginador: function(list){
+            window.console.log('Actual',list.pagina);
+            window.console.log('Primera',list.pagina===1);
+            window.console.log('Ultima',list.pagina===list.totalPaginas);
+            window.console.log('Total de paginas',list.totalPaginas);
+            window.console.log('Total de datos',list.totalDatos);
+            window.console.log('================================');
+
+            $('#kui_' + list.div.id + '_pagina')
+                .val(list.pagina)
+                .data('pagina',list.pagina);
+            $('#kui_' + list.div.id + '_totalPaginas')
+                .html(list.totalPaginas);
+            $('#kui_' + list.div.id + '_primera_pagina')
+                .prop('disabled',list.pagina===1);
+            $('#kui_' + list.div.id + '_pagina_anterior')
+                .prop('disabled',list.pagina===1);
+            $('#kui_' + list.div.id + '_ultima_pagina')
+                .prop('disabled',list.pagina===list.totalPaginas);
+            $('#kui_' + list.div.id + '_siguiente_pagina')
+                .prop('disabled',list.pagina===list.totalPaginas);
         },
 
         cargar_estilos: function(){
