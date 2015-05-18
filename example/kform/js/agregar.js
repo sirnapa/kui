@@ -44,11 +44,6 @@ $('#agregar').kForm({
 	    		titulo: 'Entrada',
 	    		tipo: 'hora',
 	    		placeholder: 'Ejemplo de tipo hora'
-	    },{
-	    		nombre: 'alta',
-	    		titulo: 'Alta',
-	    		tipo: 'fecha-hora',
-	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
     submit: function(datos,original){

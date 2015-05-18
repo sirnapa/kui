@@ -1,4 +1,4 @@
-/*! kui - v0.1.0 - 2015-05-13
+/*! kui - v0.1.1 - 2015-05-18
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -75,36 +75,9 @@
        */
 
        var input;
-       var valor_input;
-
-       if(campo.tipo==='combo'){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
-
-          if(solo_lectura){
-            valor_input = function(){
-              return typeof campo.opciones.formato==='function'? 
-                campo.opciones.formato.call(this,
-                  item[campo.nombre]?
-                  item[campo.nombre] : 
-                  item[campo.nombre+'.'+campo.opciones.id]) :
-                subvalor(item,campo.nombre,campo.opciones.formato);
-            };
-          }else{
-            valor_input = function(){
-              return subvalor(item,campo.nombre,campo.opciones.id);
-            };
-          }
-
-       }else{
-          valor_input = function(){
-            return $.kui.list.formatear(item,campo.nombre,campo.formato);
-          };
-       }
-
+       var valor_input  = function(){
+          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
+       };
 
        var crear_input_select = function(tipo){
 
@@ -670,11 +643,6 @@
             
         },
 
-        formatear: function(item,nombre,formato){
-            return typeof formato === 'function'?
-                formato.call(this,item[nombre],item) : item[nombre];
-        },
-
         cargar_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
@@ -815,6 +783,36 @@
           v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       }).toUpperCase();
+  };
+
+  // Data & Format
+  $.kui.data = {
+
+  	format: function(item,nombre,formato,combo,solo_lectura){
+
+  		if(combo){
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
+
+          if(solo_lectura){
+            return typeof combo.formato==='function'? 
+                combo.formato.call(this,
+                  item[nombre]?
+                  item[nombre] : 
+                  item[nombre+'.'+combo.id]) :
+                subvalor(item,nombre,combo.formato);
+          }else{
+          	return subvalor(item,nombre,combo.id);
+          }
+    	}
+
+        return typeof formato === 'function'?
+            formato.call(this,item[nombre],item) : item[nombre];
+    }
+
   };
 
 }(jQuery));

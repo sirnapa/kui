@@ -1,4 +1,4 @@
-/*! kui - v0.1.0 - 2015-05-13
+/*! kui - v0.1.1 - 2015-05-18
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -75,36 +75,9 @@
        */
 
        var input;
-       var valor_input;
-
-       if(campo.tipo==='combo'){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
-
-          if(solo_lectura){
-            valor_input = function(){
-              return typeof campo.opciones.formato==='function'? 
-                campo.opciones.formato.call(this,
-                  item[campo.nombre]?
-                  item[campo.nombre] : 
-                  item[campo.nombre+'.'+campo.opciones.id]) :
-                subvalor(item,campo.nombre,campo.opciones.formato);
-            };
-          }else{
-            valor_input = function(){
-              return subvalor(item,campo.nombre,campo.opciones.id);
-            };
-          }
-
-       }else{
-          valor_input = function(){
-            return $.kui.list.formatear(item,campo.nombre,campo.formato);
-          };
-       }
-
+       var valor_input  = function(){
+          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
+       };
 
        var crear_input_select = function(tipo){
 
@@ -670,11 +643,6 @@
             
         },
 
-        formatear: function(item,nombre,formato){
-            return typeof formato === 'function'?
-                formato.call(this,item[nombre],item) : item[nombre];
-        },
-
         cargar_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
@@ -815,6 +783,36 @@
           v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       }).toUpperCase();
+  };
+
+  // Data & Format
+  $.kui.data = {
+
+  	format: function(item,nombre,formato,combo,solo_lectura){
+
+  		if(combo){
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
+
+          if(solo_lectura){
+            return typeof combo.formato==='function'? 
+                combo.formato.call(this,
+                  item[nombre]?
+                  item[nombre] : 
+                  item[nombre+'.'+combo.id]) :
+                subvalor(item,nombre,combo.formato);
+          }else{
+          	return subvalor(item,nombre,combo.id);
+          }
+    	}
+
+        return typeof formato === 'function'?
+            formato.call(this,item[nombre],item) : item[nombre];
+    }
+
   };
 
 }(jQuery));
@@ -1032,7 +1030,7 @@
                         );
                 }
 
-                columna.html($.kui.list.formatear(item,campo.nombre,campo.formato));
+                columna.html($.kui.data.format(item,campo.nombre,campo.formato));
 
                 if(campo.titulo && campo.titulo!==''){
                     if(campo.tipo!=='score'){
@@ -1613,8 +1611,6 @@
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
 
-            dato = $.extend({}, kForm.dato, dato);
-
             return dato;
         }
         
@@ -1865,7 +1861,7 @@
                 var cell = $('<td>').attr('data-cell',true)
                     .data('campo',campo)
                     .appendTo(row);
-                var data = $.kui.list.formatear(item,campo.nombre,campo.formato);
+                var data = $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,true);
                 var view = $('<div>').attr('data-view',true)
                     .data('original',data)
                     .appendTo(cell);
@@ -1882,6 +1878,7 @@
                         });
                     
                     cell.addClass('text-center');
+                    view.removeClass('checkbox');
 
                 }else{
                     view.html(data);
@@ -1928,7 +1925,8 @@
                             $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
 
                             if(campo.tipo==='booleano'){
-                                formItem.find('[data-rol=input]')
+                                formItem.removeClass('checkbox')
+                                    .find('[data-rol=input]')
                                     .attr('data-pk',item[kGrid.id])
                                     .dblclick(function(e){
                                         e.stopPropagation();
@@ -1969,7 +1967,7 @@
                     $('#'+ pk + '_guardar').fadeIn();
 
                     // Focus
-                    $('#'+pk).find('input[data-rol="input"]:not([disabled],[readonly])').first().focus();
+                    $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])').first().focus();
                 };
 
             var deshabilitar_edicion = function(){
@@ -2054,11 +2052,11 @@
                                             valor = dato[it.name] = it.value;
                                         });
                                     }else{
-                                        valor = $(form).find('input[data-rol=input]').val();
+                                        valor = $(form).find('[data-rol=input]').val();
                                     }
 
                                     $(form).parent().find('[data-view]').each(function(_,view) {
-                                        var input = $(view).parent().find('[data-edit] input[data-rol=input]');
+                                        var input = $(view).parent().find('[data-edit] [data-rol=input]');
                                         $(view).empty();
 
                                         if($(input).is('[type=checkbox]')){
@@ -2068,12 +2066,12 @@
                                                 .prop('disabled',true)
                                                 .attr('data-pk',$(view).parent().parent().data('pk'))
                                                 .appendTo(view);
+                                        }else if($(input).is('select')){
+                                            $(view).html($(input).find('option[value="'+valor+'"]').text());
                                         }else{
                                             $(view).html(valor);
                                         }
                                     });
-
-                                    dato = $.extend({}, item, dato);
                                 });
 
                                 guardar_cambios(dato);
