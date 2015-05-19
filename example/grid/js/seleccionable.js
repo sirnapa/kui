@@ -1,13 +1,12 @@
-$('#simple').kGrid({
+var seleccionados = [17348,17400,18000];
+
+$('#seleccionable').kui('grid',{
     url : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
-            ancho: 4,
-            atributos: {
-                'disabled':true
-            }
+            ancho: 4
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',
@@ -17,13 +16,20 @@ $('#simple').kGrid({
             titulo: 'Modificado',
             tipo: 'fecha'
     },{
+            nombre : 'vigenciaInicio',
+            titulo: 'Vigencia',
+            formato: function(campo,row){
+                return campo + ' al ' + row['vigenciaFin']
+            },
+            atributos: {'readonly':false}
+    },{
             nombre : 'anonimo',
             titulo: 'NN',
             ancho: 1,
             tipo: 'booleano',
             formato: function(campo,row){
                     return campo=='S';
-            }
+            },
     }],
     estado : function(item) {
             if (item['activo'] == 'S') {
@@ -32,10 +38,10 @@ $('#simple').kGrid({
             return false;
     },
     permisos: {
-        remover: true,
+        remover: remover,
         activar: activar,
-        editar: true,
-        guardar: guardar
+        editar: editar
     },
-    ondblclick: true
+    seleccionable: true,
+    seleccionados: seleccionados
 });

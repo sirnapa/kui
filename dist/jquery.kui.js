@@ -1,4 +1,4 @@
-/*! kui - v0.1.2 - 2015-05-18
+/*! kui - v0.1.3 - 2015-05-19
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -720,13 +720,6 @@
         },
 
         refrescar_paginador: function(list){
-            window.console.log('Actual',list.pagina);
-            window.console.log('Primera',list.pagina===1);
-            window.console.log('Ultima',list.pagina===list.totalPaginas);
-            window.console.log('Total de paginas',list.totalPaginas);
-            window.console.log('Total de datos',list.totalDatos);
-            window.console.log('================================');
-
             $('#kui_' + list.div.id + '_pagina')
                 .val(list.pagina)
                 .data('pagina',list.pagina);
