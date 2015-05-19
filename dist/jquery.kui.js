@@ -1,4 +1,4 @@
-/*! kui - v0.1.0 - 2015-05-13
+/*! kui - v0.1.3 - 2015-05-19
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -75,36 +75,9 @@
        */
 
        var input;
-       var valor_input;
-
-       if(campo.tipo==='combo'){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
-
-          if(solo_lectura){
-            valor_input = function(){
-              return typeof campo.opciones.formato==='function'? 
-                campo.opciones.formato.call(this,
-                  item[campo.nombre]?
-                  item[campo.nombre] : 
-                  item[campo.nombre+'.'+campo.opciones.id]) :
-                subvalor(item,campo.nombre,campo.opciones.formato);
-            };
-          }else{
-            valor_input = function(){
-              return subvalor(item,campo.nombre,campo.opciones.id);
-            };
-          }
-
-       }else{
-          valor_input = function(){
-            return $.kui.list.formatear(item,campo.nombre,campo.formato);
-          };
-       }
-
+       var valor_input  = function(){
+          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
+       };
 
        var crear_input_select = function(tipo){
 
@@ -619,7 +592,7 @@
             if(o.params.seleccionable){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
-                    nombre: 'kGrid_seleccionado',
+                    nombre: 'kui_seleccionado',
                     titulo: '',
                     tipo: 'booleano',
                     ancho: 1,
@@ -660,7 +633,7 @@
             o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
 
             $.kui.list.cargar_estilos();
-            o.list.cargar_paginador();
+            $.kui.list.cargar_paginador(o.list);
             o.list.titulos();
             o.list.cargar();
             
@@ -670,9 +643,96 @@
             
         },
 
-        formatear: function(item,nombre,formato){
-            return typeof formato === 'function'?
-                formato.call(this,item[nombre],item) : item[nombre];
+        cargar_paginador : function(list){
+            if(!$(list.paginador).length){
+                return;
+            }
+            var pk = 'kui_' + list.div.id + '_';
+            var contenedor = $('<div>').attr('id',pk+'paginador')
+                .addClass('kui-paginador btn-group')
+                .appendTo(list.paginador);
+            
+            $('<button>').attr('id',pk+'primera_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-step-backward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','primera');
+                });
+                
+           $('<button>').attr('id',pk+'pagina_anterior')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-backward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','anterior');
+                });
+        
+          var alto = $('#'+pk+'pagina_anterior').outerHeight();
+          var ancho = $('#'+pk+'pagina_anterior').outerWidth();
+          
+          var centro = $('<div>').addClass('btn btn-default kpagina')
+                .css('height',alto>0? alto : 34)
+                .appendTo(contenedor);
+
+          $('<label>').html('Página ').appendTo(centro);
+          $('<input>').attr('id',pk+'pagina')
+            .attr('type','text')
+            .addClass('pagina')
+            .css('width',ancho>0? ancho : 39)
+            .appendTo(centro)
+            .keyup(function(e){
+                if(e.keyCode === 13){
+                    e.preventDefault();
+                    var pagina = parseInt($('#'+pk+'pagina').val());
+                    if(isNaN(pagina) || pagina<0 || pagina > list.totalPaginas){
+                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
+                        return;
+                    }
+                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
+                        $('#'+list.div.id).kui(list.name,'pagina',pagina);
+                    }
+                }
+            });
+          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
+          $('<span>').attr('id',pk+'totalPaginas')
+            .appendTo(totalPaginas);
+                
+          $('<button>').attr('id',pk+'siguiente_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html( $('<i>').addClass('fa fa-forward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','siguiente');
+                });
+                
+           $('<button>').attr('id',pk+'ultima_pagina')
+                .attr('type','button')
+                .addClass('btn btn-default')
+                .html($('<i>').addClass('fa fa-step-forward'))
+                .appendTo(contenedor)
+                .click(function(){
+                    $('#'+list.div.id).kui(list.name,'pagina','ultima');
+                });
+        },
+
+        refrescar_paginador: function(list){
+            $('#kui_' + list.div.id + '_pagina')
+                .val(list.pagina)
+                .data('pagina',list.pagina);
+            $('#kui_' + list.div.id + '_totalPaginas')
+                .html(list.totalPaginas);
+            $('#kui_' + list.div.id + '_primera_pagina')
+                .prop('disabled',list.pagina===1);
+            $('#kui_' + list.div.id + '_pagina_anterior')
+                .prop('disabled',list.pagina===1);
+            $('#kui_' + list.div.id + '_ultima_pagina')
+                .prop('disabled',list.pagina===list.totalPaginas);
+            $('#kui_' + list.div.id + '_siguiente_pagina')
+                .prop('disabled',list.pagina===list.totalPaginas);
         },
 
         cargar_estilos: function(){
@@ -817,6 +877,36 @@
       }).toUpperCase();
   };
 
+  // Data & Format
+  $.kui.data = {
+
+  	format: function(item,nombre,formato,combo,solo_lectura){
+
+  		if(combo){
+          var subvalor = function(dato,nivel_1,nivel_2){
+            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
+                   (dato[nivel_1+'.'+nivel_2]? 
+                    dato[nivel_1+'.'+nivel_2] : '');
+          };
+
+          if(solo_lectura){
+            return typeof combo.formato==='function'? 
+                combo.formato.call(this,
+                  item[nombre]?
+                  item[nombre] : 
+                  item[nombre+'.'+combo.id]) :
+                subvalor(item,nombre,combo.formato);
+          }else{
+          	return subvalor(item,nombre,combo.id);
+          }
+    	}
+
+        return typeof formato === 'function'?
+            formato.call(this,item[nombre],item) : item[nombre];
+    }
+
+  };
+
 }(jQuery));
 (function ($) {
 
@@ -844,6 +934,8 @@
     };
     
     KCard.prototype = {
+
+        name: 'cards',
     		
         set_data: function(data){
             var kCard = this;
@@ -885,8 +977,8 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
-                        kCard.totalDatos = retorno.respuesta.totalDatos;
-                        kCard.pagina = retorno.respuesta.pagina;
+                        kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
+                        kCard.pagina = parseInt(retorno.respuesta.pagina);
                         kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
 
                         kCard.grilla = $('<div>').addClass('kCard').prependTo(kCard.contenido);                       
@@ -930,19 +1022,7 @@
                         $(kCard.div).data('pagina',kCard.pagina);
                         $(kCard.div).data('totalPaginas',kCard.totalPaginas);
                                                 
-                        $('#kCard_' + kCard.div.id + '_pagina')
-                            .val(kCard.pagina)
-                            .data('pagina',kCard.pagina);
-                        $('#kCard_' + kCard.div.id + '_totalPaginas')
-                            .html(kCard.totalPaginas);
-                        $('#kCard_' + kCard.div.id + '_primera_pagina')
-                            .attr('disabled',kCard.pagina===1);
-                        $('#kCard_' + kCard.div.id + '_pagina_anterior')
-                            .attr('disabled',kCard.pagina===1);
-                        $('#kCard_' + kCard.div.id + '_ultima_pagina')
-                            .attr('disabled',kCard.pagina===kCard.totalPaginas);
-                        $('#kCard_' + kCard.div.id + '_siguiente_pagina')
-                            .attr('disabled',kCard.pagina===kCard.totalPaginas);
+                        $.kui.list.refrescar_paginador(kCard);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
@@ -1032,7 +1112,7 @@
                         );
                 }
 
-                columna.html($.kui.list.formatear(item,campo.nombre,campo.formato));
+                columna.html($.kui.data.format(item,campo.nombre,campo.formato));
 
                 if(campo.titulo && campo.titulo!==''){
                     if(campo.tipo!=='score'){
@@ -1279,80 +1359,6 @@
             }
         },
         
-        cargar_paginador : function(){
-            var kCard = this;    
-            if(!$(kCard.paginador).length){
-                return;
-            }
-            var pk = 'kCard_' + kCard.div.id + '_';
-            var contenedor = $('<div>').attr('id',pk+'paginador')
-                .addClass('kCard-paginador btn-group')
-                .appendTo(kCard.paginador);
-            
-            $('<button>').attr('id',pk+'primera_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','primera');
-                });
-                
-           $('<button>').attr('id',pk+'pagina_anterior')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','anterior');
-                });
-                
-          var centro = $('<div>').addClass('btn btn-default kpagina')
-                .css('height',$('#'+pk+'pagina_anterior').outerHeight())
-                .appendTo(contenedor);
-                
-          $('<label>').html('Página ').appendTo(centro);
-          $('<input>').attr('id',pk+'pagina')
-            .attr('type','text')
-            .addClass('pagina')
-            .css('width',$('#'+pk+'pagina_anterior').outerWidth())
-            .appendTo(centro)
-            .keyup(function(e){
-                if(e.keyCode === 13){
-                    e.preventDefault();
-                    var pagina = parseInt($('#'+pk+'pagina').val());
-                    if(isNaN(pagina) || pagina<0 || pagina > kCard.totalPaginas){
-                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
-                        return;
-                    }
-                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
-                        $('#'+kCard.div.id).kCard('pagina',pagina);
-                    }
-                }
-            });
-          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
-          $('<span>').attr('id',pk+'totalPaginas')
-            .appendTo(totalPaginas);
-                
-          $('<button>').attr('id',pk+'siguiente_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html( $('<i>').addClass('fa fa-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','siguiente');
-                });
-                
-           $('<button>').attr('id',pk+'ultima_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kCard.div.id).kCard('pagina','ultima');
-                });
-        },
-
         cambiar_seleccion: function(codigo,estado){
             var kCard = this;
             kCard.seleccionados[codigo] = estado;
@@ -1613,8 +1619,6 @@
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
 
-            dato = $.extend({}, kForm.dato, dato);
-
             return dato;
         }
         
@@ -1652,6 +1656,8 @@
     };
     
     KGrid.prototype = {
+
+        name: 'grid',
     		
         set_data: function(data){
             var kGrid = this;
@@ -1751,8 +1757,8 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
-                        kGrid.totalDatos = retorno.respuesta.totalDatos;
-                        kGrid.pagina = retorno.respuesta.pagina;
+                        kGrid.totalDatos = parseInt(retorno.respuesta.totalDatos);
+                        kGrid.pagina = parseInt(retorno.respuesta.pagina);
                         kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
                         
                         $.each(lista,function(i,item){
@@ -1775,19 +1781,7 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $('#kGrid_' + kGrid.div.id + '_pagina')
-                            .val(kGrid.pagina)
-                            .data('pagina',kGrid.pagina);
-                        $('#kGrid_' + kGrid.div.id + '_totalPaginas')
-                            .html(kGrid.totalPaginas);
-                        $('#kGrid_' + kGrid.div.id + '_primera_pagina')
-                            .attr('disabled',kGrid.pagina===1);
-                        $('#kGrid_' + kGrid.div.id + '_pagina_anterior')
-                            .attr('disabled',kGrid.pagina===1);
-                        $('#kGrid_' + kGrid.div.id + '_ultima_pagina')
-                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
-                        $('#kGrid_' + kGrid.div.id + '_siguiente_pagina')
-                            .attr('disabled',kGrid.pagina===kGrid.totalPaginas);
+                        $.kui.list.refrescar_paginador(kGrid);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
@@ -1865,7 +1859,7 @@
                 var cell = $('<td>').attr('data-cell',true)
                     .data('campo',campo)
                     .appendTo(row);
-                var data = $.kui.list.formatear(item,campo.nombre,campo.formato);
+                var data = $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,true);
                 var view = $('<div>').attr('data-view',true)
                     .data('original',data)
                     .appendTo(cell);
@@ -1882,6 +1876,7 @@
                         });
                     
                     cell.addClass('text-center');
+                    view.removeClass('checkbox');
 
                 }else{
                     view.html(data);
@@ -1928,7 +1923,8 @@
                             $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
 
                             if(campo.tipo==='booleano'){
-                                formItem.find('[data-rol=input]')
+                                formItem.removeClass('checkbox')
+                                    .find('[data-rol=input]')
                                     .attr('data-pk',item[kGrid.id])
                                     .dblclick(function(e){
                                         e.stopPropagation();
@@ -1969,7 +1965,7 @@
                     $('#'+ pk + '_guardar').fadeIn();
 
                     // Focus
-                    $('#'+pk).find('input[data-rol="input"]:not([disabled],[readonly])').first().focus();
+                    $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])').first().focus();
                 };
 
             var deshabilitar_edicion = function(){
@@ -2054,11 +2050,11 @@
                                             valor = dato[it.name] = it.value;
                                         });
                                     }else{
-                                        valor = $(form).find('input[data-rol=input]').val();
+                                        valor = $(form).find('[data-rol=input]').val();
                                     }
 
                                     $(form).parent().find('[data-view]').each(function(_,view) {
-                                        var input = $(view).parent().find('[data-edit] input[data-rol=input]');
+                                        var input = $(view).parent().find('[data-edit] [data-rol=input]');
                                         $(view).empty();
 
                                         if($(input).is('[type=checkbox]')){
@@ -2068,12 +2064,12 @@
                                                 .prop('disabled',true)
                                                 .attr('data-pk',$(view).parent().parent().data('pk'))
                                                 .appendTo(view);
+                                        }else if($(input).is('select')){
+                                            $(view).html($(input).find('option[value="'+valor+'"]').text());
                                         }else{
                                             $(view).html(valor);
                                         }
                                     });
-
-                                    dato = $.extend({}, item, dato);
                                 });
 
                                 guardar_cambios(dato);
@@ -2231,80 +2227,6 @@
 
         },
         
-        cargar_paginador : function(){
-            var kGrid = this;    
-            if(!$(kGrid.paginador).length){
-                return;
-            }
-            var pk = 'kGrid_' + kGrid.div.id + '_';
-            var contenedor = $('<div>').attr('id',pk+'paginador')
-                .addClass('kGrid-paginador btn-group')
-                .appendTo(kGrid.paginador);
-            
-            $('<button>').attr('id',pk+'primera_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','primera');
-                });
-                
-           $('<button>').attr('id',pk+'pagina_anterior')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-backward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','anterior');
-                });
-                
-          var centro = $('<div>').addClass('btn btn-default kpagina')
-                .css('height',$('#'+pk+'pagina_anterior').outerHeight())
-                .appendTo(contenedor);
-                
-          $('<label>').html('Página ').appendTo(centro);
-          $('<input>').attr('id',pk+'pagina')
-            .attr('type','text')
-            .addClass('pagina')
-            .css('width',$('#'+pk+'pagina_anterior').outerWidth())
-            .appendTo(centro)
-            .keyup(function(e){
-                if(e.keyCode === 13){
-                    e.preventDefault();
-                    var pagina = parseInt($('#'+pk+'pagina').val());
-                    if(isNaN(pagina) || pagina<0 || pagina > kGrid.totalPaginas){
-                        $('#'+pk+'pagina').val($('#'+pk+'pagina').data('pagina'));
-                        return;
-                    }
-                    if(pagina!==$('#'+pk+'pagina').data('pagina')){
-                        $('#'+kGrid.div.id).kGrid('pagina',pagina);
-                    }
-                }
-            });
-          var totalPaginas = $('<label>').html(' de ').appendTo(centro);
-          $('<span>').attr('id',pk+'totalPaginas')
-            .appendTo(totalPaginas);
-                
-          $('<button>').attr('id',pk+'siguiente_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html( $('<i>').addClass('fa fa-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','siguiente');
-                });
-                
-           $('<button>').attr('id',pk+'ultima_pagina')
-                .attr('type','button')
-                .addClass('btn btn-default')
-                .html($('<i>').addClass('fa fa-step-forward'))
-                .appendTo(contenedor)
-                .click(function(){
-                    $('#'+kGrid.div.id).kGrid('pagina','ultima');
-                });
-        },
-
         cambiar_seleccion: function(codigo,estado){
             var kGrid = this;
             kGrid.seleccionados[codigo] = estado;
