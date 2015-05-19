@@ -1,4 +1,4 @@
-$('#conbotones').kGrid({
+$('#conbotones').kui('grid',{
     url : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{

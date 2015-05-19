@@ -1,16 +1,4 @@
-$('#solo_lectura').kForm({
-	soloLectura: true,
-	origen:{
-		nombre: 'Nelson Páez',
-		activo: true,
-		cantidad: 23,
-		porcentaje: 24.5,
-		rol: {
-			id: 2,
-			nombre: 'Supervisor'
-		},
-		nacimiento: '08-07-1990'
-	},
+$('#agregar').kui('form',{
     campos : [
 	    {
 	            nombre : 'nombre',
@@ -63,5 +51,11 @@ $('#solo_lectura').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    submit: '/exito'
+    submit: function(datos,original){
+    	console.log(datos,original);
+    	alert('Guardar');
+    },
+    afterSubmit: function(){
+    	console.log('Este evento se dispara después de guardar.');
+    }
 });
