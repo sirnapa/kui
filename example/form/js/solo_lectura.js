@@ -1,4 +1,6 @@
-$('#agregar').kForm({
+$('#solo_lectura').kui('form',{
+	soloLectura: true,
+	origen: 'js/datos.json',
     campos : [
 	    {
 	            nombre : 'nombre',
@@ -51,11 +53,5 @@ $('#agregar').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    submit: function(datos,original){
-    	console.log(datos,original);
-    	alert('Guardar');
-    },
-    afterSubmit: function(){
-    	console.log('Este evento se dispara después de guardar.');
-    }
+    submit: '/exito'
 });

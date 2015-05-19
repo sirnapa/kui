@@ -1,4 +1,4 @@
-$('#editar').kForm({
+$('#editar').kui('form',{
     origen: 'js/datos.json',
 	campos : [
 	    {
