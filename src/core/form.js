@@ -149,15 +149,18 @@
           'fecha': {
                   icono: 'calendar',
                   formato: 'dd/MM/yyyy',
+                  rule: 'date', 
                   constructor: {pickTime: false}
               },
           'hora': {
                   icono: 'clock-o',
                   formato: 'hh:mm:ss',
+                  rule: 'hour',
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
                   icono: 'calendar-o',
+                  rule: 'datetime',
                   formato: 'dd/MM/yyyy hh:mm:ss'
               }
        };
@@ -172,11 +175,8 @@
 
           nuevo_input.attr('data-format',conf_fecha_hora[tipo].formato)
               .attr('type','text')
+              .attr('data-rule-'+conf_fecha_hora[tipo].rule,true)
               .prependTo(inputGroup);
-
-          if(tipo!=='hora'){
-              nuevo_input.attr('data-rule-date',true);
-          }
 
           if(!soloLectura){
               inputGroup.find('.input-group-addon').addClass('add-on')
