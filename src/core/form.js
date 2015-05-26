@@ -8,7 +8,7 @@
 
   $.kui.formulario = {
 
-    nuevo_elemento: function(solo_lectura,elemento,item,campo){
+    nuevo_elemento: function(soloLectura,elemento,item,campo){
 
       /*
        * Tipos de campo:
@@ -37,9 +37,10 @@
        */
 
        var input;
-       var valor_input  = function(){
-          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
-       };
+       soloLectura = soloLectura || campo.soloLectura;
+       var valorInput  = $.kui.data.format(
+        item,campo.nombre,campo.formato,campo.opciones,soloLectura
+       );
 
        var crear_input_select = function(tipo){
 
@@ -52,7 +53,7 @@
               .attr('title',
                   campo.mensaje===undefined?
                   'El formato ingresado no es correcto para ' + campo.titulo : campo.mensaje)
-              .val(valor_input())
+              .val(valorInput)
               .prop('required',campo.requerido);
        };
 
@@ -81,12 +82,12 @@
        };
 
        var crear_select = function(){
-          var nuevo_input = crear_input_select(solo_lectura?
+          var nuevo_input = crear_input_select(soloLectura?
               'input' : 'select');
           nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
           nuevo_input.appendTo(elemento);
 
-          if(!solo_lectura){
+          if(!soloLectura){
               var opciones = [];
 
               if(typeof campo.opciones.origen === 'string'){
@@ -126,7 +127,7 @@
                       )
                       .appendTo(nuevo_input);
                   
-                  if(valor_input().toString()===opcion[campo.opciones.id].toString()){
+                  if(valorInput.toString()===opcion[campo.opciones.id].toString()){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
@@ -177,7 +178,7 @@
               nuevo_input.attr('data-rule-date',true);
           }
 
-          if(!solo_lectura){
+          if(!soloLectura){
               inputGroup.find('.input-group-addon').addClass('add-on')
                 .find('i').attr({
                   'data-time-icon': 'fa fa-clock-o',
@@ -206,7 +207,7 @@
               input = crear_input_select('input');
               input.appendTo(elemento);
               input.prop('type','checkbox');
-              input.prop('checked',valor_input());
+              input.prop('checked',valorInput);
               input.removeClass('form-control');
               elemento.addClass('checkbox');
           break;

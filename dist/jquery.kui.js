@@ -1,4 +1,4 @@
-/*! kui - v0.1.3 - 2015-05-19
+/*! kui - v0.1.3 - 2015-05-26
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -46,7 +46,7 @@
 
   $.kui.formulario = {
 
-    nuevo_elemento: function(solo_lectura,elemento,item,campo){
+    nuevo_elemento: function(soloLectura,elemento,item,campo){
 
       /*
        * Tipos de campo:
@@ -75,9 +75,10 @@
        */
 
        var input;
-       var valor_input  = function(){
-          return $.kui.data.format(item,campo.nombre,campo.formato,campo.opciones,solo_lectura);
-       };
+       soloLectura = soloLectura || campo.soloLectura;
+       var valorInput  = $.kui.data.format(
+        item,campo.nombre,campo.formato,campo.opciones,soloLectura
+       );
 
        var crear_input_select = function(tipo){
 
@@ -90,7 +91,7 @@
               .attr('title',
                   campo.mensaje===undefined?
                   'El formato ingresado no es correcto para ' + campo.titulo : campo.mensaje)
-              .val(valor_input())
+              .val(valorInput)
               .prop('required',campo.requerido);
        };
 
@@ -119,12 +120,12 @@
        };
 
        var crear_select = function(){
-          var nuevo_input = crear_input_select(solo_lectura?
+          var nuevo_input = crear_input_select(soloLectura?
               'input' : 'select');
           nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
           nuevo_input.appendTo(elemento);
 
-          if(!solo_lectura){
+          if(!soloLectura){
               var opciones = [];
 
               if(typeof campo.opciones.origen === 'string'){
@@ -164,7 +165,7 @@
                       )
                       .appendTo(nuevo_input);
                   
-                  if(valor_input().toString()===opcion[campo.opciones.id].toString()){
+                  if(valorInput.toString()===opcion[campo.opciones.id].toString()){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
@@ -215,7 +216,7 @@
               nuevo_input.attr('data-rule-date',true);
           }
 
-          if(!solo_lectura){
+          if(!soloLectura){
               inputGroup.find('.input-group-addon').addClass('add-on')
                 .find('i').attr({
                   'data-time-icon': 'fa fa-clock-o',
@@ -244,7 +245,7 @@
               input = crear_input_select('input');
               input.appendTo(elemento);
               input.prop('type','checkbox');
-              input.prop('checked',valor_input());
+              input.prop('checked',valorInput);
               input.removeClass('form-control');
               elemento.addClass('checkbox');
           break;
@@ -880,7 +881,7 @@
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,solo_lectura){
+  	format: function(item,nombre,formato,combo,soloLectura){
 
   		if(combo){
           var subvalor = function(dato,nivel_1,nivel_2){
@@ -889,7 +890,7 @@
                     dato[nivel_1+'.'+nivel_2] : '');
           };
 
-          if(solo_lectura){
+          if(soloLectura){
             return typeof combo.formato==='function'? 
                 combo.formato.call(this,
                   item[nombre]?
@@ -1443,7 +1444,7 @@
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
         this.load_complete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
-        this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.soloLectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
@@ -1507,7 +1508,7 @@
             var item = kForm.dato;
 
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.solo_lectura){
+            if(kForm.soloLectura){
                 kForm.fieldset.attr('disabled',true);
             }
             
@@ -1533,7 +1534,7 @@
                 var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
+                $.kui.formulario.nuevo_elemento(kForm.soloLectura,centro,item,campo);                         
             });
             
             $(kForm.div).data('dato',kForm.dato);
@@ -1947,6 +1948,14 @@
                         $('#'+pk).data('formulario',true);               
                     }
 
+                    // Preservamos el ancho de la celda
+                    $('#'+pk).find('[data-cell]').each(function(c,cell){
+                        $(cell).css({
+                            width: $(cell).outerWidth(),
+                            height: $(cell).outerHeight()
+                        });
+                    });
+
                     // Ocultamos la version de solo lectura
                     $('#'+pk).find('[data-view]').hide();
 
@@ -1976,6 +1985,9 @@
                 // Mostramos la versión de solo lectura
                 $('#'+pk).find('[data-view]').fadeIn();
 
+                // Removemos el estilo adicional
+                $('#'+pk).find('[data-cell]').removeAttr('style');
+
                 // Cambio de botones
                 $('#'+ pk + '_guardar').hide();
                 $('#'+ pk + '_deshacer').hide();
@@ -1998,104 +2010,104 @@
 
             if(activo){
 
-                if(kGrid.permisos['editar']){
-                    var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar','Editar','pencil','primary');
 
-                    if(typeof kGrid.permisos['editar'] === 'function'){
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            kGrid.permisos['editar'].call(this,item);
+                if( kGrid.permisos['editar'] && !nueva_entrada &&
+                    typeof kGrid.permisos['editar'] === 'function'){
+                    btn_editar.click(function(e){
+                        e.stopPropagation();
+                        kGrid.permisos['editar'].call(this,item);
+                    });
+                }else if(guardar){
+
+                    // Guardar cambios
+                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    btn_guardar.hide();
+
+                    var guardar_cambios = typeof guardar === 'function'?
+                        function(formulario){
+                            guardar.call(this,formulario);
+                        } : function(formulario){
+                            $.ajax({
+                                type: 'POST',
+                                url: guardar,
+                                data: formulario,
+                                success: function(/*retorno*/){  
+                                    kGrid.cargar();
+                                }
+                            });
+                        };
+
+                    btn_guardar.click(function(e){
+                        e.stopPropagation();
+                        $('#'+pk).data('ready',0);
+                        var forms = $('#'+pk+' form');
+                        forms.each(function(f,form){
+                            $(form).submit();
                         });
-                    }else if(guardar){
 
-                        // Guardar cambios
-                        var btn_guardar = crear_boton('guardar','Guardar','save','primary');
-                        btn_guardar.hide();
+                        if($('#'+pk).data('ready')===forms.length){
 
-                        var guardar_cambios = typeof guardar === 'function'?
-                            function(formulario){
-                                guardar.call(this,formulario);
-                            } : function(formulario){
-                                $.ajax({
-                                    type: 'POST',
-                                    url: guardar,
-                                    data: formulario,
-                                    success: function(/*retorno*/){  
-                                        kGrid.cargar();
+                            deshabilitar_edicion();
+                            var dato = {};
+
+                            forms.each(function(f,form){
+
+                                var array = $(form).serializeArray();
+                                var valor = '';
+
+                                if(array.length){
+                                    // Serialize Array para todos los inputs excepto checkbox
+                                    $.each(array, function(_, it) {
+                                        valor = dato[it.name] = it.value;
+                                    });
+                                }else{
+                                    valor = $(form).find('[data-rol=input]').val();
+                                }
+
+                                $(form).parent().find('[data-view]').each(function(_,view) {
+                                    var input = $(view).parent().find('[data-edit] [data-rol=input]');
+                                    $(view).empty();
+
+                                    if($(input).is('[type=checkbox]')){
+                                        dato[$(input).attr('name')] = $(input).is(':checked');
+
+                                        $(input).clone()
+                                            .prop('disabled',true)
+                                            .attr('data-pk',$(view).parent().parent().data('pk'))
+                                            .appendTo(view);
+                                    }else if($(input).is('select')){
+                                        $(view).html($(input).find('option[value="'+valor+'"]').text());
+                                    }else{
+                                        $(view).html(valor);
                                     }
                                 });
-                            };
-
-                        btn_guardar.click(function(e){
-                            e.stopPropagation();
-                            $('#'+pk).data('ready',0);
-                            var forms = $('#'+pk+' form');
-                            forms.each(function(f,form){
-                                $(form).submit();
                             });
 
-                            if($('#'+pk).data('ready')===forms.length){
+                            guardar_cambios(dato);
+                        }                     
+                    }).appendTo(botones);
 
-                                deshabilitar_edicion();
-                                var dato = {};
-
-                                forms.each(function(f,form){
-
-                                    var array = $(form).serializeArray();
-                                    var valor = '';
-
-                                    if(array.length){
-                                        // Serialize Array para todos los inputs excepto checkbox
-                                        $.each(array, function(_, it) {
-                                            valor = dato[it.name] = it.value;
-                                        });
-                                    }else{
-                                        valor = $(form).find('[data-rol=input]').val();
-                                    }
-
-                                    $(form).parent().find('[data-view]').each(function(_,view) {
-                                        var input = $(view).parent().find('[data-edit] [data-rol=input]');
-                                        $(view).empty();
-
-                                        if($(input).is('[type=checkbox]')){
-                                            dato[$(input).attr('name')] = $(input).is(':checked');
-
-                                            $(input).clone()
-                                                .prop('disabled',true)
-                                                .attr('data-pk',$(view).parent().parent().data('pk'))
-                                                .appendTo(view);
-                                        }else if($(input).is('select')){
-                                            $(view).html($(input).find('option[value="'+valor+'"]').text());
-                                        }else{
-                                            $(view).html(valor);
-                                        }
-                                    });
-                                });
-
-                                guardar_cambios(dato);
-                            }                     
+                    // Deshacer cambios
+                    var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
+                    btn_deshacer.hide()
+                        .click(function(e){
+                            e.stopPropagation();
+                            deshacer_cambios();
                         }).appendTo(botones);
 
-                        // Deshacer cambios
-                        var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
-                        btn_deshacer.hide()
-                            .click(function(e){
-                                e.stopPropagation();
-                                deshacer_cambios();
-                            }).appendTo(botones);
-
-                        // Editar (o hacer cambios)
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            habilitar_edicion();
-                        });
-                    }
+                    // Editar (o hacer cambios)
+                    btn_editar.click(function(e){
+                        e.stopPropagation();
+                        habilitar_edicion();
+                    });
 
                     if(!nueva_entrada){
                         btn_editar.appendTo(botones);
                     }
                 }
-                if(kGrid.permisos['remover']){
+
+                if(kGrid.permisos['remover'] || nueva_entrada){
                     var btn_remover = crear_boton('remover','Remover','times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
@@ -2178,17 +2190,25 @@
                     $(row).attr('data-toggle','context')
                         .attr('data-target','#'+div_context.attr('id'));
 
-                    var close_other_dropdown = function(){
+                    var onShowDropdown = function(){
                         var current = this.id;
                         $('.kui-dropdown.open').each(function(d,dropdown){
                             if(dropdown.id!==current){
                                 $(dropdown).removeClass('open');
                             }
                         });
+                        kGrid.table.parent().addClass('kui-grid-dropdown-open');
                     };
 
-                    div_context.on('show.bs.context',close_other_dropdown);
-                    div_dropdown.on('show.bs.dropdown',close_other_dropdown);
+                    div_context.on('show.bs.context',onShowDropdown);
+                    div_dropdown.on('show.bs.dropdown',onShowDropdown);
+
+                    var onHideDropdown = function(){
+                        kGrid.table.parent().removeClass('kui-grid-dropdown-open');
+                    };
+
+                    div_context.on('hide.bs.context',onHideDropdown);
+                    div_dropdown.on('hide.bs.dropdown',onHideDropdown);
                 }
 
                 $.each(kGrid.botones,function(b,boton){

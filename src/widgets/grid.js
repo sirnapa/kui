@@ -326,6 +326,14 @@
                         $('#'+pk).data('formulario',true);               
                     }
 
+                    // Preservamos el ancho de la celda
+                    $('#'+pk).find('[data-cell]').each(function(c,cell){
+                        $(cell).css({
+                            width: $(cell).outerWidth(),
+                            height: $(cell).outerHeight()
+                        });
+                    });
+
                     // Ocultamos la version de solo lectura
                     $('#'+pk).find('[data-view]').hide();
 
@@ -355,6 +363,9 @@
                 // Mostramos la versión de solo lectura
                 $('#'+pk).find('[data-view]').fadeIn();
 
+                // Removemos el estilo adicional
+                $('#'+pk).find('[data-cell]').removeAttr('style');
+
                 // Cambio de botones
                 $('#'+ pk + '_guardar').hide();
                 $('#'+ pk + '_deshacer').hide();
@@ -377,104 +388,104 @@
 
             if(activo){
 
-                if(kGrid.permisos['editar']){
-                    var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar','Editar','pencil','primary');
 
-                    if(typeof kGrid.permisos['editar'] === 'function'){
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            kGrid.permisos['editar'].call(this,item);
+                if( kGrid.permisos['editar'] && !nueva_entrada &&
+                    typeof kGrid.permisos['editar'] === 'function'){
+                    btn_editar.click(function(e){
+                        e.stopPropagation();
+                        kGrid.permisos['editar'].call(this,item);
+                    });
+                }else if(guardar){
+
+                    // Guardar cambios
+                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    btn_guardar.hide();
+
+                    var guardar_cambios = typeof guardar === 'function'?
+                        function(formulario){
+                            guardar.call(this,formulario);
+                        } : function(formulario){
+                            $.ajax({
+                                type: 'POST',
+                                url: guardar,
+                                data: formulario,
+                                success: function(/*retorno*/){  
+                                    kGrid.cargar();
+                                }
+                            });
+                        };
+
+                    btn_guardar.click(function(e){
+                        e.stopPropagation();
+                        $('#'+pk).data('ready',0);
+                        var forms = $('#'+pk+' form');
+                        forms.each(function(f,form){
+                            $(form).submit();
                         });
-                    }else if(guardar){
 
-                        // Guardar cambios
-                        var btn_guardar = crear_boton('guardar','Guardar','save','primary');
-                        btn_guardar.hide();
+                        if($('#'+pk).data('ready')===forms.length){
 
-                        var guardar_cambios = typeof guardar === 'function'?
-                            function(formulario){
-                                guardar.call(this,formulario);
-                            } : function(formulario){
-                                $.ajax({
-                                    type: 'POST',
-                                    url: guardar,
-                                    data: formulario,
-                                    success: function(/*retorno*/){  
-                                        kGrid.cargar();
+                            deshabilitar_edicion();
+                            var dato = {};
+
+                            forms.each(function(f,form){
+
+                                var array = $(form).serializeArray();
+                                var valor = '';
+
+                                if(array.length){
+                                    // Serialize Array para todos los inputs excepto checkbox
+                                    $.each(array, function(_, it) {
+                                        valor = dato[it.name] = it.value;
+                                    });
+                                }else{
+                                    valor = $(form).find('[data-rol=input]').val();
+                                }
+
+                                $(form).parent().find('[data-view]').each(function(_,view) {
+                                    var input = $(view).parent().find('[data-edit] [data-rol=input]');
+                                    $(view).empty();
+
+                                    if($(input).is('[type=checkbox]')){
+                                        dato[$(input).attr('name')] = $(input).is(':checked');
+
+                                        $(input).clone()
+                                            .prop('disabled',true)
+                                            .attr('data-pk',$(view).parent().parent().data('pk'))
+                                            .appendTo(view);
+                                    }else if($(input).is('select')){
+                                        $(view).html($(input).find('option[value="'+valor+'"]').text());
+                                    }else{
+                                        $(view).html(valor);
                                     }
                                 });
-                            };
-
-                        btn_guardar.click(function(e){
-                            e.stopPropagation();
-                            $('#'+pk).data('ready',0);
-                            var forms = $('#'+pk+' form');
-                            forms.each(function(f,form){
-                                $(form).submit();
                             });
 
-                            if($('#'+pk).data('ready')===forms.length){
+                            guardar_cambios(dato);
+                        }                     
+                    }).appendTo(botones);
 
-                                deshabilitar_edicion();
-                                var dato = {};
-
-                                forms.each(function(f,form){
-
-                                    var array = $(form).serializeArray();
-                                    var valor = '';
-
-                                    if(array.length){
-                                        // Serialize Array para todos los inputs excepto checkbox
-                                        $.each(array, function(_, it) {
-                                            valor = dato[it.name] = it.value;
-                                        });
-                                    }else{
-                                        valor = $(form).find('[data-rol=input]').val();
-                                    }
-
-                                    $(form).parent().find('[data-view]').each(function(_,view) {
-                                        var input = $(view).parent().find('[data-edit] [data-rol=input]');
-                                        $(view).empty();
-
-                                        if($(input).is('[type=checkbox]')){
-                                            dato[$(input).attr('name')] = $(input).is(':checked');
-
-                                            $(input).clone()
-                                                .prop('disabled',true)
-                                                .attr('data-pk',$(view).parent().parent().data('pk'))
-                                                .appendTo(view);
-                                        }else if($(input).is('select')){
-                                            $(view).html($(input).find('option[value="'+valor+'"]').text());
-                                        }else{
-                                            $(view).html(valor);
-                                        }
-                                    });
-                                });
-
-                                guardar_cambios(dato);
-                            }                     
+                    // Deshacer cambios
+                    var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
+                    btn_deshacer.hide()
+                        .click(function(e){
+                            e.stopPropagation();
+                            deshacer_cambios();
                         }).appendTo(botones);
 
-                        // Deshacer cambios
-                        var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
-                        btn_deshacer.hide()
-                            .click(function(e){
-                                e.stopPropagation();
-                                deshacer_cambios();
-                            }).appendTo(botones);
-
-                        // Editar (o hacer cambios)
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            habilitar_edicion();
-                        });
-                    }
+                    // Editar (o hacer cambios)
+                    btn_editar.click(function(e){
+                        e.stopPropagation();
+                        habilitar_edicion();
+                    });
 
                     if(!nueva_entrada){
                         btn_editar.appendTo(botones);
                     }
                 }
-                if(kGrid.permisos['remover']){
+
+                if(kGrid.permisos['remover'] || nueva_entrada){
                     var btn_remover = crear_boton('remover','Remover','times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
@@ -557,17 +568,25 @@
                     $(row).attr('data-toggle','context')
                         .attr('data-target','#'+div_context.attr('id'));
 
-                    var close_other_dropdown = function(){
+                    var onShowDropdown = function(){
                         var current = this.id;
                         $('.kui-dropdown.open').each(function(d,dropdown){
                             if(dropdown.id!==current){
                                 $(dropdown).removeClass('open');
                             }
                         });
+                        kGrid.table.parent().addClass('kui-grid-dropdown-open');
                     };
 
-                    div_context.on('show.bs.context',close_other_dropdown);
-                    div_dropdown.on('show.bs.dropdown',close_other_dropdown);
+                    div_context.on('show.bs.context',onShowDropdown);
+                    div_dropdown.on('show.bs.dropdown',onShowDropdown);
+
+                    var onHideDropdown = function(){
+                        kGrid.table.parent().removeClass('kui-grid-dropdown-open');
+                    };
+
+                    div_context.on('hide.bs.context',onHideDropdown);
+                    div_dropdown.on('hide.bs.dropdown',onHideDropdown);
                 }
 
                 $.each(kGrid.botones,function(b,boton){
