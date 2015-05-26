@@ -1806,16 +1806,24 @@
                 kGrid.permisos['agregar'] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
+
                 if($('#'+pk).is(':visible')){
-                    var primer_input = $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])').first();
-                    if(primer_input.length){
-                        primer_input.focus();
-                    }else{
+                    var newReady = true;
+
+                    $('#'+pk).find('form').each(function(f,form){
+                        newReady = newReady && $(form).valid();
+                    });
+
+                    if(newReady){
                         kGrid.nuevos++;
                         kGrid.cargar_entrada(item);
+                    }else{
+                        $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])')
+                            .first().focus();
                     }
+
                     return;
-                }
+                }   
 
                 if(guardar){
                     item = {};
