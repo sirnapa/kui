@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <title>kUI Wizard</title>
+
+    <link href="../../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../bower_components/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet">
+    <link href="../../bower_components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+    <style type="text/css">
+    .tab-pane{
+      padding-top: 25px;
+    }
+    #map { min-height: 180px; }
+    </style>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+
+  </head>
+
+  <body data-spy="scroll" data-target="#navbar-menu">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../.."><i class="fa fa-puzzle-piece text-danger"></i> Wizard</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <div id="navbar-menu">
+            <ul class="nav navbar-nav" role="tablist">
+            </ul>
+          </div>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="https://github.com/konecta/kui/wiki/kGrid">
+                <i class="fa fa-book"></i> Documentación
+              </a>
+            </li>
+            <li>
+              <a href="../../#descargas">
+                <i class="fa fa-download"></i> Descargar
+              </a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+      
+      <div id="ejemplos">
+      </div>
+
+      <br>
+
+      <div class="hidden">
+        <div id="custom-html">
+
+          <div class="col-sm-4">
+            <ul class="list-group">
+
+              <li class="indice list-group-item">
+                <span class="badge">1</span>
+                Formulario
+              </li>
+
+              <li class="indice list-group-item">
+                <span class="badge">2</span>
+                Mapa
+              </li>
+
+              <li class="indice list-group-item">
+                <span class="badge">3</span>
+                Mensaje
+              </li>
+
+            </ul>
+          </div>
+
+          <div class="col-sm-8">
+
+            <div class="paso">
+              <form>
+
+                <div class="form-group">
+                  <label for="exampleInputNombre1">Nombre</label>
+                  <input type="text" class="form-control" id="exampleInputNombre1" placeholder="Ingrese su nombre">
+                </div>
+
+                <div class="form-group">
+                  <label for="exampleInputApellido1">Apellido</label>
+                  <input type="text" class="form-control" id="exampleInputApellido1" placeholder="Ingrese su apellido">
+                </div>
+
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Email</label>
+                  <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Ingrese su email">
+                </div>
+
+                <div class="form-group">
+                  <label for="exampleInputCiudad1">Ciudad</label>
+                  <select class="form-control" id="exampleInputCiudad1" placeholder="Ingrese su ciudad">
+                    <option value="[-25.266667,-57.666667]">Asunción</option>
+                    <option value="[-25.516667,-54.616667]">Ciudad del Este</option>
+                    <option value="[-27.33,-55.88]">Encarnación</option>
+                    <option value="[35.683889,139.774444]">Tokyo</option>
+                    <option value="[40.6643,-73.9385]">Nueva York</option>
+                    <option value="[25.033333,121.633333]">Taipei</option>
+                  </select>
+                </div>
+                
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox"> Check me out
+                  </label>
+                </div>
+
+              </form>
+
+            </div>
+
+            <div class="paso" id="paso2">
+               <div id="map"></div>
+            </div>
+
+            <div class="paso">
+              <p class="text-center">
+                <i class="fa fa-5x fa-check"></i>
+                <br>
+                ¡El ejemplo culminó con éxito!
+              </p>
+            </div>
+
+            <nav>
+              <ul class="pager">
+                <li>
+                  <button class="btn btn-default anterior">
+                    <i class="fa fa-arrow-left"></i> Anterior
+                  </button>
+                </li>
+                <li>
+                  <button class="btn btn-primary siguiente">
+                    Siguiente <i class="fa fa-arrow-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Liberías requeridas -->
+    <script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../bower_components/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+    <script src="../../bower_components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../../bower_components/bootstrap-datetimepicker/src/js/locales/bootstrap-datetimepicker.es.js"></script>
+    <script src="../../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="../../bower_components/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
+    <!--/ Liberías requeridas -->
+
+    <script src="../../dist/jquery.kui.min.js"></script>
+    <script src="../../assets/js/ejemplos.js"></script>
+    <script src="js/ejemplos.js"></script>
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    
+  </body>
+</html>

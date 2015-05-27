@@ -2,7 +2,7 @@
   "name": "kui",
   "title": "kUI - Utilidades para jQuery",
   "description": "Utilidades para jQuery + Bootstrap: Grillas, Formularios, etc.",
-  "version": "0.0.7",
+  "version": "0.1.4",
   "homepage": "",
   "author": {
     "name": "Nelson Paez",
@@ -20,7 +20,13 @@
     }
   ],
   "dependencies": {
-    "jquery": "~1.11.2"
+    "jquery": "~1.11.2",
+    "bootstrap": "~3.3.2",
+    "bootstrap-combobox": "~1.1.6",
+    "bootstrap-contextmenu": "~0.3.2",
+    "bootstrap-datetimepicker": "~0.0.11",
+    "fontawesome": "~4.3.0",
+    "jquery-validation": "~1.13.1"
   },
   "keywords": [
     "jquery-plugin"

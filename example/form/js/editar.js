@@ -1,6 +1,10 @@
-$('#agregar').kForm({
-    campos : [
+$('#editar').kui('form',{
+    origen: 'js/datos.json',
+	campos : [
 	    {
+	            nombre : 'id',
+	            oculto: true
+	    },{
 	            nombre : 'nombre',
 	            titulo: 'Nombre',
 	            placeholder: 'Ejemplo de tipo texto',

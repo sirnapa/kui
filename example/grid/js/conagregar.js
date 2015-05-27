@@ -1,4 +1,4 @@
-$('#conagregar').kGrid({
+$('#conagregar').kui('grid',{
     url : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{

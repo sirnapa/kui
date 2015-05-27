@@ -1,20 +1,21 @@
-/*! 
+/*
  *
- *   +++++++++++++++++++++ kForm +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ Form +++++++++++++++++++++ 
  *
  */
 
 (function ($) {
 
-    $.kForms = {
-        instances : {}
-    };
-    
+    $.kui.instances.kform = {};
+
     // Collection method.
-    $.fn.kForm = function (dato) {
-        return this.each(function () {
-            $.kForms.instances[this.id] = new KForm(this,dato);
-        });
+    $.fn.kForm = function (data) {
+        return $(this).kui('form',data);
+    };
+
+    // Widget definition
+    $.kui.widgets['form'] = function (data) {
+        return $.kui.instances.kform[this.id] = new KForm(this,data);
     };
     
     var KForm = function(div,dato){
@@ -37,7 +38,7 @@
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
         this.load_complete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
-        this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.soloLectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
@@ -101,7 +102,7 @@
             var item = kForm.dato;
 
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.solo_lectura){
+            if(kForm.soloLectura){
                 kForm.fieldset.attr('disabled',true);
             }
             
@@ -117,23 +118,17 @@
                 /* 
                  * Lado izquierdo: Label 
                  */
-                $('<label>').addClass('klabel col-md-3 control-label')
+                $('<label>').addClass('klabel col-sm-4 control-label')
                     .html(campo.titulo)
                     .appendTo(formGroup);
 
                 /* 
                  * En el centro: Input 
                  */
-                var centro = $('<div>').addClass('col-md-6')
+                var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                /* 
-                 * Lado derecho: Vacío de momento 
-                 */
-                $('<div>').addClass('col-md-3')
-                    .appendTo(formGroup);
-
-                $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
+                $.kui.formulario.nuevo_elemento(kForm.soloLectura,centro,item,campo);                         
             });
             
             $(kForm.div).data('dato',kForm.dato);
@@ -183,7 +178,7 @@
                         data: kForm.contenido(),
                         success: function(retorno){
                             if(retorno.mensaje){
-                                $.kui.mensaje(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
+                                $.kui.messages(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
                             }
                             afterSubmit(retorno);
                         },
@@ -218,8 +213,6 @@
             $.each(kForm.form.find('input[data-rol=input][type=checkbox]'),function(_, checkbox) {
                 dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
             });
-
-            dato = $.extend({}, kForm.dato, dato);
 
             return dato;
         }

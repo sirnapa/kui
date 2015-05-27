@@ -1,21 +1,8 @@
-$('#editar').kForm({
-    origen:{
-    	id: 90,
-		nombre: 'Nelson Páez',
-		activo: true,
-		cantidad: 23,
-		porcentaje: 24.5,
-		rol: {
-			id: 2,
-			nombre: 'Supervisor'
-		},
-		nacimiento: '08-07-1990'
-	},
-	campos : [
+$('#solo_lectura').kui('form',{
+	soloLectura: true,
+	origen: 'js/datos.json',
+    campos : [
 	    {
-	            nombre : 'id',
-	            oculto: true
-	    },{
 	            nombre : 'nombre',
 	            titulo: 'Nombre',
 	            placeholder: 'Ejemplo de tipo texto',
@@ -66,11 +53,5 @@ $('#editar').kForm({
 	    		placeholder: 'Ejemplo de tipo fecha-hora'
 	    }
     ],
-    submit: function(datos,original){
-    	console.log(datos,original);
-    	alert('Guardar');
-    },
-    afterSubmit: function(){
-    	console.log('Este evento se dispara después de guardar.');
-    }
+    submit: '/exito'
 });
