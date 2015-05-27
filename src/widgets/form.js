@@ -38,7 +38,7 @@
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
         this.load_complete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
-        this.solo_lectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.soloLectura = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
@@ -102,7 +102,7 @@
             var item = kForm.dato;
 
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.solo_lectura){
+            if(kForm.soloLectura){
                 kForm.fieldset.attr('disabled',true);
             }
             
@@ -128,7 +128,7 @@
                 var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                $.kui.formulario.nuevo_elemento(kForm.solo_lectura,centro,item,campo);                         
+                $.kui.formulario.nuevo_elemento(kForm.soloLectura,centro,item,campo);                         
             });
             
             $(kForm.div).data('dato',kForm.dato);

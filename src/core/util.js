@@ -19,7 +19,7 @@
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,solo_lectura){
+  	format: function(item,nombre,formato,combo,soloLectura){
 
   		if(combo){
           var subvalor = function(dato,nivel_1,nivel_2){
@@ -28,7 +28,7 @@
                     dato[nivel_1+'.'+nivel_2] : '');
           };
 
-          if(solo_lectura){
+          if(soloLectura){
             return typeof combo.formato==='function'? 
                 combo.formato.call(this,
                   item[nombre]?
