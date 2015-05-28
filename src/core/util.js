@@ -24,7 +24,7 @@
 
   	format: function(item,name,format,combobox,readOnly){
 
-  		if(combobox){
+  		if(combobox && combobox.id && combobox.formato){
           if(readOnly){
             return typeof combobox.formato==='function'? 
                 combobox.formato.call(this,
@@ -37,8 +37,8 @@
           }
     	}
 
-        return typeof format === 'function'?
-            format.call(this,item[name],item) : item[name];
+      return typeof format === 'function'?
+        format.call(this,item[name],item) : item[name];
     },
 
     valueFromJson: function(data,level1,level2){

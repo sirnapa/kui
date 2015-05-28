@@ -120,9 +120,14 @@
        };
 
        var newSelect = function(){
+          var stringOnly = !field.opciones.id || !field.opciones.formato;
+          var name = field.nombre;
+          if(!stringOnly){
+            name += '.' + field.opciones.id;
+          }
           var select = newInputSelect(readOnly?
               'input' : 'select');
-          select.attr('name',field.nombre+'.'+field.opciones.id);
+          select.attr('name',name);
           select.appendTo(element);
 
           if(!readOnly){
@@ -156,23 +161,31 @@
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
-                  var item = $('<option>')
-                      .attr('value',opcion[field.opciones.id])
+                  var item = $('<option>');
+
+                  if(stringOnly){
+                    item.html(opcion);
+                  }else{
+                    item.attr('value',opcion[field.opciones.id])
                       .html(
-                          typeof field.opciones.formato==='function'?
+                        typeof field.opciones.formato==='function'?
                           field.opciones.formato.call(this,opcion) 
                           : opcion[field.opciones.formato]
-                      )
-                      .appendTo(select);
+                      );
+                  }
+                     
+                  item.appendTo(select);
                   
-                  if(inputVal.toString()===opcion[field.opciones.id].toString()){
+                  if( inputVal.toString() === 
+                      (stringOnly? opcion : opcion[field.opciones.id].toString())
+                    ){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
               });
 
               if(!seleccionado){
-                  $('<option>').attr('value','').html('')
+                  $('<option>').html('')
                       .attr('selected',true)
                       .prependTo(select);
               }
@@ -942,7 +955,7 @@
 
   	format: function(item,name,format,combobox,readOnly){
 
-  		if(combobox){
+  		if(combobox && combobox.id && combobox.formato){
           if(readOnly){
             return typeof combobox.formato==='function'? 
                 combobox.formato.call(this,
@@ -955,12 +968,11 @@
           }
     	}
 
-        return typeof format === 'function'?
-            format.call(this,item[name],item) : item[name];
+      return typeof format === 'function'?
+        format.call(this,item[name],item) : item[name];
     },
 
     valueFromJson: function(data,level1,level2){
-      window.console.log('Data = ',data, 'Niveles = ', level1,level2);
       return data[level1]? data[level1][level2] : 
              (data[level1+'.'+level2]? 
               data[level1+'.'+level2] : '');
