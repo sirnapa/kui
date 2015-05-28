@@ -79,7 +79,7 @@
             var row = $('<tr>');
             kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
-            $.each(kGrid.campos,function(c,campo){                       
+            $.each(kGrid.campos,function(c,campo){                 
                 var label = $('<strong>');
 
                 if(campo.titulo!==undefined){
@@ -95,6 +95,10 @@
                 var titulo = $('<th>')
                     .html(label)
                     .appendTo(row);
+
+                if(campo.oculto){
+                    titulo.addClass('hidden');
+                }
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
@@ -129,7 +133,7 @@
             
             $.ajax({
                 type: kGrid.ajax,
-                url: kGrid.url,
+                url: kGrid.source,
                 data: kGrid.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
@@ -255,6 +259,10 @@
                 var view = $('<div>').attr('data-view',true)
                     .data('original',data)
                     .appendTo(cell);
+
+                if(campo.oculto){
+                    cell.addClass('hidden');
+                }
 
                 if(campo.tipo==='booleano'){
 

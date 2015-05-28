@@ -211,7 +211,7 @@
 
             $.extend(o.list,{
                 div : o.div,
-                url : finalParams[$.kui.i18n.source],
+                source : finalParams[$.kui.i18n.source],
                 data : finalParams[$.kui.i18n.data],
                 id : finalParams[$.kui.i18n.id],
                 mostrar_titulos : finalParams[$.kui.i18n.titles],

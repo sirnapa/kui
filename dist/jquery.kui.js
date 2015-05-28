@@ -685,7 +685,7 @@
 
             $.extend(o.list,{
                 div : o.div,
-                url : finalParams[$.kui.i18n.source],
+                source : finalParams[$.kui.i18n.source],
                 data : finalParams[$.kui.i18n.data],
                 id : finalParams[$.kui.i18n.id],
                 mostrar_titulos : finalParams[$.kui.i18n.titles],
@@ -956,6 +956,39 @@
   // Data & Format
   $.kui.data = {
 
+    source : function(source,sourceAjax,sourceData){
+
+      window.console.log('source',source);
+      window.console.log('sourceAjax',sourceAjax);
+      window.console.log('sourceData',sourceData);
+
+      var data = {};
+
+      if(source===undefined){
+          data = {};
+      }else if(typeof source === 'string'){
+      
+          $.ajax({
+              type: sourceAjax,
+              url: source,
+              data: sourceData,
+              success: function(remoteData){ 
+                  if (!remoteData.error) {
+                      data = remoteData;
+                  }
+              },
+              async: false
+          });
+
+      }else{
+          data = source;
+      }
+
+      window.console.log('* final data ',data);
+
+      return data;
+    },
+
   	format: function(item,name,format,combobox,readOnly){
 
   		if(combobox && combobox.id && combobox.formato){
@@ -1042,7 +1075,7 @@
             
             $.ajax({
                 type: kCard.ajax,
-                url: kCard.url,
+                url: kCard.source,
                 data: kCard.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
@@ -1584,7 +1617,7 @@
             var row = $('<tr>');
             kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
-            $.each(kGrid.campos,function(c,campo){                       
+            $.each(kGrid.campos,function(c,campo){                 
                 var label = $('<strong>');
 
                 if(campo.titulo!==undefined){
@@ -1600,6 +1633,10 @@
                 var titulo = $('<th>')
                     .html(label)
                     .appendTo(row);
+
+                if(campo.oculto){
+                    titulo.addClass('hidden');
+                }
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
@@ -1634,7 +1671,7 @@
             
             $.ajax({
                 type: kGrid.ajax,
-                url: kGrid.url,
+                url: kGrid.source,
                 data: kGrid.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
@@ -1760,6 +1797,10 @@
                 var view = $('<div>').attr('data-view',true)
                     .data('original',data)
                     .appendTo(cell);
+
+                if(campo.oculto){
+                    cell.addClass('hidden');
+                }
 
                 if(campo.tipo==='booleano'){
 

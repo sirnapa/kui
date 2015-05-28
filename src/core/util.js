@@ -22,6 +22,39 @@
   // Data & Format
   $.kui.data = {
 
+    source : function(source,sourceAjax,sourceData){
+
+      window.console.log('source',source);
+      window.console.log('sourceAjax',sourceAjax);
+      window.console.log('sourceData',sourceData);
+
+      var data = {};
+
+      if(source===undefined){
+          data = {};
+      }else if(typeof source === 'string'){
+      
+          $.ajax({
+              type: sourceAjax,
+              url: source,
+              data: sourceData,
+              success: function(remoteData){ 
+                  if (!remoteData.error) {
+                      data = remoteData;
+                  }
+              },
+              async: false
+          });
+
+      }else{
+          data = source;
+      }
+
+      window.console.log('* final data ',data);
+
+      return data;
+    },
+
   	format: function(item,name,format,combobox,readOnly){
 
   		if(combobox && combobox.id && combobox.formato){

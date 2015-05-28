@@ -62,7 +62,7 @@
             
             $.ajax({
                 type: kCard.ajax,
-                url: kCard.url,
+                url: kCard.source,
                 data: kCard.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
