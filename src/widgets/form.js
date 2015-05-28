@@ -42,7 +42,7 @@
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
-        this.cargar();
+        this.load();
         
     };
     
@@ -54,13 +54,9 @@
                     .addClass('kform form-horizontal')
                     .attr('action','#')
                     .prependTo(kForm.div);
-
-            if(kForm.seleccionable){
-                kForm.seleccionar(kForm.preseleccionados);
-            }
         },
         
-        cargar : function() {
+        load : function() {
             
             var kForm = this;
             if(kForm.form){
@@ -93,10 +89,10 @@
                 kForm.dato = kForm.origen;
             }
 
-            kForm.cargar_campos();
+            kForm.load_campos();
         },
 
-        cargar_campos : function(){
+        load_campos : function(){
             
             var kForm = this;
             var item = kForm.dato;
@@ -146,7 +142,7 @@
 
             if(kForm.boton_submit===undefined){
                 kForm.boton_submit = $('<button>').addClass('btn btn-primary')
-                    .html('Guardar')
+                    .html($.kui.i18n.saveMsg)
                     .appendTo(
                         $('<div>').addClass('form-group text-right')
                             .appendTo(kForm.fieldset)

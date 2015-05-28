@@ -1,4 +1,4 @@
-/*! kui - v0.1.4 - 2015-05-27
+/*! kui - v0.1.4 - 2015-05-28
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -397,61 +397,67 @@
 
   $.kui.i18n = {
 
-    // Input options
-    inputs: {
+    /* Funciones de list */
+    reload: 'recargar',
+    page: 'pagina',
+    first: 'primera',
+    prev: 'anterior',
+    next: 'siguiente',
+    last: 'ultima',
+    search: 'buscar',
+    select: 'seleccionar',
+    add: 'agregar',
+    edit: 'editar',
+    save: 'guardar',
+    activate: 'activar',
+    remove: 'remover',
 
-      /* Funciones de list */
-      reload: 'recargar',
-      page: 'pagina',
-      first: 'primera',
-      prev: 'anterior',
-      next: 'siguiente',
-      last: 'ultima',
-      search: 'buscar',
-      select: 'seleccionar',
-      add: 'agregar',
-      edit: 'editar',
-      save: 'guardar',
-      activate: 'activar',
-      remove: 'remover',
+    /* Mensajes de List y Wizard */
+    editMsg: 'Editar',
+    saveMsg: 'Guardar',
+    activateMsg: 'Reactivar',
+    removeMsg: 'Remover',
+    prevMsg: 'Anterior',
+    nextMsg: 'Siguiente',
 
-      /* Campos de List */
-      //url: 'url', // comparar con origen de Form >>> se convierte a source
-      id: 'id',
-      fields: 'campos',
-      ajax: 'ajax',
-      data: 'data',
-      titles: 'titulos',
-      pass: 'permisos',
-      sourceFormat: 'retorno',
-      buttons: 'botones',
-      pager: 'paginador',
-      selectable: 'seleccionable',
-      selected: 'seleccionados',
-      state: 'estado',
-      loadComplete: 'loadComplete',
-      onclick: 'onclick',
-      ondblclick: 'ondblclick',
+    /* Campos de List */
+    id: 'id',
+    fields: 'campos',
+    ajax: 'ajax',
+    data: 'data',
+    titles: 'titulos',
+    pass: 'permisos',
+    sourceFormat: 'retorno',
+    buttons: 'botones',
+    pager: 'paginador',
+    selectable: 'seleccionable',
+    selected: 'seleccionados',
+    state: 'estado',
+    loadComplete: 'loadComplete',
+    onclick: 'onclick',
+    ondblclick: 'ondblclick',
 
-      /* Eventos de List */
-      reloadGrid: 'reloadGrid',
+    /* Eventos de List */
+    reloadGrid: 'reloadGrid',
 
-      /* Campos de Form */
-      submit: 'submit',
-      submitAjax: 'ajaxSubmit',
-      submitButton: 'botonSubmit',
-      source: 'origen', //comparar con url de List
-      sourceAjax: 'ajaxOrigen',
-      sourceData: 'dataOrigen',
-      readOnly: 'soloLectura',
-      afterSubmit: 'afterSubmit',
+    /* Data de List */
+    totalData: 'totalDatos',
+    totalPages: 'totalPaginas',
 
-      /* Campos de Wizard */
-      steps: 'pasos',
-      indices: 'indices',
-      validate: 'validacion'
+    /* Campos de Form */
+    submit: 'submit',
+    submitAjax: 'ajaxSubmit',
+    submitButton: 'botonSubmit',
+    source: 'origen',
+    sourceAjax: 'ajaxOrigen',
+    sourceData: 'dataOrigen',
+    readOnly: 'soloLectura',
+    afterSubmit: 'afterSubmit',
 
-    }
+    /* Campos de Wizard */
+    steps: 'pasos',
+    indices: 'indices',
+    validate: 'validacion'
 
   };
 
@@ -460,17 +466,16 @@
 
 	$.kui.list = {
 
+        /**
+         * @param o = {
+         *      {Object} element
+         *      {Object} constructor
+         *      {Object} instances
+         *      {Object} data
+         *      {Object} aux 
+         * }
+         */
     	actions: function(o){
-
-    		/*
-    		 *	Actions params:
-    		 *	- element
-    		 *	- constructor
-    		 *	- instances
-    		 *	- data
-    		 *	- aux
-    		 *
-    		 */
 
     		if(typeof o.data === 'string'){
                 var instance = o.instances[o.element.id];
@@ -480,14 +485,14 @@
                 }
 
                 switch(o.data) {
-                    case $.kui.i18n.inputs.reload:
+                    case $.kui.i18n.reload:
                         // o.aux sirve para sobre-escribir el data
                         if(o.aux!==undefined){
-                            instance.set_data(o.aux);
+                            instance.setData(o.aux);
                         }
-                        instance.cargar();
+                        instance.load();
                         break;
-                    case $.kui.i18n.inputs.page:
+                    case $.kui.i18n.page:
                         // o.aux recibe la pagina de destino, tambien puede recibir
                         // estas opciones: primera, anterior, siguiente, ultima
                         if(o.aux===undefined){
@@ -497,16 +502,16 @@
                         if(isNaN(pagina)){
                             pagina = 0;
                             switch(o.aux) {
-                                case $.kui.i18n.inputs.first:
+                                case $.kui.i18n.first:
                                     pagina = 1;
                                     break;
-                                case $.kui.i18n.inputs.prev:
+                                case $.kui.i18n.prev:
                                     pagina = parseInt(instance.pagina) - 1;
                                     break;
-                                case $.kui.i18n.inputs.next:
+                                case $.kui.i18n.next:
                                     pagina = parseInt(instance.pagina) + 1;
                                     break;
-                                case $.kui.i18n.inputs.last:
+                                case $.kui.i18n.last:
                                     pagina = instance.totalPaginas;
                                     break;
                                 default:
@@ -516,10 +521,10 @@
                         if(pagina<1 || pagina>parseInt(instance.totalPaginas)){
                             return;
                         }
-                        instance.set_data({page:pagina});
-                        instance.cargar();
+                        instance.setData({page:pagina});
+                        instance.load();
                         break;
-                    case $.kui.i18n.inputs.search:
+                    case $.kui.i18n.search:
                         // o.aux es la clave de búsqueda
                         if(o.aux===undefined){
                             return;
@@ -537,20 +542,20 @@
                                 'op': (campo.op!==undefined)? campo.op : 'cn'
                             });
                         });  
-                        instance.set_data({
+                        instance.setData({
                             _search: true,
                             filters: JSON.stringify({
                                 "groupOp":groupOp,
                                 "rules": reglas
                                 })
                         });
-                        instance.set_data({page:1});
-                        instance.cargar();
+                        instance.setData({page:1});
+                        instance.load();
                         break;
-                    case $.kui.i18n.inputs.select:
+                    case $.kui.i18n.select:
                         instance.seleccionar(o.aux);
                         break;
-                    case $.kui.i18n.inputs.add:
+                    case $.kui.i18n.add:
                         instance.agregar(o.aux);
                         break;
                     default:
@@ -563,30 +568,28 @@
 
     	},
 
+        /**
+         * @param o = {
+         *      {Object} list
+         *      {Object} div
+         *      {Object} params
+         *      {number} rows
+         * }
+         */
         params: function(o){
-
-            /*
-             *  Params params:
-             *  - list
-             *  - div
-             *  - params
-             *  - rows
-             *
-             */
         
             /* 
              * Required params
-             * 
-            */
+             */
 
-            if( o.params[$.kui.i18n.inputs.source]===undefined || 
-                o.params[$.kui.i18n.inputs.id]===undefined || 
-                o.params[$.kui.i18n.inputs.fields]===undefined){
+            if( o.params[$.kui.i18n.source]===undefined || 
+                o.params[$.kui.i18n.id]===undefined || 
+                o.params[$.kui.i18n.fields]===undefined){
                 window.console.error(
                     'The params ' +
-                    '"' + $.kui.i18n.inputs.source + '", ' +
-                    '"' + $.kui.i18n.inputs.id + '" and ' +
-                    '"' + $.kui.i18n.inputs.fields + '"' +
+                    '"' + $.kui.i18n.source + '", ' +
+                    '"' + $.kui.i18n.id + '" and ' +
+                    '"' + $.kui.i18n.fields + '"' +
                     ' are required.'
                 );
                 return;
@@ -597,10 +600,10 @@
              */
 
              var finalParams = {};
-            finalParams[$.kui.i18n.inputs.ajax] = 'GET';
-            finalParams[$.kui.i18n.inputs.titles] = true;
-            finalParams[$.kui.i18n.inputs.serviceFormat] = {};
-            finalParams[$.kui.i18n.inputs.buttons] = [];
+            finalParams[$.kui.i18n.ajax] = 'GET';
+            finalParams[$.kui.i18n.titles] = true;
+            finalParams[$.kui.i18n.serviceFormat] = {};
+            finalParams[$.kui.i18n.buttons] = [];
 
              var data_final = {
                 _search:false,
@@ -612,21 +615,21 @@
                 todos:false
             };
 
-            $.extend(data_final,o.params[$.kui.i18n.inputs.data]);
-            finalParams[$.kui.i18n.inputs.data] = data_final;
+            $.extend(data_final,o.params[$.kui.i18n.data]);
+            finalParams[$.kui.i18n.data] = data_final;
             
             var permisos_finales = {};
-            permisos_finales[$.kui.i18n.inputs.add] = null;
-            permisos_finales[$.kui.i18n.inputs.edit] = null;
-            permisos_finales[$.kui.i18n.inputs.save] =  null;
-            permisos_finales[$.kui.i18n.inputs.activate] = null;
-            permisos_finales[$.kui.i18n.inputs.remove] = null;
+            permisos_finales[$.kui.i18n.add] = null;
+            permisos_finales[$.kui.i18n.edit] = null;
+            permisos_finales[$.kui.i18n.save] =  null;
+            permisos_finales[$.kui.i18n.activate] = null;
+            permisos_finales[$.kui.i18n.remove] = null;
 
-            $.extend(permisos_finales,o.params[$.kui.i18n.inputs.pass]);
-            finalParams[$.kui.i18n.inputs.pass] = permisos_finales;
+            $.extend(permisos_finales,o.params[$.kui.i18n.pass]);
+            finalParams[$.kui.i18n.pass] = permisos_finales;
             
-            if(o.params[$.kui.i18n.inputs.pager]===undefined){
-                o.params[$.kui.i18n.inputs.pager] = $('<div>')
+            if(o.params[$.kui.i18n.pager]===undefined){
+                o.params[$.kui.i18n.pager] = $('<div>')
                     .addClass('text-center')
                     .appendTo(o.div);
             }
@@ -637,11 +640,11 @@
                 totalDatos: 'totalDatos'
             }
             
-            $.each(o.params[$.kui.i18n.inputs.sourceFormat],function(key,value){
+            $.each(o.params[$.kui.i18n.sourceFormat],function(key,value){
                 retorno_final[key] = value;
             });*/
 
-            if(o.params[$.kui.i18n.inputs.selectable]){
+            if(o.params[$.kui.i18n.selectable]){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
                     nombre: 'kui_seleccionado',
@@ -653,10 +656,10 @@
                         'class': o.div.id + '_seleccionar_row'
                     }
                 };
-                o.params[$.kui.i18n.inputs.fields].unshift(campo_seleccion);
+                o.params[$.kui.i18n.fields].unshift(campo_seleccion);
 
-                if(!o.params[$.kui.i18n.inputs.selected]){
-                    o.params[[$.kui.i18n.inputs.selected]] = [];
+                if(!o.params[$.kui.i18n.selected]){
+                    o.params[[$.kui.i18n.selected]] = [];
                 }
 
                 o.list.checkall = $('<input>');
@@ -666,38 +669,38 @@
 
             $.extend(o.list,{
                 div : o.div,
-                url : finalParams[$.kui.i18n.inputs.source],
-                data : finalParams[$.kui.i18n.inputs.data],
-                id : finalParams[$.kui.i18n.inputs.id],
-                mostrar_titulos : finalParams[$.kui.i18n.inputs.titles],
-                campos : finalParams[$.kui.i18n.inputs.fields],
-                ajax : finalParams[$.kui.i18n.inputs.ajax],
-                permisos : finalParams[$.kui.i18n.inputs.pass],
-                botones : finalParams[$.kui.i18n.inputs.buttons],
-                estado : finalParams[$.kui.i18n.inputs.state],
-                //retorno : finalParams[$.kui.i18n.inputs.sourceFormat],
-                load_complete : finalParams[$.kui.i18n.inputs.loadComplete],
-                paginador : finalParams[$.kui.i18n.inputs.pager],
-                onclick : finalParams[$.kui.i18n.inputs.onclick],
-                ondblclick : finalParams[$.kui.i18n.inputs.ondblclick],
-                seleccionable : finalParams[$.kui.i18n.inputs.selectable],
+                url : finalParams[$.kui.i18n.source],
+                data : finalParams[$.kui.i18n.data],
+                id : finalParams[$.kui.i18n.id],
+                mostrar_titulos : finalParams[$.kui.i18n.titles],
+                campos : finalParams[$.kui.i18n.fields],
+                ajax : finalParams[$.kui.i18n.ajax],
+                permisos : finalParams[$.kui.i18n.pass],
+                botones : finalParams[$.kui.i18n.buttons],
+                estado : finalParams[$.kui.i18n.state],
+                //retorno : finalParams[$.kui.i18n.sourceFormat],
+                load_complete : finalParams[$.kui.i18n.loadComplete],
+                paginador : finalParams[$.kui.i18n.pager],
+                onclick : finalParams[$.kui.i18n.onclick],
+                ondblclick : finalParams[$.kui.i18n.ondblclick],
+                seleccionable : finalParams[$.kui.i18n.selectable],
                 seleccionados : {},
-                preseleccionados : finalParams[$.kui.i18n.inputs.selected],
+                preseleccionados : finalParams[$.kui.i18n.selected],
                 nuevos : 0
             });
                     
-            $.kui.list.cargar_estilos();
-            $.kui.list.cargar_paginador(o.list);
+            $.kui.list.load_estilos();
+            $.kui.list.load_paginador(o.list);
             o.list.titulos();
-            o.list.cargar();
+            o.list.load();
             
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].cargar();
+                $.kui.instances.kgrid[o.list.id].load();
             });
             
         },
 
-        cargar_paginador : function(list){
+        load_paginador : function(list){
             if(!$(list.paginador).length){
                 return;
             }
@@ -712,7 +715,7 @@
                 .html($('<i>').addClass('fa fa-step-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.first);
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.first);
                 });
                 
            $('<button>').attr('id',pk+'pagina_anterior')
@@ -721,7 +724,7 @@
                 .html($('<i>').addClass('fa fa-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.prev);
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.prev);
                 });
         
           var alto = $('#'+pk+'pagina_anterior').outerHeight();
@@ -760,7 +763,7 @@
                 .html( $('<i>').addClass('fa fa-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.next);
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.next);
                 });
                 
            $('<button>').attr('id',pk+'ultima_pagina')
@@ -769,11 +772,11 @@
                 .html($('<i>').addClass('fa fa-step-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.last);
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.last);
                 });
         },
 
-        refrescar_paginador: function(list){
+        reloadPager: function(list){
             $('#kui_' + list.div.id + '_pagina')
                 .val(list.pagina)
                 .data('pagina',list.pagina);
@@ -789,7 +792,7 @@
                 .prop('disabled',list.pagina===list.totalPaginas);
         },
 
-        cargar_estilos: function(){
+        load_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
             }
@@ -940,26 +943,27 @@
   	format: function(item,name,format,combobox,readOnly){
 
   		if(combobox){
-          var value = function(data,level1,level2){
-            return data[level1]? data[level1][level2] : 
-                   (data[level1+'.'+level2]? 
-                    data[level1+'.'+level2] : '');
-          };
-
           if(readOnly){
             return typeof combobox.formato==='function'? 
                 combobox.formato.call(this,
                   item[name]?
                   item[name] : 
                   item[name+'.'+combobox.id]) :
-                value(item,name,combobox.formato);
+                $.kui.data.valueFromJson(item,name,combobox.formato);
           }else{
-          	return value(item,name,combobox.id);
+          	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
 
         return typeof format === 'function'?
             format.call(this,item[name],item) : item[name];
+    },
+
+    valueFromJson: function(data,level1,level2){
+      window.console.log('Data = ',data, 'Niveles = ', level1,level2);
+      return data[level1]? data[level1][level2] : 
+             (data[level1+'.'+level2]? 
+              data[level1+'.'+level2] : '');
     }
 
   };
@@ -994,7 +998,7 @@
 
         name: 'cards',
     		
-        set_data: function(data){
+        setData: function(data){
             var kCard = this;
             $.each(data,function(key,value){
                 kCard.data[key] = value;
@@ -1006,17 +1010,13 @@
             $(kCard.div).addClass('kui-list form-horizontal');
             kCard.contenido = $('<div>').attr('id',kCard.div.id + '_grilla')
                     .prependTo(kCard.div);
-
-            if(kCard.seleccionable){
-                kCard.seleccionar(kCard.preseleccionados);
-            }
         },
 
         titulos: function(){
         	return;
         },
         
-        cargar : function() {
+        load : function() {
             
             var kCard = this;
             if(kCard.contenido){
@@ -1034,6 +1034,7 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
+                        
                         kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
                         kCard.pagina = parseInt(retorno.respuesta.pagina);
                         kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
@@ -1042,18 +1043,8 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kCard.id]] = item;
-                            kCard.cargar_entrada(item);                          
+                            kCard.load_entrada(item);                          
                         });
-
-                        $(kCard.grilla).find('.' + kCard.div.id + '_seleccionar_row')
-                            .each(function(i,item){
-                                if(kCard.seleccionados[$(item).data('pk')]){
-                                    $(item).attr('checked','checked');
-                                }
-                                $(item).change(function(){
-                                    kCard.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
-                                });
-                            });
 
                         kCard.grilla.find('.kscore').each(function(s,score){
                             var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
@@ -1074,12 +1065,12 @@
                             }
                         });
 
-                        $(kCard.div).data('datos',datos);
-                        $(kCard.div).data('totalDatos',kCard.totalDatos);
-                        $(kCard.div).data('pagina',kCard.pagina);
-                        $(kCard.div).data('totalPaginas',kCard.totalPaginas);
+                        $(kCard.div).data($.kui.i18n.source,datos);
+                        $(kCard.div).data($.kui.i18n.totalData,kCard.totalDatos);
+                        $(kCard.div).data($.kui.i18n.page,kCard.pagina);
+                        $(kCard.div).data($.kui.i18n.totalPages,kCard.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kCard);
+                        $.kui.list.reloadPager(kCard);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
@@ -1093,14 +1084,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kCard = this;
             var nueva_entrada = item===undefined;
             var pk = 'kCard_' + kCard.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
-            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.inputs.add])?
-                kCard.permisos[$.kui.i18n.inputs.add] : kCard.permisos['guardar'];
+            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.add])?
+                kCard.permisos[$.kui.i18n.add] : kCard.permisos['guardar'];
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kCard.id])
@@ -1203,7 +1194,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kCard.cargar();
+                    //kCard.load();
 
                     // Habilitar edición inline
                      $('#'+pk+' form').find('input[readonly]').each(function(x,input){
@@ -1252,7 +1243,7 @@
             };
 
             var deshacer_cambios = function(){
-                    var original = $(kCard.div).data('datos')[$('#'+pk).attr('data-pk')];
+                    var original = $(kCard.div).data($.kui.i18n.source)[$('#'+pk).attr('data-pk')];
                     var editados = $('#'+pk+' form').find('input[data-editando]');
                     deshabilitar_edicion();
                     editados.each(function(x,input){
@@ -1267,7 +1258,7 @@
             if(activo){
 
                 if(kCard.permisos['editar']){
-                    var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                    var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                     if(typeof kCard.permisos['editar'] === 'function'){
                         btn_editar.click(function(e){
@@ -1277,7 +1268,7 @@
                     }else if(guardar){
 
                         // Guardar cambios
-                        var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                        var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                         btn_guardar.hide();
 
                         var guardar_cambios = typeof guardar === 'function'?
@@ -1289,7 +1280,7 @@
                                     url: guardar,
                                     data: formulario,
                                     success: function(/*retorno*/){  
-                                        kCard.cargar();
+                                        kCard.load();
                                     }
                                 });
                             };
@@ -1349,7 +1340,7 @@
                     }
                 }
                 if(kCard.permisos['remover']){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kCard.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -1369,7 +1360,7 @@
             } else{                                    
                 if(typeof kCard.permisos['activar'] === 'function'){
                     formGroup.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -1415,52 +1406,10 @@
                 formGroup.appendTo(kCard.grilla);
             }
         },
-        
-        cambiar_seleccion: function(codigo,estado){
-            var kCard = this;
-            kCard.seleccionados[codigo] = estado;
-            kCard.refrescar_seleccionados();
-        },
-
-        seleccionar: function(seleccionados){
-            var kCard = this;
-            kCard.seleccionados = {};
-            $.each(seleccionados,function(s,seleccionado){
-                kCard.seleccionados[seleccionado] = true;
-            });
-
-            $('.' + kCard.div.id + '_seleccionar_row').each(function(i,item){
-                $(item).removeAttr('checked');
-                if(kCard.seleccionados[$(item).data('pk')]){
-                    $(item).prop('checked',true);
-                }
-            });
-
-            kCard.refrescar_seleccionados();
-        },
-
-        refrescar_seleccionados: function(){
-            var kCard = this;
-            var seleccionados = [];
-            $.each(kCard.seleccionados,function(codigo,estado){
-                if(estado){
-                    seleccionados.push(codigo);
-                }
-            });
-            $(kCard.div).data('seleccionados',seleccionados);
-
-            var seleccionados_pagina_actual = $(kCard.div)
-                .find('.' + kCard.div.id + '_seleccionar_row:checked').length;
-
-            kCard.checkall.prop('checked',
-                seleccionados_pagina_actual>0 &&
-                ($(kCard.div).find('.' + kCard.div.id + '_seleccionar_row').length ===
-                seleccionados_pagina_actual));
-        },
 
         agregar: function(nuevo){
             var kCard = this;
-            kCard.cargar_entrada(nuevo);
+            kCard.load_entrada(nuevo);
         }
 
     };
@@ -1504,7 +1453,7 @@
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
-        this.cargar();
+        this.load();
         
     };
     
@@ -1516,13 +1465,9 @@
                     .addClass('kform form-horizontal')
                     .attr('action','#')
                     .prependTo(kForm.div);
-
-            if(kForm.seleccionable){
-                kForm.seleccionar(kForm.preseleccionados);
-            }
         },
         
-        cargar : function() {
+        load : function() {
             
             var kForm = this;
             if(kForm.form){
@@ -1555,10 +1500,10 @@
                 kForm.dato = kForm.origen;
             }
 
-            kForm.cargar_campos();
+            kForm.load_campos();
         },
 
-        cargar_campos : function(){
+        load_campos : function(){
             
             var kForm = this;
             var item = kForm.dato;
@@ -1608,7 +1553,7 @@
 
             if(kForm.boton_submit===undefined){
                 kForm.boton_submit = $('<button>').addClass('btn btn-primary')
-                    .html('Guardar')
+                    .html($.kui.i18n.saveMsg)
                     .appendTo(
                         $('<div>').addClass('form-group text-right')
                             .appendTo(kForm.fieldset)
@@ -1716,7 +1661,7 @@
 
         name: 'grid',
     		
-        set_data: function(data){
+        setData: function(data){
             var kGrid = this;
             $.each(data,function(key,value){
                 kGrid.data[key] = value;
@@ -1795,7 +1740,7 @@
             row.appendTo(kGrid.thead);
         },
         
-        cargar : function() {
+        load : function() {
             
             var kGrid = this;
 
@@ -1820,7 +1765,7 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
-                            kGrid.cargar_entrada(item);                          
+                            kGrid.load_entrada(item);                          
                         });
 
                         $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
@@ -1838,7 +1783,7 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kGrid);
+                        $.kui.list.reloadPager(kGrid);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
@@ -1852,14 +1797,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kGrid = this;
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
-            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.inputs.add])?
-                kGrid.permisos[$.kui.i18n.inputs.add] : kGrid.permisos['guardar'];
+            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.add])?
+                kGrid.permisos[$.kui.i18n.add] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
 
@@ -1872,7 +1817,7 @@
 
                     if(newReady){
                         kGrid.nuevos++;
-                        kGrid.cargar_entrada(item);
+                        kGrid.load_entrada(item);
                     }else{
                         $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])')
                             .first().focus();
@@ -1968,7 +1913,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kGrid.cargar();
+                    //kGrid.load();
 
                     // Si el formulario no existe, crearlo
                     if(!$('#'+pk).data('formulario')){
@@ -2074,7 +2019,7 @@
 
             if(activo){
 
-                var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                 if( kGrid.permisos['editar'] && !nueva_entrada &&
                     typeof kGrid.permisos['editar'] === 'function'){
@@ -2085,7 +2030,7 @@
                 }else if(guardar){
 
                     // Guardar cambios
-                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                     btn_guardar.hide();
 
                     var guardar_cambios = typeof guardar === 'function'?
@@ -2097,7 +2042,7 @@
                                 url: guardar,
                                 data: formulario,
                                 success: function(/*retorno*/){  
-                                    kGrid.cargar();
+                                    kGrid.load();
                                 }
                             });
                         };
@@ -2172,7 +2117,7 @@
                 }
 
                 if(kGrid.permisos['remover'] || nueva_entrada){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -2192,7 +2137,7 @@
             } else{                                    
                 if(typeof kGrid.permisos['activar'] === 'function'){
                     row.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -2355,7 +2300,7 @@
 
         agregar: function(nuevo){
             var kGrid = this;
-            kGrid.cargar_entrada(nuevo);
+            kGrid.load_entrada(nuevo);
         }
 
     };
@@ -2372,23 +2317,32 @@
     };
     
     var KWizard = function(div,params){
-    	// Revisión de parámetros
         
-        if( params.pasos===undefined){
-            window.console.error('Los parámetros "pasos" y "" son obligatorios.');
+        if( params[$.kui.i18n.steps]===undefined){
+            window.console.error(
+                'The param ' + 
+                '"' + $.kui.i18n.steps + '"' +
+                ' is required.'
+            );
             return;
         }
 
-        // Merge params into this
-        $.extend(this,params);
+        $.extend(this,{
+            steps: params[$.kui.i18n.steps],
+            indices: params[$.kui.i18n.indices],
+            prev: params[$.kui.i18n.prev],
+            next: params[$.kui.i18n.next],
+            validate: params[$.kui.i18n.validate],
+            loadComplete: params[$.kui.i18n.loadComplete]
+        });
 
         this.div = div;
-        this.cargar();
+        this.load();
     };
     
     KWizard.prototype = {
     		        
-        cargar : function() {
+        load : function() {
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -2397,43 +2351,51 @@
                 .attr('data-wizard',true)
                 .attr('data-step','0');
 
-            if(typeof kWizard.pasos === 'string'){
-                wizard.find(kWizard.pasos).each(function(p,paso){
-                    $(paso).hide()
+            if(typeof kWizard.steps === 'string'){
+                wizard.find(kWizard.steps).each(function(p,step){
+                    $(step).hide()
                         .attr('data-wizard-step',true)
                         .attr('data-step',p+1);
                 });
-
-                wizard.find(kWizard.indices).each(function(p,paso){
-                    $(paso).removeClass('active')
+                wizard.find(kWizard.indices).each(function(p,step){
+                    $(step).removeClass('active')
                         .attr('data-wizard-index',true)
                         .attr('data-index',p+1);
                 });
             }else{
-                //TODO construir pasos
+                //TODO Build automatic steps
             }
 
-            kWizard.control = {};
+            kWizard.pager = {};
 
-            kWizard.control.prev = kWizard.anterior? 
-                $(kWizard.anterior) : 
+            if(!kWizard.prev || !kWizard.next){
+                kWizard.pager.container = $('<ul>').addClass('pager')
+                    .appendTo($('<nav>').appendTo(wizard));
+            }
+
+            kWizard.pager.prev = kWizard.prev? 
+                $(kWizard.prev) : 
                 $('<button>').addClass('btn btn-default')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.prevMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .after('&nbsp;');
 
-            kWizard.control.next = kWizard.siguiente? 
-                $(kWizard.siguiente) : 
+            kWizard.pager.next = kWizard.next? 
+                $(kWizard.next) : 
                 $('<button>').addClass('btn btn-primary')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.nextMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .before('&nbsp;');
 
-            kWizard.control.prev.click(function(){
+            kWizard.pager.prev.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                kWizard.mostrarPaso(step-1);
+                kWizard.showStep(step-1);
             });
 
-            kWizard.control.next.click(function(){
+            kWizard.pager.next.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                if(kWizard.validar(step)){
-                    kWizard.mostrarPaso(step+1);
+                if(kWizard.validate(step)){
+                    kWizard.showStep(step+1);
                 }
             });
             
@@ -2441,25 +2403,25 @@
                 kWizard.loadComplete.call(this);
             }
 
-            kWizard.mostrarPaso(1);
+            kWizard.showStep(1);
             wizard.fadeIn();
             
         },
 
-        validar: function(step){
+        validate: function(step){
 
             var kWizard = this;
             var success = true;
             var currentStep = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
 
-            if(typeof kWizard.validacion === 'function'){
-                success = kWizard.validacion.call(this,currentStep);
+            if(typeof kWizard.validate === 'function'){
+                success = kWizard.validate.call(this,currentStep);
             }
 
             return success;
         },
 
-        mostrarPaso: function(step){
+        showStep: function(step){
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -2476,8 +2438,8 @@
                 .addClass('active');
 
             wizard.attr('data-step',step);
-            kWizard.control.prev.prop('disabled',step===1);
-            kWizard.control.next.prop('disabled',
+            kWizard.pager.prev.prop('disabled',step===1);
+            kWizard.pager.next.prop('disabled',
                 step===wizard.find('[data-wizard-step]').length);
 
 

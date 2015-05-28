@@ -38,7 +38,7 @@
 
         name: 'grid',
     		
-        set_data: function(data){
+        setData: function(data){
             var kGrid = this;
             $.each(data,function(key,value){
                 kGrid.data[key] = value;
@@ -117,7 +117,7 @@
             row.appendTo(kGrid.thead);
         },
         
-        cargar : function() {
+        load : function() {
             
             var kGrid = this;
 
@@ -142,7 +142,7 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
-                            kGrid.cargar_entrada(item);                          
+                            kGrid.load_entrada(item);                          
                         });
 
                         $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
@@ -160,7 +160,7 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kGrid);
+                        $.kui.list.reloadPager(kGrid);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
@@ -174,14 +174,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kGrid = this;
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
-            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.inputs.add])?
-                kGrid.permisos[$.kui.i18n.inputs.add] : kGrid.permisos['guardar'];
+            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.add])?
+                kGrid.permisos[$.kui.i18n.add] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
 
@@ -194,7 +194,7 @@
 
                     if(newReady){
                         kGrid.nuevos++;
-                        kGrid.cargar_entrada(item);
+                        kGrid.load_entrada(item);
                     }else{
                         $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])')
                             .first().focus();
@@ -290,7 +290,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kGrid.cargar();
+                    //kGrid.load();
 
                     // Si el formulario no existe, crearlo
                     if(!$('#'+pk).data('formulario')){
@@ -396,7 +396,7 @@
 
             if(activo){
 
-                var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                 if( kGrid.permisos['editar'] && !nueva_entrada &&
                     typeof kGrid.permisos['editar'] === 'function'){
@@ -407,7 +407,7 @@
                 }else if(guardar){
 
                     // Guardar cambios
-                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                     btn_guardar.hide();
 
                     var guardar_cambios = typeof guardar === 'function'?
@@ -419,7 +419,7 @@
                                 url: guardar,
                                 data: formulario,
                                 success: function(/*retorno*/){  
-                                    kGrid.cargar();
+                                    kGrid.load();
                                 }
                             });
                         };
@@ -494,7 +494,7 @@
                 }
 
                 if(kGrid.permisos['remover'] || nueva_entrada){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -514,7 +514,7 @@
             } else{                                    
                 if(typeof kGrid.permisos['activar'] === 'function'){
                     row.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -677,7 +677,7 @@
 
         agregar: function(nuevo){
             var kGrid = this;
-            kGrid.cargar_entrada(nuevo);
+            kGrid.load_entrada(nuevo);
         }
 
     };

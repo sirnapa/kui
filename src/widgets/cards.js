@@ -33,7 +33,7 @@
 
         name: 'cards',
     		
-        set_data: function(data){
+        setData: function(data){
             var kCard = this;
             $.each(data,function(key,value){
                 kCard.data[key] = value;
@@ -45,17 +45,13 @@
             $(kCard.div).addClass('kui-list form-horizontal');
             kCard.contenido = $('<div>').attr('id',kCard.div.id + '_grilla')
                     .prependTo(kCard.div);
-
-            if(kCard.seleccionable){
-                kCard.seleccionar(kCard.preseleccionados);
-            }
         },
 
         titulos: function(){
         	return;
         },
         
-        cargar : function() {
+        load : function() {
             
             var kCard = this;
             if(kCard.contenido){
@@ -73,6 +69,7 @@
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
+                        
                         kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
                         kCard.pagina = parseInt(retorno.respuesta.pagina);
                         kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
@@ -81,18 +78,8 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kCard.id]] = item;
-                            kCard.cargar_entrada(item);                          
+                            kCard.load_entrada(item);                          
                         });
-
-                        $(kCard.grilla).find('.' + kCard.div.id + '_seleccionar_row')
-                            .each(function(i,item){
-                                if(kCard.seleccionados[$(item).data('pk')]){
-                                    $(item).attr('checked','checked');
-                                }
-                                $(item).change(function(){
-                                    kCard.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
-                                });
-                            });
 
                         kCard.grilla.find('.kscore').each(function(s,score){
                             var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
@@ -113,12 +100,12 @@
                             }
                         });
 
-                        $(kCard.div).data('datos',datos);
-                        $(kCard.div).data('totalDatos',kCard.totalDatos);
-                        $(kCard.div).data('pagina',kCard.pagina);
-                        $(kCard.div).data('totalPaginas',kCard.totalPaginas);
+                        $(kCard.div).data($.kui.i18n.source,datos);
+                        $(kCard.div).data($.kui.i18n.totalData,kCard.totalDatos);
+                        $(kCard.div).data($.kui.i18n.page,kCard.pagina);
+                        $(kCard.div).data($.kui.i18n.totalPages,kCard.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kCard);
+                        $.kui.list.reloadPager(kCard);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
@@ -132,14 +119,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kCard = this;
             var nueva_entrada = item===undefined;
             var pk = 'kCard_' + kCard.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
-            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.inputs.add])?
-                kCard.permisos[$.kui.i18n.inputs.add] : kCard.permisos['guardar'];
+            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.add])?
+                kCard.permisos[$.kui.i18n.add] : kCard.permisos['guardar'];
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kCard.id])
@@ -242,7 +229,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kCard.cargar();
+                    //kCard.load();
 
                     // Habilitar edición inline
                      $('#'+pk+' form').find('input[readonly]').each(function(x,input){
@@ -291,7 +278,7 @@
             };
 
             var deshacer_cambios = function(){
-                    var original = $(kCard.div).data('datos')[$('#'+pk).attr('data-pk')];
+                    var original = $(kCard.div).data($.kui.i18n.source)[$('#'+pk).attr('data-pk')];
                     var editados = $('#'+pk+' form').find('input[data-editando]');
                     deshabilitar_edicion();
                     editados.each(function(x,input){
@@ -306,7 +293,7 @@
             if(activo){
 
                 if(kCard.permisos['editar']){
-                    var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                    var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                     if(typeof kCard.permisos['editar'] === 'function'){
                         btn_editar.click(function(e){
@@ -316,7 +303,7 @@
                     }else if(guardar){
 
                         // Guardar cambios
-                        var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                        var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                         btn_guardar.hide();
 
                         var guardar_cambios = typeof guardar === 'function'?
@@ -328,7 +315,7 @@
                                     url: guardar,
                                     data: formulario,
                                     success: function(/*retorno*/){  
-                                        kCard.cargar();
+                                        kCard.load();
                                     }
                                 });
                             };
@@ -388,7 +375,7 @@
                     }
                 }
                 if(kCard.permisos['remover']){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kCard.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -408,7 +395,7 @@
             } else{                                    
                 if(typeof kCard.permisos['activar'] === 'function'){
                     formGroup.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -454,52 +441,10 @@
                 formGroup.appendTo(kCard.grilla);
             }
         },
-        
-        cambiar_seleccion: function(codigo,estado){
-            var kCard = this;
-            kCard.seleccionados[codigo] = estado;
-            kCard.refrescar_seleccionados();
-        },
-
-        seleccionar: function(seleccionados){
-            var kCard = this;
-            kCard.seleccionados = {};
-            $.each(seleccionados,function(s,seleccionado){
-                kCard.seleccionados[seleccionado] = true;
-            });
-
-            $('.' + kCard.div.id + '_seleccionar_row').each(function(i,item){
-                $(item).removeAttr('checked');
-                if(kCard.seleccionados[$(item).data('pk')]){
-                    $(item).prop('checked',true);
-                }
-            });
-
-            kCard.refrescar_seleccionados();
-        },
-
-        refrescar_seleccionados: function(){
-            var kCard = this;
-            var seleccionados = [];
-            $.each(kCard.seleccionados,function(codigo,estado){
-                if(estado){
-                    seleccionados.push(codigo);
-                }
-            });
-            $(kCard.div).data('seleccionados',seleccionados);
-
-            var seleccionados_pagina_actual = $(kCard.div)
-                .find('.' + kCard.div.id + '_seleccionar_row:checked').length;
-
-            kCard.checkall.prop('checked',
-                seleccionados_pagina_actual>0 &&
-                ($(kCard.div).find('.' + kCard.div.id + '_seleccionar_row').length ===
-                seleccionados_pagina_actual));
-        },
 
         agregar: function(nuevo){
             var kCard = this;
-            kCard.cargar_entrada(nuevo);
+            kCard.load_entrada(nuevo);
         }
 
     };

@@ -25,26 +25,26 @@
   	format: function(item,name,format,combobox,readOnly){
 
   		if(combobox){
-          var value = function(data,level1,level2){
-            return data[level1]? data[level1][level2] : 
-                   (data[level1+'.'+level2]? 
-                    data[level1+'.'+level2] : '');
-          };
-
           if(readOnly){
             return typeof combobox.formato==='function'? 
                 combobox.formato.call(this,
                   item[name]?
                   item[name] : 
                   item[name+'.'+combobox.id]) :
-                value(item,name,combobox.formato);
+                $.kui.data.valueFromJson(item,name,combobox.formato);
           }else{
-          	return value(item,name,combobox.id);
+          	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
 
         return typeof format === 'function'?
             format.call(this,item[name],item) : item[name];
+    },
+
+    valueFromJson: function(data,level1,level2){
+      return data[level1]? data[level1][level2] : 
+             (data[level1+'.'+level2]? 
+              data[level1+'.'+level2] : '');
     }
 
   };
