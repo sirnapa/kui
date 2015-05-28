@@ -212,7 +212,10 @@
             }
 
             var row = $('<tr>').attr('id',pk)
-                .attr('data-pk',nueva_entrada? 'new-' + kGrid.nuevos : item[kGrid.id]);
+                .attr('data-pk',nueva_entrada? 
+                    'new-' + kGrid.nuevos + '-' + $.kui.randomId() : 
+                    item[kGrid.id]
+                );
 
             var activo = nueva_entrada? true : false;
 
@@ -473,6 +476,10 @@
                             });
 
                             guardar_cambios(dato,$('#'+pk));
+
+                            if($('#'+pk).data('new')){
+                                $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = dato;
+                            }
                         }                     
                     }).appendTo(botones);
 
@@ -506,6 +513,8 @@
                     }else{
                         btn_remover.click(function(e){
                             e.stopPropagation();
+                            $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = null;
+                            delete $(kGrid.div).data('datos')[$('#'+pk).data('pk')];
                             $('#'+pk).remove();
                         });
                     }
