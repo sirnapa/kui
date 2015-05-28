@@ -46,7 +46,7 @@
 
   $.kui.form = {
 
-    newElement: function(readOnly,element,item,field){
+    newElement: function(readOnly,element,item,field,create){
 
       /*
        * Tipos de field:
@@ -74,8 +74,13 @@
        * - fecha-hora
        */
 
-       var input;
+       
        readOnly = readOnly || field.soloLectura;
+       if(create && field.atributos!==undefined && field.atributos['data-creable']){
+        readOnly = false;
+       }
+
+       var input;
        var inputVal  = $.kui.data.format(
         item,field.nombre,field.formato,field.opciones,readOnly
        );

@@ -46,7 +46,7 @@
 
   $.kui.form = {
 
-    newElement: function(readOnly,element,item,field){
+    newElement: function(readOnly,element,item,field,create){
 
       /*
        * Tipos de field:
@@ -74,8 +74,13 @@
        * - fecha-hora
        */
 
-       var input;
+       
        readOnly = readOnly || field.soloLectura;
+       if(create && field.atributos!==undefined && field.atributos['data-creable']){
+        readOnly = false;
+       }
+
+       var input;
        var inputVal  = $.kui.data.format(
         item,field.nombre,field.formato,field.opciones,readOnly
        );
@@ -1663,7 +1668,7 @@
                         $.kui.list.reloadPager(kGrid);
                         
                     }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.messages(kGrid.mensaje,kGrid.div,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -1712,11 +1717,13 @@
             }
 
             var row = $('<tr>').attr('id',pk)
-                .attr('data-pk',item[kGrid.id]);
+                .attr('data-pk',nueva_entrada? 'new-' + kGrid.nuevos : item[kGrid.id]);
 
             var activo = nueva_entrada? true : false;
 
-            if(!nueva_entrada && typeof kGrid.estado === 'function'){
+            if(nueva_entrada){
+                row.attr('data-new',true);
+            }else if(typeof kGrid.estado === 'function'){
                 activo = kGrid.estado.call(this,item);
             }
             
@@ -1807,7 +1814,7 @@
                                 .appendTo(cell)
                                 .hide();
 
-                            $.kui.form.newElement(false,formItem,item,campo);
+                            $.kui.form.newElement(false,formItem,item,campo,$('#'+pk).data('new'));
 
                             if(campo.tipo==='booleano'){
                                 formItem.removeClass('checkbox')
@@ -2124,9 +2131,6 @@
             if(nueva_entrada){
                 row.prependTo(kGrid.tbody);
                 habilitar_edicion();
-                row.find('[data-creable]')
-                    .removeAttr('readonly')
-                    .removeAttr('disabled');
             }else{
                 row.appendTo(kGrid.tbody);
             }
