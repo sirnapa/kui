@@ -411,8 +411,8 @@
                     btn_guardar.hide();
 
                     var guardar_cambios = typeof guardar === 'function'?
-                        function(formulario){
-                            guardar.call(this,formulario);
+                        function(formulario,tr){
+                            guardar.call(this,formulario,tr);
                         } : function(formulario){
                             $.ajax({
                                 type: 'POST',
@@ -470,7 +470,7 @@
                                 });
                             });
 
-                            guardar_cambios(dato);
+                            guardar_cambios(dato,$('#'+pk));
                         }                     
                     }).appendTo(botones);
 
