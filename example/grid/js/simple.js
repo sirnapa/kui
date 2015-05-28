@@ -1,13 +1,11 @@
 $('#simple').kui('grid',{
-    url : 'js/datos.json',
+    origen : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
             ancho: 4,
-            atributos: {
-                'disabled':true
-            }
+            soloLectura: true
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',

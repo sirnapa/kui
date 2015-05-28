@@ -8,17 +8,16 @@
 
 	$.kui.list = {
 
+        /**
+         * @param o = {
+         *      {Object} element
+         *      {Object} constructor
+         *      {Object} instances
+         *      {Object} data
+         *      {Object} aux 
+         * }
+         */
     	actions: function(o){
-
-    		/*
-    		 *	Actions params:
-    		 *	- element
-    		 *	- constructor
-    		 *	- instances
-    		 *	- data
-    		 *	- aux
-    		 *
-    		 */
 
     		if(typeof o.data === 'string'){
                 var instance = o.instances[o.element.id];
@@ -28,14 +27,14 @@
                 }
 
                 switch(o.data) {
-                    case 'recargar':
+                    case $.kui.i18n.reload:
                         // o.aux sirve para sobre-escribir el data
                         if(o.aux!==undefined){
-                            instance.set_data(o.aux);
+                            instance.setData(o.aux);
                         }
-                        instance.cargar();
+                        instance.load();
                         break;
-                    case 'pagina':
+                    case $.kui.i18n.page:
                         // o.aux recibe la pagina de destino, tambien puede recibir
                         // estas opciones: primera, anterior, siguiente, ultima
                         if(o.aux===undefined){
@@ -45,16 +44,16 @@
                         if(isNaN(pagina)){
                             pagina = 0;
                             switch(o.aux) {
-                                case 'primera':
+                                case $.kui.i18n.first:
                                     pagina = 1;
                                     break;
-                                case 'anterior':
+                                case $.kui.i18n.prev:
                                     pagina = parseInt(instance.pagina) - 1;
                                     break;
-                                case 'siguiente':
+                                case $.kui.i18n.next:
                                     pagina = parseInt(instance.pagina) + 1;
                                     break;
-                                case 'ultima':
+                                case $.kui.i18n.last:
                                     pagina = instance.totalPaginas;
                                     break;
                                 default:
@@ -64,10 +63,10 @@
                         if(pagina<1 || pagina>parseInt(instance.totalPaginas)){
                             return;
                         }
-                        instance.set_data({page:pagina});
-                        instance.cargar();
+                        instance.setData({page:pagina});
+                        instance.load();
                         break;
-                    case 'buscar':
+                    case $.kui.i18n.search:
                         // o.aux es la clave de búsqueda
                         if(o.aux===undefined){
                             return;
@@ -85,20 +84,20 @@
                                 'op': (campo.op!==undefined)? campo.op : 'cn'
                             });
                         });  
-                        instance.set_data({
+                        instance.setData({
                             _search: true,
                             filters: JSON.stringify({
                                 "groupOp":groupOp,
                                 "rules": reglas
                                 })
                         });
-                        instance.set_data({page:1});
-                        instance.cargar();
+                        instance.setData({page:1});
+                        instance.load();
                         break;
-                    case 'seleccionar':
+                    case $.kui.i18n.select:
                         instance.seleccionar(o.aux);
                         break;
-                    case 'agregar':
+                    case $.kui.i18n.add:
                         instance.agregar(o.aux);
                         break;
                     default:
@@ -111,61 +110,44 @@
 
     	},
 
+        /**
+         * @param o = {
+         *      {Object} list
+         *      {Object} div
+         *      {Object} params
+         *      {number} rows
+         * }
+         */
         params: function(o){
-
-            /*
-             *  Params params:
-             *  - list
-             *  - div
-             *  - params
-             *  - rows
-             *
-             */
         
             /* 
-             * Si no se provee algun campo obligatorio, 
-             * no se puede continuar.
-            */
+             * Required params
+             */
 
-            if( o.params.url===undefined || o.params.id===undefined || o.params.campos===undefined){
-                window.console.error('Los campos id, url y campos son obligatorios.');
+            if( o.params[$.kui.i18n.source]===undefined || 
+                o.params[$.kui.i18n.id]===undefined || 
+                o.params[$.kui.i18n.fields]===undefined){
+                window.console.error(
+                    'The params ' +
+                    '"' + $.kui.i18n.source + '", ' +
+                    '"' + $.kui.i18n.id + '" and ' +
+                    '"' + $.kui.i18n.fields + '"' +
+                    ' are required.'
+                );
                 return;
             }
             
             /*
-             * Se procesan los campos opcionales
+             * Optional params
              */
-            
-            if(o.params.ajax===undefined){
-                o.params.ajax = 'GET';
-            }
 
-            if(o.params.data===undefined){
-                o.params.data = {};
-            }
+             var finalParams = {};
+            finalParams[$.kui.i18n.ajax] = 'GET';
+            finalParams[$.kui.i18n.titles] = true;
+            finalParams[$.kui.i18n.serviceFormat] = {};
+            finalParams[$.kui.i18n.buttons] = [];
 
-            if(o.params.titulos===undefined){
-                o.params.titulos = true;
-            }
-            
-            if(o.params.permisos===undefined){
-                o.params.permisos = {};
-            }
-            
-            if(o.params.retorno===undefined){
-                o.params.retorno = {};
-            }
-            
-            if(o.params.botones===undefined){
-                o.params.botones = [];
-            }
-            
-            if(o.params.paginador===undefined){
-                o.params.paginador = $('<div>').addClass('text-center')
-                    .appendTo(o.div);
-            }
-            
-            var data_final = {
+             var data_final = {
                 _search:false,
                 filters:null,
                 page:1,
@@ -175,21 +157,24 @@
                 todos:false
             };
 
-            $.each(o.params.data,function(key,value){
-                data_final[key] = value;
-            });
+            $.extend(data_final,o.params[$.kui.i18n.data]);
+            finalParams[$.kui.i18n.data] = data_final;
+            
+            var permisos_finales = {};
+            permisos_finales[$.kui.i18n.add] = null;
+            permisos_finales[$.kui.i18n.edit] = null;
+            permisos_finales[$.kui.i18n.save] =  null;
+            permisos_finales[$.kui.i18n.activate] = null;
+            permisos_finales[$.kui.i18n.remove] = null;
 
-            var permisos_finales = {
-                agregar:null,
-                editar:null,
-                guardar: null,
-                activar:null,
-                remover:null
-            };
-
-            $.each(o.params.permisos,function(key,value){
-                permisos_finales[key] = value;
-            });
+            $.extend(permisos_finales,o.params[$.kui.i18n.pass]);
+            finalParams[$.kui.i18n.pass] = permisos_finales;
+            
+            if(o.params[$.kui.i18n.pager]===undefined){
+                o.params[$.kui.i18n.pager] = $('<div>')
+                    .addClass('text-center')
+                    .appendTo(o.div);
+            }
                     
             /*var retorno_final = {
                 lista: 'lista',                    
@@ -197,11 +182,11 @@
                 totalDatos: 'totalDatos'
             }
             
-            $.each(o.params.retorno,function(key,value){
+            $.each(o.params[$.kui.i18n.sourceFormat],function(key,value){
                 retorno_final[key] = value;
             });*/
 
-            if(o.params.seleccionable){
+            if(o.params[$.kui.i18n.selectable]){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
                     nombre: 'kui_seleccionado',
@@ -213,49 +198,51 @@
                         'class': o.div.id + '_seleccionar_row'
                     }
                 };
-                o.params.campos.unshift(campo_seleccion);
+                o.params[$.kui.i18n.fields].unshift(campo_seleccion);
 
-                if(!o.params.seleccionados){
-                    o.params.seleccionados = [];
+                if(!o.params[$.kui.i18n.selected]){
+                    o.params[[$.kui.i18n.selected]] = [];
                 }
 
                 o.list.checkall = $('<input>');
-            } 
-                    
-            o.list.div = o.div;
-            o.list.url = o.params.url;
-            o.list.data = data_final;
-            o.list.id = o.params.id;
-            o.list.mostrar_titulos = o.params.titulos;
-            o.list.etiquetas = [];
-            o.list.campos = o.params.campos;
-            o.list.ajax = o.params.ajax;
-            o.list.permisos = permisos_finales;
-            o.list.botones = o.params.botones;
-            o.list.estado = o.params.estado;
-            //o.list.retorno = retorno_final;
-            o.list.load_complete = o.params.loadComplete;
-            o.list.paginador = o.params.paginador;
-            o.list.onclick = o.params.onclick;
-            o.list.ondblclick = o.params.ondblclick;
-            o.list.seleccionable = o.params.seleccionable;
-            o.list.seleccionados = {};
-            o.list.preseleccionados = o.params.seleccionados;
-            o.list.nuevos = 0;
-            o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
+            }
 
-            $.kui.list.cargar_estilos();
-            $.kui.list.cargar_paginador(o.list);
+            $.extend(finalParams,o.params);
+
+            $.extend(o.list,{
+                div : o.div,
+                source : finalParams[$.kui.i18n.source],
+                data : finalParams[$.kui.i18n.data],
+                id : finalParams[$.kui.i18n.id],
+                mostrar_titulos : finalParams[$.kui.i18n.titles],
+                campos : finalParams[$.kui.i18n.fields],
+                ajax : finalParams[$.kui.i18n.ajax],
+                permisos : finalParams[$.kui.i18n.pass],
+                botones : finalParams[$.kui.i18n.buttons],
+                estado : finalParams[$.kui.i18n.state],
+                //retorno : finalParams[$.kui.i18n.sourceFormat],
+                load_complete : finalParams[$.kui.i18n.loadComplete],
+                paginador : finalParams[$.kui.i18n.pager],
+                onclick : finalParams[$.kui.i18n.onclick],
+                ondblclick : finalParams[$.kui.i18n.ondblclick],
+                seleccionable : finalParams[$.kui.i18n.selectable],
+                seleccionados : {},
+                preseleccionados : finalParams[$.kui.i18n.selected],
+                nuevos : 0
+            });
+                    
+            $.kui.list.load_estilos();
+            $.kui.list.load_paginador(o.list);
             o.list.titulos();
-            o.list.cargar();
+            o.list.load();
             
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].cargar();
+                $.kui.instances.kgrid[o.list.id].load();
             });
             
         },
 
-        cargar_paginador : function(list){
+        load_paginador : function(list){
             if(!$(list.paginador).length){
                 return;
             }
@@ -270,7 +257,7 @@
                 .html($('<i>').addClass('fa fa-step-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','primera');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.first);
                 });
                 
            $('<button>').attr('id',pk+'pagina_anterior')
@@ -279,7 +266,7 @@
                 .html($('<i>').addClass('fa fa-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','anterior');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.prev);
                 });
         
           var alto = $('#'+pk+'pagina_anterior').outerHeight();
@@ -318,7 +305,7 @@
                 .html( $('<i>').addClass('fa fa-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','siguiente');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.next);
                 });
                 
            $('<button>').attr('id',pk+'ultima_pagina')
@@ -327,11 +314,11 @@
                 .html($('<i>').addClass('fa fa-step-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','ultima');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.last);
                 });
         },
 
-        refrescar_paginador: function(list){
+        reloadPager: function(list){
             $('#kui_' + list.div.id + '_pagina')
                 .val(list.pagina)
                 .data('pagina',list.pagina);
@@ -347,7 +334,7 @@
                 .prop('disabled',list.pagina===list.totalPaginas);
         },
 
-        cargar_estilos: function(){
+        load_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
             }

@@ -1,13 +1,13 @@
 $('#conagregar').kui('grid',{
-    url : 'js/datos.json',
+    origen : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
             nombre : 'nombre',
             titulo: 'Nombre',
             ancho: 4,
             requerido: true,
+            soloLectura: true,
             atributos: {
-                'readonly':true,
                 'data-creable': true
             }
     },{
@@ -15,8 +15,8 @@ $('#conagregar').kui('grid',{
             titulo: 'Empresa',
             ancho: 4,
             requerido: true,
+            soloLectura: true,
             atributos: {
-                'readonly':true,
                 'data-creable': true
                 },
             tipo: 'combo',

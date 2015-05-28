@@ -1,4 +1,4 @@
-/*! kui - v0.1.3 - 2015-05-26
+/*! kui - v0.2.0 - 2015-05-28
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -44,12 +44,12 @@
 
 (function ($) {
 
-  $.kui.formulario = {
+  $.kui.form = {
 
-    nuevo_elemento: function(soloLectura,elemento,item,campo){
+    newElement: function(readOnly,element,item,field,create){
 
       /*
-       * Tipos de campo:
+       * Tipos de field:
        * - texto (no hace falta aclarar, es el tipo por defecto)
        * - booleano
        * - numero (enteros)
@@ -74,74 +74,84 @@
        * - fecha-hora
        */
 
+       
+       readOnly = readOnly || field.soloLectura;
+       if(create && field.atributos!==undefined && field.atributos['data-creable']){
+        readOnly = false;
+       }
+
        var input;
-       soloLectura = soloLectura || campo.soloLectura;
-       var valorInput  = $.kui.data.format(
-        item,campo.nombre,campo.formato,campo.opciones,soloLectura
+       var inputVal  = $.kui.data.format(
+        item,field.nombre,field.formato,field.opciones,readOnly
        );
 
-       var crear_input_select = function(tipo){
+       var newInputSelect = function(type){
 
-          return $('<'+tipo+'>').addClass('form-control')
+          return $('<'+type+'>').addClass('form-control')
               .attr('data-rol','input')
-              .attr('name',campo.nombre)
+              .attr('name',field.nombre)
               .attr('placeholder',
-                  campo.placeholder===undefined?
-                  campo.titulo : campo.placeholder)
+                  field.placeholder===undefined?
+                  field.titulo : field.placeholder)
               .attr('title',
-                  campo.mensaje===undefined?
-                  'El formato ingresado no es correcto para ' + campo.titulo : campo.mensaje)
-              .val(valorInput)
-              .prop('required',campo.requerido);
+                  field.mensaje===undefined?
+                  'El formato ingresado no es correcto para ' + field.titulo : field.mensaje)
+              .val(inputVal)
+              .prop('required',field.requerido);
        };
 
-       var crear_input = function(icono){
+       var newInput = function(icono){
 
-          if(campo.icono!==undefined){
-              icono=campo.icono;
+          if(field.icono!==undefined){
+              icono=field.icono;
           }
 
-          var nuevo_input = crear_input_select('input');
+          var input = newInputSelect('input');
 
-          if(campo.simple){
-            nuevo_input.appendTo(elemento);
+          if(field.simple){
+            input.appendTo(element);
           }else{
             var inputGroup = $('<div>').addClass('input-group')
-              .appendTo(elemento);
+              .appendTo(element);
 
             $('<span>').addClass('input-group-addon')
                 .html('<i class="fa fa-' + icono + '"></i>')
                 .appendTo(inputGroup);
 
-            nuevo_input.appendTo(inputGroup);
+            input.appendTo(inputGroup);
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       var crear_select = function(){
-          var nuevo_input = crear_input_select(soloLectura?
+       var newSelect = function(){
+          var stringOnly = !field.opciones.id || !field.opciones.formato;
+          var name = field.nombre;
+          if(!stringOnly){
+            name += '.' + field.opciones.id;
+          }
+          var select = newInputSelect(readOnly?
               'input' : 'select');
-          nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
-          nuevo_input.appendTo(elemento);
+          select.attr('name',name);
+          select.appendTo(element);
 
-          if(!soloLectura){
+          if(!readOnly){
               var opciones = [];
 
-              if(typeof campo.opciones.origen === 'string'){
+              if(typeof field.opciones.origen === 'string'){
                   $.ajax({
-                      type: campo.opciones.ajax,
-                      url: campo.opciones.origen,
-                      data: campo.opciones.data===undefined?
+                      type: field.opciones.ajax,
+                      url: field.opciones.origen,
+                      data: field.opciones.data===undefined?
                       {
                           _search: false,
                           filters: null,
                           page:    1,
                           rows:    10,
-                          sidx:    campo.opciones.id,
+                          sidx:    field.opciones.id,
                           sord:    'asc',
                           todos:   true
-                      } : campo.opciones.data,
+                      } : field.opciones.data,
                       success: function(retorno){ 
                           if (!retorno.error) {
                               opciones = retorno.respuesta.datos;
@@ -150,40 +160,48 @@
                       async: false
                   });
               }else{
-                  opciones = campo.opciones.origen;
+                  opciones = field.opciones.origen;
               }
 
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
-                  var item = $('<option>')
-                      .attr('value',opcion[campo.opciones.id])
+                  var item = $('<option>');
+
+                  if(stringOnly){
+                    item.html(opcion);
+                  }else{
+                    item.attr('value',opcion[field.opciones.id])
                       .html(
-                          typeof campo.opciones.formato==='function'?
-                          campo.opciones.formato.call(this,opcion) 
-                          : opcion[campo.opciones.formato]
-                      )
-                      .appendTo(nuevo_input);
+                        typeof field.opciones.formato==='function'?
+                          field.opciones.formato.call(this,opcion) 
+                          : opcion[field.opciones.formato]
+                      );
+                  }
+                     
+                  item.appendTo(select);
                   
-                  if(valorInput.toString()===opcion[campo.opciones.id].toString()){
+                  if( inputVal.toString() === 
+                      (stringOnly? opcion : opcion[field.opciones.id].toString())
+                    ){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
               });
 
               if(!seleccionado){
-                  $('<option>').attr('value','').html('')
+                  $('<option>').html('')
                       .attr('selected',true)
-                      .prependTo(nuevo_input);
+                      .prependTo(select);
               }
 
-              nuevo_input.combobox();    
+              select.combobox();    
           }
 
-          return nuevo_input;
+          return select;
        };
 
-       var conf_fecha_hora = {
+       var confDateTime = {
           'fecha': {
                   icono: 'calendar',
                   formato: 'dd/MM/yyyy',
@@ -203,20 +221,20 @@
               }
        };
 
-       var crear_combo_fecha_hora = function(tipo){
+       var newDateTimeCombobox = function(type){
           // Los datetimepicker siempre deberán tener íconos
-          campo.simple = false;
+          field.simple = false;
 
-          var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
-          var inputGroup = nuevo_input.parent();
+          var input = newInput(confDateTime[type].icono);
+          var inputGroup = input.parent();
           inputGroup.addClass('date');
 
-          nuevo_input.attr('data-format',conf_fecha_hora[tipo].formato)
+          input.attr('data-format',confDateTime[type].formato)
               .attr('type','text')
-              .attr('data-rule-'+conf_fecha_hora[tipo].rule,true)
+              .attr('data-rule-'+confDateTime[type].rule,true)
               .prependTo(inputGroup);
 
-          if(!soloLectura){
+          if(!readOnly){
               inputGroup.find('.input-group-addon').addClass('add-on')
                 .find('i').attr({
                   'data-time-icon': 'fa fa-clock-o',
@@ -224,7 +242,7 @@
                 });
 
               var constructor = {language: "es",autoclose: true};
-              $.extend(constructor,conf_fecha_hora[tipo].constructor);
+              $.extend(constructor,confDateTime[type].constructor);
               inputGroup.datetimepicker(constructor);
 
               var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
@@ -236,73 +254,71 @@
               widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       switch(campo.tipo) {
+       switch(field.tipo) {
 
           case 'booleano':
-              input = crear_input_select('input');
-              input.appendTo(elemento);
+              input = newInputSelect('input');
+              input.appendTo(element);
               input.prop('type','checkbox');
-              input.prop('checked',valorInput);
+              input.prop('checked',inputVal);
               input.removeClass('form-control');
-              elemento.addClass('checkbox');
+              element.addClass('checkbox');
           break;
 
           case 'numero':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
           break;
 
           case 'decimal':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
               input.attr('step','any');
           break;
 
           case 'archivo':
-              input = crear_input('file');
+              input = newInput('file');
               input.attr('type','file');
               //kForm.form.attr('enctype','multipart/form-data');
           break;
 
           case 'combo':
-              input = crear_select();
+              input = newSelect();
           break;
 
           case 'fecha':
-              input = crear_combo_fecha_hora('fecha');
+              input = newDateTimeCombobox('fecha');
           break;
 
           case 'hora':
-              input = crear_combo_fecha_hora('hora');
+              input = newDateTimeCombobox('hora');
           break;
 
           case 'fecha-hora':
-              input = crear_combo_fecha_hora('fecha-hora');
+              input = newDateTimeCombobox('fecha-hora');
           break;
 
           default:
               /* Tipo texto */
-              input = crear_input('align-right');
+              input = newInput('align-right');
               input.attr('type','text');
           break;
       }
 
-      if(campo.atributos!==undefined){
-          $.each(campo.atributos,function(atributo,valor){
+      if(field.atributos!==undefined){
+          $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
-          
-          var campos_especiales = ['disabled','readonly'];
-          $.each(campos_especiales,function(e,especial){
-              if(campo.atributos[especial]==='false'){
-                  input.removeAttr(especial);
-              }
-              input.attr('data-'+especial,campo.atributos[especial]);
-          });
       }
+
+      if(readOnly){
+        input.attr(field.tipo==='booleano'? 
+          'disabled':'readonly',true);
+      }
+
     },
 
     validar: {
@@ -395,19 +411,87 @@
 
 (function ($) {
 
+  $.kui.i18n = {
+
+    /* Funciones de list */
+    reload: 'recargar',
+    page: 'pagina',
+    first: 'primera',
+    prev: 'anterior',
+    next: 'siguiente',
+    last: 'ultima',
+    search: 'buscar',
+    select: 'seleccionar',
+    add: 'agregar',
+    edit: 'editar',
+    save: 'guardar',
+    activate: 'activar',
+    remove: 'remover',
+
+    /* Mensajes de List y Wizard */
+    editMsg: 'Editar',
+    saveMsg: 'Guardar',
+    activateMsg: 'Reactivar',
+    removeMsg: 'Remover',
+    prevMsg: 'Anterior',
+    nextMsg: 'Siguiente',
+
+    /* Campos de List */
+    id: 'id',
+    fields: 'campos',
+    ajax: 'ajax',
+    data: 'data',
+    titles: 'titulos',
+    pass: 'permisos',
+    sourceFormat: 'retorno',
+    buttons: 'botones',
+    pager: 'paginador',
+    selectable: 'seleccionable',
+    selected: 'seleccionados',
+    state: 'estado',
+    loadComplete: 'loadComplete',
+    onclick: 'onclick',
+    ondblclick: 'ondblclick',
+
+    /* Eventos de List */
+    reloadGrid: 'reloadGrid',
+
+    /* Data de List */
+    totalData: 'totalDatos',
+    totalPages: 'totalPaginas',
+
+    /* Campos de Form */
+    submit: 'submit',
+    submitAjax: 'ajaxSubmit',
+    submitButton: 'botonSubmit',
+    source: 'origen',
+    sourceAjax: 'ajaxOrigen',
+    sourceData: 'dataOrigen',
+    readOnly: 'soloLectura',
+    afterSubmit: 'afterSubmit',
+
+    /* Campos de Wizard */
+    steps: 'pasos',
+    indices: 'indices',
+    validate: 'validacion'
+
+  };
+
+}(jQuery));
+(function ($) {
+
 	$.kui.list = {
 
+        /**
+         * @param o = {
+         *      {Object} element
+         *      {Object} constructor
+         *      {Object} instances
+         *      {Object} data
+         *      {Object} aux 
+         * }
+         */
     	actions: function(o){
-
-    		/*
-    		 *	Actions params:
-    		 *	- element
-    		 *	- constructor
-    		 *	- instances
-    		 *	- data
-    		 *	- aux
-    		 *
-    		 */
 
     		if(typeof o.data === 'string'){
                 var instance = o.instances[o.element.id];
@@ -417,14 +501,14 @@
                 }
 
                 switch(o.data) {
-                    case 'recargar':
+                    case $.kui.i18n.reload:
                         // o.aux sirve para sobre-escribir el data
                         if(o.aux!==undefined){
-                            instance.set_data(o.aux);
+                            instance.setData(o.aux);
                         }
-                        instance.cargar();
+                        instance.load();
                         break;
-                    case 'pagina':
+                    case $.kui.i18n.page:
                         // o.aux recibe la pagina de destino, tambien puede recibir
                         // estas opciones: primera, anterior, siguiente, ultima
                         if(o.aux===undefined){
@@ -434,16 +518,16 @@
                         if(isNaN(pagina)){
                             pagina = 0;
                             switch(o.aux) {
-                                case 'primera':
+                                case $.kui.i18n.first:
                                     pagina = 1;
                                     break;
-                                case 'anterior':
+                                case $.kui.i18n.prev:
                                     pagina = parseInt(instance.pagina) - 1;
                                     break;
-                                case 'siguiente':
+                                case $.kui.i18n.next:
                                     pagina = parseInt(instance.pagina) + 1;
                                     break;
-                                case 'ultima':
+                                case $.kui.i18n.last:
                                     pagina = instance.totalPaginas;
                                     break;
                                 default:
@@ -453,10 +537,10 @@
                         if(pagina<1 || pagina>parseInt(instance.totalPaginas)){
                             return;
                         }
-                        instance.set_data({page:pagina});
-                        instance.cargar();
+                        instance.setData({page:pagina});
+                        instance.load();
                         break;
-                    case 'buscar':
+                    case $.kui.i18n.search:
                         // o.aux es la clave de búsqueda
                         if(o.aux===undefined){
                             return;
@@ -474,20 +558,20 @@
                                 'op': (campo.op!==undefined)? campo.op : 'cn'
                             });
                         });  
-                        instance.set_data({
+                        instance.setData({
                             _search: true,
                             filters: JSON.stringify({
                                 "groupOp":groupOp,
                                 "rules": reglas
                                 })
                         });
-                        instance.set_data({page:1});
-                        instance.cargar();
+                        instance.setData({page:1});
+                        instance.load();
                         break;
-                    case 'seleccionar':
+                    case $.kui.i18n.select:
                         instance.seleccionar(o.aux);
                         break;
-                    case 'agregar':
+                    case $.kui.i18n.add:
                         instance.agregar(o.aux);
                         break;
                     default:
@@ -500,61 +584,44 @@
 
     	},
 
+        /**
+         * @param o = {
+         *      {Object} list
+         *      {Object} div
+         *      {Object} params
+         *      {number} rows
+         * }
+         */
         params: function(o){
-
-            /*
-             *  Params params:
-             *  - list
-             *  - div
-             *  - params
-             *  - rows
-             *
-             */
         
             /* 
-             * Si no se provee algun campo obligatorio, 
-             * no se puede continuar.
-            */
+             * Required params
+             */
 
-            if( o.params.url===undefined || o.params.id===undefined || o.params.campos===undefined){
-                window.console.error('Los campos id, url y campos son obligatorios.');
+            if( o.params[$.kui.i18n.source]===undefined || 
+                o.params[$.kui.i18n.id]===undefined || 
+                o.params[$.kui.i18n.fields]===undefined){
+                window.console.error(
+                    'The params ' +
+                    '"' + $.kui.i18n.source + '", ' +
+                    '"' + $.kui.i18n.id + '" and ' +
+                    '"' + $.kui.i18n.fields + '"' +
+                    ' are required.'
+                );
                 return;
             }
             
             /*
-             * Se procesan los campos opcionales
+             * Optional params
              */
-            
-            if(o.params.ajax===undefined){
-                o.params.ajax = 'GET';
-            }
 
-            if(o.params.data===undefined){
-                o.params.data = {};
-            }
+             var finalParams = {};
+            finalParams[$.kui.i18n.ajax] = 'GET';
+            finalParams[$.kui.i18n.titles] = true;
+            finalParams[$.kui.i18n.serviceFormat] = {};
+            finalParams[$.kui.i18n.buttons] = [];
 
-            if(o.params.titulos===undefined){
-                o.params.titulos = true;
-            }
-            
-            if(o.params.permisos===undefined){
-                o.params.permisos = {};
-            }
-            
-            if(o.params.retorno===undefined){
-                o.params.retorno = {};
-            }
-            
-            if(o.params.botones===undefined){
-                o.params.botones = [];
-            }
-            
-            if(o.params.paginador===undefined){
-                o.params.paginador = $('<div>').addClass('text-center')
-                    .appendTo(o.div);
-            }
-            
-            var data_final = {
+             var data_final = {
                 _search:false,
                 filters:null,
                 page:1,
@@ -564,21 +631,24 @@
                 todos:false
             };
 
-            $.each(o.params.data,function(key,value){
-                data_final[key] = value;
-            });
+            $.extend(data_final,o.params[$.kui.i18n.data]);
+            finalParams[$.kui.i18n.data] = data_final;
+            
+            var permisos_finales = {};
+            permisos_finales[$.kui.i18n.add] = null;
+            permisos_finales[$.kui.i18n.edit] = null;
+            permisos_finales[$.kui.i18n.save] =  null;
+            permisos_finales[$.kui.i18n.activate] = null;
+            permisos_finales[$.kui.i18n.remove] = null;
 
-            var permisos_finales = {
-                agregar:null,
-                editar:null,
-                guardar: null,
-                activar:null,
-                remover:null
-            };
-
-            $.each(o.params.permisos,function(key,value){
-                permisos_finales[key] = value;
-            });
+            $.extend(permisos_finales,o.params[$.kui.i18n.pass]);
+            finalParams[$.kui.i18n.pass] = permisos_finales;
+            
+            if(o.params[$.kui.i18n.pager]===undefined){
+                o.params[$.kui.i18n.pager] = $('<div>')
+                    .addClass('text-center')
+                    .appendTo(o.div);
+            }
                     
             /*var retorno_final = {
                 lista: 'lista',                    
@@ -586,11 +656,11 @@
                 totalDatos: 'totalDatos'
             }
             
-            $.each(o.params.retorno,function(key,value){
+            $.each(o.params[$.kui.i18n.sourceFormat],function(key,value){
                 retorno_final[key] = value;
             });*/
 
-            if(o.params.seleccionable){
+            if(o.params[$.kui.i18n.selectable]){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
                     nombre: 'kui_seleccionado',
@@ -602,49 +672,51 @@
                         'class': o.div.id + '_seleccionar_row'
                     }
                 };
-                o.params.campos.unshift(campo_seleccion);
+                o.params[$.kui.i18n.fields].unshift(campo_seleccion);
 
-                if(!o.params.seleccionados){
-                    o.params.seleccionados = [];
+                if(!o.params[$.kui.i18n.selected]){
+                    o.params[[$.kui.i18n.selected]] = [];
                 }
 
                 o.list.checkall = $('<input>');
-            } 
-                    
-            o.list.div = o.div;
-            o.list.url = o.params.url;
-            o.list.data = data_final;
-            o.list.id = o.params.id;
-            o.list.mostrar_titulos = o.params.titulos;
-            o.list.etiquetas = [];
-            o.list.campos = o.params.campos;
-            o.list.ajax = o.params.ajax;
-            o.list.permisos = permisos_finales;
-            o.list.botones = o.params.botones;
-            o.list.estado = o.params.estado;
-            //o.list.retorno = retorno_final;
-            o.list.load_complete = o.params.loadComplete;
-            o.list.paginador = o.params.paginador;
-            o.list.onclick = o.params.onclick;
-            o.list.ondblclick = o.params.ondblclick;
-            o.list.seleccionable = o.params.seleccionable;
-            o.list.seleccionados = {};
-            o.list.preseleccionados = o.params.seleccionados;
-            o.list.nuevos = 0;
-            o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
+            }
 
-            $.kui.list.cargar_estilos();
-            $.kui.list.cargar_paginador(o.list);
+            $.extend(finalParams,o.params);
+
+            $.extend(o.list,{
+                div : o.div,
+                source : finalParams[$.kui.i18n.source],
+                data : finalParams[$.kui.i18n.data],
+                id : finalParams[$.kui.i18n.id],
+                mostrar_titulos : finalParams[$.kui.i18n.titles],
+                campos : finalParams[$.kui.i18n.fields],
+                ajax : finalParams[$.kui.i18n.ajax],
+                permisos : finalParams[$.kui.i18n.pass],
+                botones : finalParams[$.kui.i18n.buttons],
+                estado : finalParams[$.kui.i18n.state],
+                //retorno : finalParams[$.kui.i18n.sourceFormat],
+                load_complete : finalParams[$.kui.i18n.loadComplete],
+                paginador : finalParams[$.kui.i18n.pager],
+                onclick : finalParams[$.kui.i18n.onclick],
+                ondblclick : finalParams[$.kui.i18n.ondblclick],
+                seleccionable : finalParams[$.kui.i18n.selectable],
+                seleccionados : {},
+                preseleccionados : finalParams[$.kui.i18n.selected],
+                nuevos : 0
+            });
+                    
+            $.kui.list.load_estilos();
+            $.kui.list.load_paginador(o.list);
             o.list.titulos();
-            o.list.cargar();
+            o.list.load();
             
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].cargar();
+                $.kui.instances.kgrid[o.list.id].load();
             });
             
         },
 
-        cargar_paginador : function(list){
+        load_paginador : function(list){
             if(!$(list.paginador).length){
                 return;
             }
@@ -659,7 +731,7 @@
                 .html($('<i>').addClass('fa fa-step-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','primera');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.first);
                 });
                 
            $('<button>').attr('id',pk+'pagina_anterior')
@@ -668,7 +740,7 @@
                 .html($('<i>').addClass('fa fa-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','anterior');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.prev);
                 });
         
           var alto = $('#'+pk+'pagina_anterior').outerHeight();
@@ -707,7 +779,7 @@
                 .html( $('<i>').addClass('fa fa-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','siguiente');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.next);
                 });
                 
            $('<button>').attr('id',pk+'ultima_pagina')
@@ -716,11 +788,11 @@
                 .html($('<i>').addClass('fa fa-step-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','ultima');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.last);
                 });
         },
 
-        refrescar_paginador: function(list){
+        reloadPager: function(list){
             $('#kui_' + list.div.id + '_pagina')
                 .val(list.pagina)
                 .data('pagina',list.pagina);
@@ -736,7 +808,7 @@
                 .prop('disabled',list.pagina===list.totalPaginas);
         },
 
-        cargar_estilos: function(){
+        load_estilos: function(){
             if($('#kcard_estilos').length){
                 return;
             }
@@ -869,7 +941,7 @@
 (function ($) {
 
   // Generate random ID
-  $.kui.random_id = function() {
+  $.kui.randomId = function() {
     return 'xxxx-xxxx-xxxx'.replace(/[x]/g,
       function(c) {
         var r = Math.random() * 16 | 0,
@@ -878,32 +950,68 @@
       }).toUpperCase();
   };
 
+  // Dummy link
+  $.kui.dummyLink = 'javascript'+':'.toLowerCase()+'void(0)';
+
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,soloLectura){
+    source : function(source,sourceAjax,sourceData){
 
-  		if(combo){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
+      window.console.log('source',source);
+      window.console.log('sourceAjax',sourceAjax);
+      window.console.log('sourceData',sourceData);
 
-          if(soloLectura){
-            return typeof combo.formato==='function'? 
-                combo.formato.call(this,
-                  item[nombre]?
-                  item[nombre] : 
-                  item[nombre+'.'+combo.id]) :
-                subvalor(item,nombre,combo.formato);
+      var data = {};
+
+      if(source===undefined){
+          data = {};
+      }else if(typeof source === 'string'){
+      
+          $.ajax({
+              type: sourceAjax,
+              url: source,
+              data: sourceData,
+              success: function(remoteData){ 
+                  if (!remoteData.error) {
+                      data = remoteData;
+                  }
+              },
+              async: false
+          });
+
+      }else{
+          data = source;
+      }
+
+      window.console.log('* final data ',data);
+
+      return data;
+    },
+
+  	format: function(item,name,format,combobox,readOnly){
+
+  		if(combobox && combobox.id && combobox.formato){
+          if(readOnly){
+            return typeof combobox.formato==='function'? 
+                combobox.formato.call(this,
+                  item[name]?
+                  item[name] : 
+                  item[name+'.'+combobox.id]) :
+                $.kui.data.valueFromJson(item,name,combobox.formato);
           }else{
-          	return subvalor(item,nombre,combo.id);
+          	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
 
-        return typeof formato === 'function'?
-            formato.call(this,item[nombre],item) : item[nombre];
+      return typeof format === 'function'?
+        format.call(this,item[name],item) : item[name];
+    },
+
+    valueFromJson: function(data,level1,level2){
+      return data[level1]? data[level1][level2] : 
+             (data[level1+'.'+level2]? 
+              data[level1+'.'+level2] : '');
     }
 
   };
@@ -938,7 +1046,7 @@
 
         name: 'cards',
     		
-        set_data: function(data){
+        setData: function(data){
             var kCard = this;
             $.each(data,function(key,value){
                 kCard.data[key] = value;
@@ -950,17 +1058,13 @@
             $(kCard.div).addClass('kui-list form-horizontal');
             kCard.contenido = $('<div>').attr('id',kCard.div.id + '_grilla')
                     .prependTo(kCard.div);
-
-            if(kCard.seleccionable){
-                kCard.seleccionar(kCard.preseleccionados);
-            }
         },
 
         titulos: function(){
         	return;
         },
         
-        cargar : function() {
+        load : function() {
             
             var kCard = this;
             if(kCard.contenido){
@@ -971,13 +1075,14 @@
             
             $.ajax({
                 type: kCard.ajax,
-                url: kCard.url,
+                url: kCard.source,
                 data: kCard.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
 
                         var lista = retorno.respuesta.datos;
                         var datos = {};
+                        
                         kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
                         kCard.pagina = parseInt(retorno.respuesta.pagina);
                         kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
@@ -986,18 +1091,8 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kCard.id]] = item;
-                            kCard.cargar_entrada(item);                          
+                            kCard.load_entrada(item);                          
                         });
-
-                        $(kCard.grilla).find('.' + kCard.div.id + '_seleccionar_row')
-                            .each(function(i,item){
-                                if(kCard.seleccionados[$(item).data('pk')]){
-                                    $(item).attr('checked','checked');
-                                }
-                                $(item).change(function(){
-                                    kCard.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
-                                });
-                            });
 
                         kCard.grilla.find('.kscore').each(function(s,score){
                             var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
@@ -1018,12 +1113,12 @@
                             }
                         });
 
-                        $(kCard.div).data('datos',datos);
-                        $(kCard.div).data('totalDatos',kCard.totalDatos);
-                        $(kCard.div).data('pagina',kCard.pagina);
-                        $(kCard.div).data('totalPaginas',kCard.totalPaginas);
+                        $(kCard.div).data($.kui.i18n.source,datos);
+                        $(kCard.div).data($.kui.i18n.totalData,kCard.totalDatos);
+                        $(kCard.div).data($.kui.i18n.page,kCard.pagina);
+                        $(kCard.div).data($.kui.i18n.totalPages,kCard.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kCard);
+                        $.kui.list.reloadPager(kCard);
                         
                     }else if(retorno.mensaje){
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
@@ -1037,14 +1132,12 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kCard = this;
             var nueva_entrada = item===undefined;
             var pk = 'kCard_' + kCard.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
-            var guardar = (nueva_entrada && kCard.permisos['agregar'])?
-                kCard.permisos['agregar'] : kCard.permisos['guardar'];
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kCard.id])
@@ -1077,7 +1170,7 @@
                 }
             }
                                         
-            var izquierda = $(guardar? '<form>' : '<div>')
+            var izquierda = $('<div>')
                 .addClass('col-sm-7')
                 .appendTo(formGroup);
             var derecha = $('<div>').addClass('text-right col-sm-5')
@@ -1138,153 +1231,22 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href',kCard.enlace_dummy)
+                        .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
                     return boton;
                 };
 
-            var habilitar_edicion = function(){
-                    // Deshabilitamos ediciones anteriores
-                    //kCard.cargar();
-
-                    // Habilitar edición inline
-                     $('#'+pk+' form').find('input[readonly]').each(function(x,input){
-                        if(($(input).attr('data-disabled')!=='true' && $(input).attr('data-readonly')!=='true') || 
-                            (nueva_entrada && $(input).attr('data-creable'))){
-                            $(input).removeAttr('readonly')
-                                .removeAttr('disabled')
-                                .attr('data-editando',true)
-                                .keyup(function(e){
-                                    if(e.keyCode === 13){
-                                        e.preventDefault();
-                                        $('#'+pk+' form').submit();
-                                    }
-                                });
-                        }
-                    });
-
-                    // Cambio de botones        
-                    $('#'+ pk + '_editar').hide();
-                    if(!nueva_entrada){
-                        $('#'+ pk + '_remover').hide();
-                        $('#'+ pk + '_deshacer').fadeIn();
-                    }
-                    $('#'+ pk + '_guardar').fadeIn();
-
-                    // Focus
-                    $('#'+pk).find('input[data-editando]').first().focus();
-                };
-
-            var deshabilitar_edicion = function(){
-                // Deshabilitar edición
-                $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
-                    $(input).attr('readonly',$(input).attr('data-readonly')!=='false')
-                        .removeAttr('data-editando')
-                        .unbind('keyup');
-                    if($(input).attr('type')==='checkbox'){
-                        $(input).attr('disabled',$(input).attr('data-disabled')!=='false');
-                    }
-                });
-
-                // Cambio de botones
-                $('#'+ pk + '_guardar').hide();
-                $('#'+ pk + '_deshacer').hide();
-                $('#'+ pk + '_editar').fadeIn();
-                $('#'+ pk + '_remover').fadeIn();
-            };
-
-            var deshacer_cambios = function(){
-                    var original = $(kCard.div).data('datos')[$('#'+pk).attr('data-pk')];
-                    var editados = $('#'+pk+' form').find('input[data-editando]');
-                    deshabilitar_edicion();
-                    editados.each(function(x,input){
-                        if($(input).attr('type')==='checkbox'){
-                            $(input).prop('checked',original[$(input).attr('name')]);
-                        }else{
-                            $(input).val(original[$(input).attr('name')]);
-                        }
-                    });
-                };
-
             if(activo){
 
                 if(kCard.permisos['editar']){
-                    var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                    var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                     if(typeof kCard.permisos['editar'] === 'function'){
                         btn_editar.click(function(e){
                             e.stopPropagation();
                             kCard.permisos['editar'].call(this,item);
-                        });
-                    }else if(guardar){
-
-                        // Guardar cambios
-                        var btn_guardar = crear_boton('guardar','Guardar','save','primary');
-                        btn_guardar.hide();
-
-                        var guardar_cambios = typeof guardar === 'function'?
-                            function(formulario){
-                                guardar.call(this,formulario);
-                            } : function(formulario){
-                                $.ajax({
-                                    type: 'POST',
-                                    url: guardar,
-                                    data: formulario,
-                                    success: function(/*retorno*/){  
-                                        kCard.cargar();
-                                    }
-                                });
-                            };
-
-                        $.kui.formulario.validar.reglas();
-
-                        $(izquierda).validate({
-                            showErrors: function(errorMap, errorList) {
-                                $.kui.formulario.validar.error(this, errorMap, errorList);
-                            },
-                            submitHandler: function(form) {
-                                $.kui.formulario.validar.fecha(form);
-                                
-                                deshabilitar_edicion();
-                                var dato = {};
-
-                                // Serialize Array para todos los inputs excepto checkbox
-                                $.each($('#'+pk+' form').serializeArray(), function(_, it) {
-                                    dato[it.name] = it.value;
-                                });
-
-                                // Checkboxs
-                                $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
-                                    dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
-                                });
-
-                                dato = $.extend({}, item, dato);
-
-                                guardar_cambios(dato);
-
-                                return false;
-                            }
-                        });
-
-                        btn_guardar.click(function(e){
-                            e.stopPropagation();
-                            $('#'+pk+' form').submit();                      
-                        }).appendTo(botones);
-
-                        // Deshacer cambios
-                        var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
-                        btn_deshacer.hide()
-                            .click(function(e){
-                                e.stopPropagation();
-                                deshacer_cambios();
-                            }).appendTo(botones);
-
-                        // Editar (o hacer cambios)
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            habilitar_edicion();
                         });
                     }
 
@@ -1292,8 +1254,9 @@
                         btn_editar.appendTo(botones);
                     }
                 }
+
                 if(kCard.permisos['remover']){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kCard.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -1313,7 +1276,7 @@
             } else{                                    
                 if(typeof kCard.permisos['activar'] === 'function'){
                     formGroup.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -1330,9 +1293,9 @@
 
                 $.each(kCard.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
-                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kCard.enlace_dummy);
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
                         
                         if(boton.onclick!==undefined){
                             btn.click(function(e){
@@ -1354,57 +1317,14 @@
 
             if(nueva_entrada){
                 formGroup.prependTo(kCard.grilla);
-                habilitar_edicion();
             }else{
                 formGroup.appendTo(kCard.grilla);
             }
         },
-        
-        cambiar_seleccion: function(codigo,estado){
-            var kCard = this;
-            kCard.seleccionados[codigo] = estado;
-            kCard.refrescar_seleccionados();
-        },
-
-        seleccionar: function(seleccionados){
-            var kCard = this;
-            kCard.seleccionados = {};
-            $.each(seleccionados,function(s,seleccionado){
-                kCard.seleccionados[seleccionado] = true;
-            });
-
-            $('.' + kCard.div.id + '_seleccionar_row').each(function(i,item){
-                $(item).removeAttr('checked');
-                if(kCard.seleccionados[$(item).data('pk')]){
-                    $(item).prop('checked',true);
-                }
-            });
-
-            kCard.refrescar_seleccionados();
-        },
-
-        refrescar_seleccionados: function(){
-            var kCard = this;
-            var seleccionados = [];
-            $.each(kCard.seleccionados,function(codigo,estado){
-                if(estado){
-                    seleccionados.push(codigo);
-                }
-            });
-            $(kCard.div).data('seleccionados',seleccionados);
-
-            var seleccionados_pagina_actual = $(kCard.div)
-                .find('.' + kCard.div.id + '_seleccionar_row:checked').length;
-
-            kCard.checkall.prop('checked',
-                seleccionados_pagina_actual>0 &&
-                ($(kCard.div).find('.' + kCard.div.id + '_seleccionar_row').length ===
-                seleccionados_pagina_actual));
-        },
 
         agregar: function(nuevo){
             var kCard = this;
-            kCard.cargar_entrada(nuevo);
+            kCard.load_entrada(nuevo);
         }
 
     };
@@ -1444,11 +1364,11 @@
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
         this.load_complete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
-        this.soloLectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.readOnly = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
-        this.cargar();
+        this.load();
         
     };
     
@@ -1460,13 +1380,9 @@
                     .addClass('kform form-horizontal')
                     .attr('action','#')
                     .prependTo(kForm.div);
-
-            if(kForm.seleccionable){
-                kForm.seleccionar(kForm.preseleccionados);
-            }
         },
         
-        cargar : function() {
+        load : function() {
             
             var kForm = this;
             if(kForm.form){
@@ -1499,16 +1415,16 @@
                 kForm.dato = kForm.origen;
             }
 
-            kForm.cargar_campos();
+            kForm.load_campos();
         },
 
-        cargar_campos : function(){
+        load_campos : function(){
             
             var kForm = this;
             var item = kForm.dato;
 
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.soloLectura){
+            if(kForm.readOnly){
                 kForm.fieldset.attr('disabled',true);
             }
             
@@ -1534,7 +1450,7 @@
                 var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                $.kui.formulario.nuevo_elemento(kForm.soloLectura,centro,item,campo);                         
+                $.kui.form.newElement(kForm.readOnly,centro,item,campo);                         
             });
             
             $(kForm.div).data('dato',kForm.dato);
@@ -1552,7 +1468,7 @@
 
             if(kForm.boton_submit===undefined){
                 kForm.boton_submit = $('<button>').addClass('btn btn-primary')
-                    .html('Guardar')
+                    .html($.kui.i18n.saveMsg)
                     .appendTo(
                         $('<div>').addClass('form-group text-right')
                             .appendTo(kForm.fieldset)
@@ -1566,7 +1482,7 @@
                 kForm.form.submit();
             });
 
-            $.kui.formulario.validar.reglas();
+            $.kui.form.validar.reglas();
 
             var afterSubmit = typeof kForm.after_submit === 'function'?
                 function(retorno){
@@ -1595,10 +1511,10 @@
 
             $(kForm.form).validate({
                 showErrors: function(errorMap, errorList) {
-                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                    $.kui.form.validar.error(this, errorMap, errorList);
                 },
                 submitHandler: function(form) {
-                    $.kui.formulario.validar.fecha(form);
+                    $.kui.form.validar.fecha(form);
                     on_submit();
                     return false;
                 }
@@ -1660,7 +1576,7 @@
 
         name: 'grid',
     		
-        set_data: function(data){
+        setData: function(data){
             var kGrid = this;
             $.each(data,function(key,value){
                 kGrid.data[key] = value;
@@ -1687,7 +1603,7 @@
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
 
-            $.kui.formulario.validar.reglas();
+            $.kui.form.validar.reglas();
         },
 
         titulos: function(){
@@ -1701,7 +1617,7 @@
             var row = $('<tr>');
             kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
-            $.each(kGrid.campos,function(c,campo){                       
+            $.each(kGrid.campos,function(c,campo){                 
                 var label = $('<strong>');
 
                 if(campo.titulo!==undefined){
@@ -1717,6 +1633,10 @@
                 var titulo = $('<th>')
                     .html(label)
                     .appendTo(row);
+
+                if(campo.oculto){
+                    titulo.addClass('hidden');
+                }
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
@@ -1739,7 +1659,7 @@
             row.appendTo(kGrid.thead);
         },
         
-        cargar : function() {
+        load : function() {
             
             var kGrid = this;
 
@@ -1751,7 +1671,7 @@
             
             $.ajax({
                 type: kGrid.ajax,
-                url: kGrid.url,
+                url: kGrid.source,
                 data: kGrid.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
@@ -1764,7 +1684,7 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
-                            kGrid.cargar_entrada(item);                          
+                            kGrid.load_entrada(item);                          
                         });
 
                         $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
@@ -1782,10 +1702,10 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kGrid);
+                        $.kui.list.reloadPager(kGrid);
                         
                     }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.messages(kGrid.mensaje,kGrid.div,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -1796,14 +1716,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kGrid = this;
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
-            var guardar = (nueva_entrada && kGrid.permisos['agregar'])?
-                kGrid.permisos['agregar'] : kGrid.permisos['guardar'];
+            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.add])?
+                kGrid.permisos[$.kui.i18n.add] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
 
@@ -1816,7 +1736,7 @@
 
                     if(newReady){
                         kGrid.nuevos++;
-                        kGrid.cargar_entrada(item);
+                        kGrid.load_entrada(item);
                     }else{
                         $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])')
                             .first().focus();
@@ -1834,11 +1754,16 @@
             }
 
             var row = $('<tr>').attr('id',pk)
-                .attr('data-pk',item[kGrid.id]);
+                .attr('data-pk',nueva_entrada? 
+                    'new-' + kGrid.nuevos + '-' + $.kui.randomId() : 
+                    item[kGrid.id]
+                );
 
             var activo = nueva_entrada? true : false;
 
-            if(!nueva_entrada && typeof kGrid.estado === 'function'){
+            if(nueva_entrada){
+                row.attr('data-new',true);
+            }else if(typeof kGrid.estado === 'function'){
                 activo = kGrid.estado.call(this,item);
             }
             
@@ -1873,9 +1798,13 @@
                     .data('original',data)
                     .appendTo(cell);
 
+                if(campo.oculto){
+                    cell.addClass('hidden');
+                }
+
                 if(campo.tipo==='booleano'){
 
-                    $.kui.formulario.nuevo_elemento(false,view,item,campo);
+                    $.kui.form.newElement(false,view,item,campo);
 
                     cell.find('[data-rol=input]')
                         .prop('disabled',!campo.editonly)
@@ -1903,7 +1832,7 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href',kGrid.enlace_dummy)
+                        .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
@@ -1912,7 +1841,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kGrid.cargar();
+                    //kGrid.load();
 
                     // Si el formulario no existe, crearlo
                     if(!$('#'+pk).data('formulario')){
@@ -1929,7 +1858,7 @@
                                 .appendTo(cell)
                                 .hide();
 
-                            $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
+                            $.kui.form.newElement(false,formItem,item,campo,$('#'+pk).data('new'));
 
                             if(campo.tipo==='booleano'){
                                 formItem.removeClass('checkbox')
@@ -1942,10 +1871,10 @@
 
                             formItem.validate({
                                 showErrors: function(errorMap, errorList) {
-                                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                                    $.kui.form.validar.error(this, errorMap, errorList);
                                 },
                                 submitHandler: function(form) {
-                                    $.kui.formulario.validar.fecha(form);
+                                    $.kui.form.validar.fecha(form);
                                     var ready = $('#'+pk).data('ready');
                                     $('#'+pk).data('ready',++ready);
                                     return false;
@@ -2018,7 +1947,7 @@
 
             if(activo){
 
-                var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                 if( kGrid.permisos['editar'] && !nueva_entrada &&
                     typeof kGrid.permisos['editar'] === 'function'){
@@ -2029,19 +1958,19 @@
                 }else if(guardar){
 
                     // Guardar cambios
-                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                     btn_guardar.hide();
 
                     var guardar_cambios = typeof guardar === 'function'?
-                        function(formulario){
-                            guardar.call(this,formulario);
+                        function(formulario,tr){
+                            guardar.call(this,formulario,tr);
                         } : function(formulario){
                             $.ajax({
                                 type: 'POST',
                                 url: guardar,
                                 data: formulario,
                                 success: function(/*retorno*/){  
-                                    kGrid.cargar();
+                                    kGrid.load();
                                 }
                             });
                         };
@@ -2092,7 +2021,11 @@
                                 });
                             });
 
-                            guardar_cambios(dato);
+                            guardar_cambios(dato,$('#'+pk));
+
+                            if($('#'+pk).data('new')){
+                                $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = dato;
+                            }
                         }                     
                     }).appendTo(botones);
 
@@ -2116,7 +2049,7 @@
                 }
 
                 if(kGrid.permisos['remover'] || nueva_entrada){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -2126,6 +2059,8 @@
                     }else{
                         btn_remover.click(function(e){
                             e.stopPropagation();
+                            $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = null;
+                            delete $(kGrid.div).data('datos')[$('#'+pk).data('pk')];
                             $('#'+pk).remove();
                         });
                     }
@@ -2136,7 +2071,7 @@
             } else{                                    
                 if(typeof kGrid.permisos['activar'] === 'function'){
                     row.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -2155,7 +2090,7 @@
                     };
                 }else{
                     var div_context = $('<div>')
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('kui-dropdown')
                         .appendTo('body');
 
@@ -2164,7 +2099,7 @@
                         .addClass('dropdown-menu')
                         .appendTo(div_context);
 
-                    var btn = crear_boton($.kui.random_id(),'Acciones','angle-down','primary');
+                    var btn = crear_boton($.kui.randomId(),'Acciones','angle-down','primary');
                     
                     btn.attr('data-toggle','dropdown')
                         .attr('aria-haspopup',true)
@@ -2172,7 +2107,7 @@
                         .appendTo(botones);
                     
                     var div_dropdown = btn.parent()
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('dropdown kui-dropdown');
 
                     var ul = ul_context.clone()
@@ -2221,9 +2156,9 @@
 
                 $.each(kGrid.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
-                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy);
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
                         
                         if(boton.onclick!==undefined){
                             btn.click(function(e){
@@ -2246,9 +2181,6 @@
             if(nueva_entrada){
                 row.prependTo(kGrid.tbody);
                 habilitar_edicion();
-                row.find('[data-creable]')
-                    .removeAttr('readonly')
-                    .removeAttr('disabled');
             }else{
                 row.appendTo(kGrid.tbody);
             }
@@ -2299,7 +2231,7 @@
 
         agregar: function(nuevo){
             var kGrid = this;
-            kGrid.cargar_entrada(nuevo);
+            kGrid.load_entrada(nuevo);
         }
 
     };
@@ -2316,23 +2248,32 @@
     };
     
     var KWizard = function(div,params){
-    	// Revisión de parámetros
         
-        if( params.pasos===undefined){
-            window.console.error('Los parámetros "pasos" y "" son obligatorios.');
+        if( params[$.kui.i18n.steps]===undefined){
+            window.console.error(
+                'The param ' + 
+                '"' + $.kui.i18n.steps + '"' +
+                ' is required.'
+            );
             return;
         }
 
-        // Merge params into this
-        $.extend(this,params);
+        $.extend(this,{
+            steps: params[$.kui.i18n.steps],
+            indices: params[$.kui.i18n.indices],
+            prev: params[$.kui.i18n.prev],
+            next: params[$.kui.i18n.next],
+            validate: params[$.kui.i18n.validate],
+            loadComplete: params[$.kui.i18n.loadComplete]
+        });
 
         this.div = div;
-        this.cargar();
+        this.load();
     };
     
     KWizard.prototype = {
     		        
-        cargar : function() {
+        load : function() {
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -2341,43 +2282,51 @@
                 .attr('data-wizard',true)
                 .attr('data-step','0');
 
-            if(typeof kWizard.pasos === 'string'){
-                wizard.find(kWizard.pasos).each(function(p,paso){
-                    $(paso).hide()
+            if(typeof kWizard.steps === 'string'){
+                wizard.find(kWizard.steps).each(function(p,step){
+                    $(step).hide()
                         .attr('data-wizard-step',true)
                         .attr('data-step',p+1);
                 });
-
-                wizard.find(kWizard.indices).each(function(p,paso){
-                    $(paso).removeClass('active')
+                wizard.find(kWizard.indices).each(function(p,step){
+                    $(step).removeClass('active')
                         .attr('data-wizard-index',true)
                         .attr('data-index',p+1);
                 });
             }else{
-                //TODO construir pasos
+                //TODO Build automatic steps
             }
 
-            kWizard.control = {};
+            kWizard.pager = {};
 
-            kWizard.control.prev = kWizard.anterior? 
-                $(kWizard.anterior) : 
+            if(!kWizard.prev || !kWizard.next){
+                kWizard.pager.container = $('<ul>').addClass('pager')
+                    .appendTo($('<nav>').appendTo(wizard));
+            }
+
+            kWizard.pager.prev = kWizard.prev? 
+                $(kWizard.prev) : 
                 $('<button>').addClass('btn btn-default')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.prevMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .after('&nbsp;');
 
-            kWizard.control.next = kWizard.siguiente? 
-                $(kWizard.siguiente) : 
+            kWizard.pager.next = kWizard.next? 
+                $(kWizard.next) : 
                 $('<button>').addClass('btn btn-primary')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.nextMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .before('&nbsp;');
 
-            kWizard.control.prev.click(function(){
+            kWizard.pager.prev.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                kWizard.mostrarPaso(step-1);
+                kWizard.showStep(step-1);
             });
 
-            kWizard.control.next.click(function(){
+            kWizard.pager.next.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                if(kWizard.validar(step)){
-                    kWizard.mostrarPaso(step+1);
+                if(kWizard.validate(step)){
+                    kWizard.showStep(step+1);
                 }
             });
             
@@ -2385,25 +2334,25 @@
                 kWizard.loadComplete.call(this);
             }
 
-            kWizard.mostrarPaso(1);
+            kWizard.showStep(1);
             wizard.fadeIn();
             
         },
 
-        validar: function(step){
+        validate: function(step){
 
             var kWizard = this;
             var success = true;
             var currentStep = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
 
-            if(typeof kWizard.validacion === 'function'){
-                success = kWizard.validacion.call(this,currentStep);
+            if(typeof kWizard.validate === 'function'){
+                success = kWizard.validate.call(this,currentStep);
             }
 
             return success;
         },
 
-        mostrarPaso: function(step){
+        showStep: function(step){
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -2420,8 +2369,8 @@
                 .addClass('active');
 
             wizard.attr('data-step',step);
-            kWizard.control.prev.prop('disabled',step===1);
-            kWizard.control.next.prop('disabled',
+            kWizard.pager.prev.prop('disabled',step===1);
+            kWizard.pager.next.prop('disabled',
                 step===wizard.find('[data-wizard-step]').length);
 
 
