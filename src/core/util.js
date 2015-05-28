@@ -7,7 +7,7 @@
 (function ($) {
 
   // Generate random ID
-  $.kui.random_id = function() {
+  $.kui.randomId = function() {
     return 'xxxx-xxxx-xxxx'.replace(/[x]/g,
       function(c) {
         var r = Math.random() * 16 | 0,
@@ -16,32 +16,68 @@
       }).toUpperCase();
   };
 
+  // Dummy link
+  $.kui.dummyLink = 'javascript'+':'.toLowerCase()+'void(0)';
+
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,soloLectura){
+    source : function(source,sourceAjax,sourceData){
 
-  		if(combo){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
-          };
+      window.console.log('source',source);
+      window.console.log('sourceAjax',sourceAjax);
+      window.console.log('sourceData',sourceData);
 
-          if(soloLectura){
-            return typeof combo.formato==='function'? 
-                combo.formato.call(this,
-                  item[nombre]?
-                  item[nombre] : 
-                  item[nombre+'.'+combo.id]) :
-                subvalor(item,nombre,combo.formato);
+      var data = {};
+
+      if(source===undefined){
+          data = {};
+      }else if(typeof source === 'string'){
+      
+          $.ajax({
+              type: sourceAjax,
+              url: source,
+              data: sourceData,
+              success: function(remoteData){ 
+                  if (!remoteData.error) {
+                      data = remoteData;
+                  }
+              },
+              async: false
+          });
+
+      }else{
+          data = source;
+      }
+
+      window.console.log('* final data ',data);
+
+      return data;
+    },
+
+  	format: function(item,name,format,combobox,readOnly){
+
+  		if(combobox && combobox.id && combobox.formato){
+          if(readOnly){
+            return typeof combobox.formato==='function'? 
+                combobox.formato.call(this,
+                  item[name]?
+                  item[name] : 
+                  item[name+'.'+combobox.id]) :
+                $.kui.data.valueFromJson(item,name,combobox.formato);
           }else{
-          	return subvalor(item,nombre,combo.id);
+          	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
 
-        return typeof formato === 'function'?
-            formato.call(this,item[nombre],item) : item[nombre];
+      return typeof format === 'function'?
+        format.call(this,item[name],item) : item[name];
+    },
+
+    valueFromJson: function(data,level1,level2){
+      return data[level1]? data[level1][level2] : 
+             (data[level1+'.'+level2]? 
+              data[level1+'.'+level2] : '');
     }
 
   };

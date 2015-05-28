@@ -1,6 +1,6 @@
 /*
  *
- *   +++++++++++++++++++++ Cards +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ Wizard +++++++++++++++++++++ 
  *
  */
 
@@ -15,23 +15,32 @@
     };
     
     var KWizard = function(div,params){
-    	// Revisión de parámetros
         
-        if( params.pasos===undefined){
-            window.console.error('Los parámetros "pasos" y "" son obligatorios.');
+        if( params[$.kui.i18n.steps]===undefined){
+            window.console.error(
+                'The param ' + 
+                '"' + $.kui.i18n.steps + '"' +
+                ' is required.'
+            );
             return;
         }
 
-        // Merge params into this
-        $.extend(this,params);
+        $.extend(this,{
+            steps: params[$.kui.i18n.steps],
+            indices: params[$.kui.i18n.indices],
+            prev: params[$.kui.i18n.prev],
+            next: params[$.kui.i18n.next],
+            validate: params[$.kui.i18n.validate],
+            loadComplete: params[$.kui.i18n.loadComplete]
+        });
 
         this.div = div;
-        this.cargar();
+        this.load();
     };
     
     KWizard.prototype = {
     		        
-        cargar : function() {
+        load : function() {
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -40,43 +49,51 @@
                 .attr('data-wizard',true)
                 .attr('data-step','0');
 
-            if(typeof kWizard.pasos === 'string'){
-                wizard.find(kWizard.pasos).each(function(p,paso){
-                    $(paso).hide()
+            if(typeof kWizard.steps === 'string'){
+                wizard.find(kWizard.steps).each(function(p,step){
+                    $(step).hide()
                         .attr('data-wizard-step',true)
                         .attr('data-step',p+1);
                 });
-
-                wizard.find(kWizard.indices).each(function(p,paso){
-                    $(paso).removeClass('active')
+                wizard.find(kWizard.indices).each(function(p,step){
+                    $(step).removeClass('active')
                         .attr('data-wizard-index',true)
                         .attr('data-index',p+1);
                 });
             }else{
-                //TODO construir pasos
+                //TODO Build automatic steps
             }
 
-            kWizard.control = {};
+            kWizard.pager = {};
 
-            kWizard.control.prev = kWizard.anterior? 
-                $(kWizard.anterior) : 
+            if(!kWizard.prev || !kWizard.next){
+                kWizard.pager.container = $('<ul>').addClass('pager')
+                    .appendTo($('<nav>').appendTo(wizard));
+            }
+
+            kWizard.pager.prev = kWizard.prev? 
+                $(kWizard.prev) : 
                 $('<button>').addClass('btn btn-default')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.prevMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .after('&nbsp;');
 
-            kWizard.control.next = kWizard.siguiente? 
-                $(kWizard.siguiente) : 
+            kWizard.pager.next = kWizard.next? 
+                $(kWizard.next) : 
                 $('<button>').addClass('btn btn-primary')
-                    .appendTo(wizard);
+                    .html($.kui.i18n.nextMsg)
+                    .appendTo($('<li>').appendTo(kWizard.pager.container))
+                    .before('&nbsp;');
 
-            kWizard.control.prev.click(function(){
+            kWizard.pager.prev.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                kWizard.mostrarPaso(step-1);
+                kWizard.showStep(step-1);
             });
 
-            kWizard.control.next.click(function(){
+            kWizard.pager.next.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                if(kWizard.validar(step)){
-                    kWizard.mostrarPaso(step+1);
+                if(kWizard.validate(step)){
+                    kWizard.showStep(step+1);
                 }
             });
             
@@ -84,25 +101,25 @@
                 kWizard.loadComplete.call(this);
             }
 
-            kWizard.mostrarPaso(1);
+            kWizard.showStep(1);
             wizard.fadeIn();
             
         },
 
-        validar: function(step){
+        validate: function(step){
 
             var kWizard = this;
             var success = true;
             var currentStep = $(kWizard.div).find('[data-wizard-step][data-step="'+step+'"]');
 
-            if(typeof kWizard.validacion === 'function'){
-                success = kWizard.validacion.call(this,currentStep);
+            if(typeof kWizard.validate === 'function'){
+                success = kWizard.validate.call(this,currentStep);
             }
 
             return success;
         },
 
-        mostrarPaso: function(step){
+        showStep: function(step){
             
             var kWizard = this;
             var wizard = $(kWizard.div);
@@ -119,8 +136,8 @@
                 .addClass('active');
 
             wizard.attr('data-step',step);
-            kWizard.control.prev.prop('disabled',step===1);
-            kWizard.control.next.prop('disabled',
+            kWizard.pager.prev.prop('disabled',step===1);
+            kWizard.pager.next.prop('disabled',
                 step===wizard.find('[data-wizard-step]').length);
 
 

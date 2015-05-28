@@ -1,7 +1,7 @@
 var seleccionados = [17348,17400,18000];
 
 $('#seleccionable').kui('grid',{
-    url : 'js/datos.json',
+    origen : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
             nombre : 'nombre',
@@ -20,8 +20,7 @@ $('#seleccionable').kui('grid',{
             titulo: 'Vigencia',
             formato: function(campo,row){
                 return campo + ' al ' + row['vigenciaFin']
-            },
-            atributos: {'readonly':false}
+            }
     },{
             nombre : 'anonimo',
             titulo: 'NN',

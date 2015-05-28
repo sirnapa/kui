@@ -38,7 +38,7 @@
 
         name: 'grid',
     		
-        set_data: function(data){
+        setData: function(data){
             var kGrid = this;
             $.each(data,function(key,value){
                 kGrid.data[key] = value;
@@ -65,7 +65,7 @@
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
 
-            $.kui.formulario.validar.reglas();
+            $.kui.form.validar.reglas();
         },
 
         titulos: function(){
@@ -79,7 +79,7 @@
             var row = $('<tr>');
             kGrid.thead = $('<thead>').prependTo(kGrid.table);
                                                                             
-            $.each(kGrid.campos,function(c,campo){                       
+            $.each(kGrid.campos,function(c,campo){                 
                 var label = $('<strong>');
 
                 if(campo.titulo!==undefined){
@@ -95,6 +95,10 @@
                 var titulo = $('<th>')
                     .html(label)
                     .appendTo(row);
+
+                if(campo.oculto){
+                    titulo.addClass('hidden');
+                }
 
                 if(kGrid.seleccionable && c===0){
                     titulo.addClass('text-center');
@@ -117,7 +121,7 @@
             row.appendTo(kGrid.thead);
         },
         
-        cargar : function() {
+        load : function() {
             
             var kGrid = this;
 
@@ -129,7 +133,7 @@
             
             $.ajax({
                 type: kGrid.ajax,
-                url: kGrid.url,
+                url: kGrid.source,
                 data: kGrid.data,
                 success: function(retorno){                                    
                     if (!retorno.error) {
@@ -142,7 +146,7 @@
                         
                         $.each(lista,function(i,item){
                             datos[item[kGrid.id]] = item;
-                            kGrid.cargar_entrada(item);                          
+                            kGrid.load_entrada(item);                          
                         });
 
                         $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
@@ -160,10 +164,10 @@
                         $(kGrid.div).data('pagina',kGrid.pagina);
                         $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
                                                 
-                        $.kui.list.refrescar_paginador(kGrid);
+                        $.kui.list.reloadPager(kGrid);
                         
                     }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.tbody,retorno.tipoMensaje,retorno.mensaje);
+                        $.kui.messages(kGrid.mensaje,kGrid.div,retorno.tipoMensaje,retorno.mensaje);
                     }
             
                     if(typeof kGrid.load_complete === 'function'){
@@ -174,14 +178,14 @@
             });
         },
 
-        cargar_entrada: function(item){
+        load_entrada: function(item){
 
             var kGrid = this;
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
-            var guardar = (nueva_entrada && kGrid.permisos['agregar'])?
-                kGrid.permisos['agregar'] : kGrid.permisos['guardar'];
+            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.add])?
+                kGrid.permisos[$.kui.i18n.add] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
 
@@ -194,7 +198,7 @@
 
                     if(newReady){
                         kGrid.nuevos++;
-                        kGrid.cargar_entrada(item);
+                        kGrid.load_entrada(item);
                     }else{
                         $('#'+pk).find('[data-rol="input"]:not([disabled],[readonly])')
                             .first().focus();
@@ -212,11 +216,16 @@
             }
 
             var row = $('<tr>').attr('id',pk)
-                .attr('data-pk',item[kGrid.id]);
+                .attr('data-pk',nueva_entrada? 
+                    'new-' + kGrid.nuevos + '-' + $.kui.randomId() : 
+                    item[kGrid.id]
+                );
 
             var activo = nueva_entrada? true : false;
 
-            if(!nueva_entrada && typeof kGrid.estado === 'function'){
+            if(nueva_entrada){
+                row.attr('data-new',true);
+            }else if(typeof kGrid.estado === 'function'){
                 activo = kGrid.estado.call(this,item);
             }
             
@@ -251,9 +260,13 @@
                     .data('original',data)
                     .appendTo(cell);
 
+                if(campo.oculto){
+                    cell.addClass('hidden');
+                }
+
                 if(campo.tipo==='booleano'){
 
-                    $.kui.formulario.nuevo_elemento(false,view,item,campo);
+                    $.kui.form.newElement(false,view,item,campo);
 
                     cell.find('[data-rol=input]')
                         .prop('disabled',!campo.editonly)
@@ -281,7 +294,7 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href',kGrid.enlace_dummy)
+                        .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
@@ -290,7 +303,7 @@
 
             var habilitar_edicion = function(){
                     // Deshabilitamos ediciones anteriores
-                    //kGrid.cargar();
+                    //kGrid.load();
 
                     // Si el formulario no existe, crearlo
                     if(!$('#'+pk).data('formulario')){
@@ -307,7 +320,7 @@
                                 .appendTo(cell)
                                 .hide();
 
-                            $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
+                            $.kui.form.newElement(false,formItem,item,campo,$('#'+pk).data('new'));
 
                             if(campo.tipo==='booleano'){
                                 formItem.removeClass('checkbox')
@@ -320,10 +333,10 @@
 
                             formItem.validate({
                                 showErrors: function(errorMap, errorList) {
-                                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                                    $.kui.form.validar.error(this, errorMap, errorList);
                                 },
                                 submitHandler: function(form) {
-                                    $.kui.formulario.validar.fecha(form);
+                                    $.kui.form.validar.fecha(form);
                                     var ready = $('#'+pk).data('ready');
                                     $('#'+pk).data('ready',++ready);
                                     return false;
@@ -396,7 +409,7 @@
 
             if(activo){
 
-                var btn_editar = crear_boton('editar','Editar','pencil','primary');
+                var btn_editar = crear_boton('editar',$.kui.i18n.editMsg,'pencil','primary');
 
                 if( kGrid.permisos['editar'] && !nueva_entrada &&
                     typeof kGrid.permisos['editar'] === 'function'){
@@ -407,19 +420,19 @@
                 }else if(guardar){
 
                     // Guardar cambios
-                    var btn_guardar = crear_boton('guardar','Guardar','save','primary');
+                    var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
                     btn_guardar.hide();
 
                     var guardar_cambios = typeof guardar === 'function'?
-                        function(formulario){
-                            guardar.call(this,formulario);
+                        function(formulario,tr){
+                            guardar.call(this,formulario,tr);
                         } : function(formulario){
                             $.ajax({
                                 type: 'POST',
                                 url: guardar,
                                 data: formulario,
                                 success: function(/*retorno*/){  
-                                    kGrid.cargar();
+                                    kGrid.load();
                                 }
                             });
                         };
@@ -470,7 +483,11 @@
                                 });
                             });
 
-                            guardar_cambios(dato);
+                            guardar_cambios(dato,$('#'+pk));
+
+                            if($('#'+pk).data('new')){
+                                $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = dato;
+                            }
                         }                     
                     }).appendTo(botones);
 
@@ -494,7 +511,7 @@
                 }
 
                 if(kGrid.permisos['remover'] || nueva_entrada){
-                    var btn_remover = crear_boton('remover','Remover','times','danger');
+                    var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
                     if(!nueva_entrada && typeof kGrid.permisos['remover'] === 'function'){
                         btn_remover.click(function(e){
@@ -504,6 +521,8 @@
                     }else{
                         btn_remover.click(function(e){
                             e.stopPropagation();
+                            $(kGrid.div).data('datos')[$('#'+pk).data('pk')] = null;
+                            delete $(kGrid.div).data('datos')[$('#'+pk).data('pk')];
                             $('#'+pk).remove();
                         });
                     }
@@ -514,7 +533,7 @@
             } else{                                    
                 if(typeof kGrid.permisos['activar'] === 'function'){
                     row.addClass('has-error');
-                    var btn_activar = crear_boton('reactivar','Reactivar','check','success');
+                    var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
 
                     btn_activar.click(function(e){
                             e.stopPropagation();
@@ -533,7 +552,7 @@
                     };
                 }else{
                     var div_context = $('<div>')
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('kui-dropdown')
                         .appendTo('body');
 
@@ -542,7 +561,7 @@
                         .addClass('dropdown-menu')
                         .appendTo(div_context);
 
-                    var btn = crear_boton($.kui.random_id(),'Acciones','angle-down','primary');
+                    var btn = crear_boton($.kui.randomId(),'Acciones','angle-down','primary');
                     
                     btn.attr('data-toggle','dropdown')
                         .attr('aria-haspopup',true)
@@ -550,7 +569,7 @@
                         .appendTo(botones);
                     
                     var div_dropdown = btn.parent()
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('dropdown kui-dropdown');
 
                     var ul = ul_context.clone()
@@ -599,9 +618,9 @@
 
                 $.each(kGrid.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
-                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy);
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
                         
                         if(boton.onclick!==undefined){
                             btn.click(function(e){
@@ -624,9 +643,6 @@
             if(nueva_entrada){
                 row.prependTo(kGrid.tbody);
                 habilitar_edicion();
-                row.find('[data-creable]')
-                    .removeAttr('readonly')
-                    .removeAttr('disabled');
             }else{
                 row.appendTo(kGrid.tbody);
             }
@@ -677,7 +693,7 @@
 
         agregar: function(nuevo){
             var kGrid = this;
-            kGrid.cargar_entrada(nuevo);
+            kGrid.load_entrada(nuevo);
         }
 
     };
