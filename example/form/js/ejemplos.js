@@ -15,5 +15,5 @@ $(document).ready(function () {
     agregar_ejemplo('agregar','Agregar');
     agregar_ejemplo('editar','Editar');
     agregar_ejemplo('solo_lectura','Sólo lectura');
-    agregar_ejemplo('selects','Ejemplos de select');
+    agregar_ejemplo('selects','Ejemplos de select y soloLectura');
 });

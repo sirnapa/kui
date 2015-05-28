@@ -20,8 +20,7 @@ $('#seleccionable').kui('grid',{
             titulo: 'Vigencia',
             formato: function(campo,row){
                 return campo + ' al ' + row['vigenciaFin']
-            },
-            atributos: {'readonly':false}
+            }
     },{
             nombre : 'anonimo',
             titulo: 'NN',

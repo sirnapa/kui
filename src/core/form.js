@@ -269,15 +269,13 @@
           $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
-          
-          var fields_especiales = ['disabled','readonly'];
-          $.each(fields_especiales,function(e,especial){
-              if(field.atributos[especial]==='false'){
-                  input.removeAttr(especial);
-              }
-              input.attr('data-'+especial,field.atributos[especial]);
-          });
       }
+
+      if(readOnly){
+        input.attr(field.tipo==='booleano'? 
+          'disabled':'readonly',true);
+      }
+
     },
 
     validar: {

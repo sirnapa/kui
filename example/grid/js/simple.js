@@ -5,9 +5,7 @@ $('#simple').kui('grid',{
             nombre : 'nombre',
             titulo: 'Nombre',
             ancho: 4,
-            atributos: {
-                'disabled':true
-            }
+            soloLectura: true
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',

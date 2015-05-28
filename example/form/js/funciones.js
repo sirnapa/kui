@@ -1,5 +1,6 @@
 function submitFunction(datos,original){
-	console.log(datos,original);
+	console.log('* Original',original);
+	console.log('* Con cambios',datos);
 	alert('Guardar');
 }
 

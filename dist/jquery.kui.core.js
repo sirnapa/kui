@@ -1,4 +1,4 @@
-/*! kui - v0.1.4 - 2015-05-28
+/*! kui - v0.2.0 - 2015-05-28
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -307,15 +307,13 @@
           $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
-          
-          var fields_especiales = ['disabled','readonly'];
-          $.each(fields_especiales,function(e,especial){
-              if(field.atributos[especial]==='false'){
-                  input.removeAttr(especial);
-              }
-              input.attr('data-'+especial,field.atributos[especial]);
-          });
       }
+
+      if(readOnly){
+        input.attr(field.tipo==='booleano'? 
+          'disabled':'readonly',true);
+      }
+
     },
 
     validar: {

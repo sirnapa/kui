@@ -1,4 +1,4 @@
-/*! kui - v0.1.4 - 2015-05-28
+/*! kui - v0.2.0 - 2015-05-28
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -307,15 +307,13 @@
           $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
-          
-          var fields_especiales = ['disabled','readonly'];
-          $.each(fields_especiales,function(e,especial){
-              if(field.atributos[especial]==='false'){
-                  input.removeAttr(especial);
-              }
-              input.attr('data-'+especial,field.atributos[especial]);
-          });
       }
+
+      if(readOnly){
+        input.attr(field.tipo==='booleano'? 
+          'disabled':'readonly',true);
+      }
+
     },
 
     validar: {
@@ -1102,8 +1100,6 @@
             var nueva_entrada = item===undefined;
             var pk = 'kCard_' + kCard.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
-            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.add])?
-                kCard.permisos[$.kui.i18n.add] : kCard.permisos['guardar'];
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kCard.id])
@@ -1136,7 +1132,7 @@
                 }
             }
                                         
-            var izquierda = $(guardar? '<form>' : '<div>')
+            var izquierda = $('<div>')
                 .addClass('col-sm-7')
                 .appendTo(formGroup);
             var derecha = $('<div>').addClass('text-right col-sm-5')
@@ -1204,69 +1200,6 @@
                     return boton;
                 };
 
-            var habilitar_edicion = function(){
-                    // Deshabilitamos ediciones anteriores
-                    //kCard.load();
-
-                    // Habilitar edición inline
-                     $('#'+pk+' form').find('input[readonly]').each(function(x,input){
-                        if(($(input).attr('data-disabled')!=='true' && $(input).attr('data-readonly')!=='true') || 
-                            (nueva_entrada && $(input).attr('data-creable'))){
-                            $(input).removeAttr('readonly')
-                                .removeAttr('disabled')
-                                .attr('data-editando',true)
-                                .keyup(function(e){
-                                    if(e.keyCode === 13){
-                                        e.preventDefault();
-                                        $('#'+pk+' form').submit();
-                                    }
-                                });
-                        }
-                    });
-
-                    // Cambio de botones        
-                    $('#'+ pk + '_editar').hide();
-                    if(!nueva_entrada){
-                        $('#'+ pk + '_remover').hide();
-                        $('#'+ pk + '_deshacer').fadeIn();
-                    }
-                    $('#'+ pk + '_guardar').fadeIn();
-
-                    // Focus
-                    $('#'+pk).find('input[data-editando]').first().focus();
-                };
-
-            var deshabilitar_edicion = function(){
-                // Deshabilitar edición
-                $('#'+pk+' form').find('input[data-editando]').each(function(x,input){
-                    $(input).attr('readonly',$(input).attr('data-readonly')!=='false')
-                        .removeAttr('data-editando')
-                        .unbind('keyup');
-                    if($(input).attr('type')==='checkbox'){
-                        $(input).attr('disabled',$(input).attr('data-disabled')!=='false');
-                    }
-                });
-
-                // Cambio de botones
-                $('#'+ pk + '_guardar').hide();
-                $('#'+ pk + '_deshacer').hide();
-                $('#'+ pk + '_editar').fadeIn();
-                $('#'+ pk + '_remover').fadeIn();
-            };
-
-            var deshacer_cambios = function(){
-                    var original = $(kCard.div).data($.kui.i18n.source)[$('#'+pk).attr('data-pk')];
-                    var editados = $('#'+pk+' form').find('input[data-editando]');
-                    deshabilitar_edicion();
-                    editados.each(function(x,input){
-                        if($(input).attr('type')==='checkbox'){
-                            $(input).prop('checked',original[$(input).attr('name')]);
-                        }else{
-                            $(input).val(original[$(input).attr('name')]);
-                        }
-                    });
-                };
-
             if(activo){
 
                 if(kCard.permisos['editar']){
@@ -1277,80 +1210,13 @@
                             e.stopPropagation();
                             kCard.permisos['editar'].call(this,item);
                         });
-                    }else if(guardar){
-
-                        // Guardar cambios
-                        var btn_guardar = crear_boton('guardar',$.kui.i18n.saveMsg,'save','primary');
-                        btn_guardar.hide();
-
-                        var guardar_cambios = typeof guardar === 'function'?
-                            function(formulario){
-                                guardar.call(this,formulario);
-                            } : function(formulario){
-                                $.ajax({
-                                    type: 'POST',
-                                    url: guardar,
-                                    data: formulario,
-                                    success: function(/*retorno*/){  
-                                        kCard.load();
-                                    }
-                                });
-                            };
-
-                        $.kui.form.validar.reglas();
-
-                        $(izquierda).validate({
-                            showErrors: function(errorMap, errorList) {
-                                $.kui.form.validar.error(this, errorMap, errorList);
-                            },
-                            submitHandler: function(form) {
-                                $.kui.form.validar.fecha(form);
-                                
-                                deshabilitar_edicion();
-                                var dato = {};
-
-                                // Serialize Array para todos los inputs excepto checkbox
-                                $.each($('#'+pk+' form').serializeArray(), function(_, it) {
-                                    dato[it.name] = it.value;
-                                });
-
-                                // Checkboxs
-                                $.each($('#'+pk+' form input[data-rol=input][type=checkbox]'), function(_, checkbox) {
-                                    dato[$(checkbox).attr('name')] = $(checkbox).is(':checked');
-                                });
-
-                                dato = $.extend({}, item, dato);
-
-                                guardar_cambios(dato);
-
-                                return false;
-                            }
-                        });
-
-                        btn_guardar.click(function(e){
-                            e.stopPropagation();
-                            $('#'+pk+' form').submit();                      
-                        }).appendTo(botones);
-
-                        // Deshacer cambios
-                        var btn_deshacer = crear_boton('deshacer','Deshacer cambios','undo','danger');
-                        btn_deshacer.hide()
-                            .click(function(e){
-                                e.stopPropagation();
-                                deshacer_cambios();
-                            }).appendTo(botones);
-
-                        // Editar (o hacer cambios)
-                        btn_editar.click(function(e){
-                            e.stopPropagation();
-                            habilitar_edicion();
-                        });
                     }
 
                     if(!nueva_entrada){
                         btn_editar.appendTo(botones);
                     }
                 }
+
                 if(kCard.permisos['remover']){
                     var btn_remover = crear_boton('remover',$.kui.i18n.removeMsg,'times','danger');
 
@@ -1413,7 +1279,6 @@
 
             if(nueva_entrada){
                 formGroup.prependTo(kCard.grilla);
-                habilitar_edicion();
             }else{
                 formGroup.appendTo(kCard.grilla);
             }

@@ -5,9 +5,7 @@ $('#conbotones').kui('grid',{
             nombre : 'nombre',
             titulo: 'Nombre',
             ancho: 4,
-            atributos: {
-                'readonly':true
-                }
+            soloLectura: true
     },{
             nombre : 'fechaAlta',
             titulo: 'Creado',
