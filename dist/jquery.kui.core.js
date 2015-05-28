@@ -1,4 +1,4 @@
-/*! kui - v0.1.3 - 2015-05-26
+/*! kui - v0.1.4 - 2015-05-27
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -44,12 +44,12 @@
 
 (function ($) {
 
-  $.kui.formulario = {
+  $.kui.form = {
 
-    nuevo_elemento: function(soloLectura,elemento,item,campo){
+    newElement: function(readOnly,element,item,field){
 
       /*
-       * Tipos de campo:
+       * Tipos de field:
        * - texto (no hace falta aclarar, es el tipo por defecto)
        * - booleano
        * - numero (enteros)
@@ -75,73 +75,73 @@
        */
 
        var input;
-       soloLectura = soloLectura || campo.soloLectura;
-       var valorInput  = $.kui.data.format(
-        item,campo.nombre,campo.formato,campo.opciones,soloLectura
+       readOnly = readOnly || field.soloLectura;
+       var inputVal  = $.kui.data.format(
+        item,field.nombre,field.formato,field.opciones,readOnly
        );
 
-       var crear_input_select = function(tipo){
+       var newInputSelect = function(type){
 
-          return $('<'+tipo+'>').addClass('form-control')
+          return $('<'+type+'>').addClass('form-control')
               .attr('data-rol','input')
-              .attr('name',campo.nombre)
+              .attr('name',field.nombre)
               .attr('placeholder',
-                  campo.placeholder===undefined?
-                  campo.titulo : campo.placeholder)
+                  field.placeholder===undefined?
+                  field.titulo : field.placeholder)
               .attr('title',
-                  campo.mensaje===undefined?
-                  'El formato ingresado no es correcto para ' + campo.titulo : campo.mensaje)
-              .val(valorInput)
-              .prop('required',campo.requerido);
+                  field.mensaje===undefined?
+                  'El formato ingresado no es correcto para ' + field.titulo : field.mensaje)
+              .val(inputVal)
+              .prop('required',field.requerido);
        };
 
-       var crear_input = function(icono){
+       var newInput = function(icono){
 
-          if(campo.icono!==undefined){
-              icono=campo.icono;
+          if(field.icono!==undefined){
+              icono=field.icono;
           }
 
-          var nuevo_input = crear_input_select('input');
+          var input = newInputSelect('input');
 
-          if(campo.simple){
-            nuevo_input.appendTo(elemento);
+          if(field.simple){
+            input.appendTo(element);
           }else{
             var inputGroup = $('<div>').addClass('input-group')
-              .appendTo(elemento);
+              .appendTo(element);
 
             $('<span>').addClass('input-group-addon')
                 .html('<i class="fa fa-' + icono + '"></i>')
                 .appendTo(inputGroup);
 
-            nuevo_input.appendTo(inputGroup);
+            input.appendTo(inputGroup);
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       var crear_select = function(){
-          var nuevo_input = crear_input_select(soloLectura?
+       var newSelect = function(){
+          var select = newInputSelect(readOnly?
               'input' : 'select');
-          nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
-          nuevo_input.appendTo(elemento);
+          select.attr('name',field.nombre+'.'+field.opciones.id);
+          select.appendTo(element);
 
-          if(!soloLectura){
+          if(!readOnly){
               var opciones = [];
 
-              if(typeof campo.opciones.origen === 'string'){
+              if(typeof field.opciones.origen === 'string'){
                   $.ajax({
-                      type: campo.opciones.ajax,
-                      url: campo.opciones.origen,
-                      data: campo.opciones.data===undefined?
+                      type: field.opciones.ajax,
+                      url: field.opciones.origen,
+                      data: field.opciones.data===undefined?
                       {
                           _search: false,
                           filters: null,
                           page:    1,
                           rows:    10,
-                          sidx:    campo.opciones.id,
+                          sidx:    field.opciones.id,
                           sord:    'asc',
                           todos:   true
-                      } : campo.opciones.data,
+                      } : field.opciones.data,
                       success: function(retorno){ 
                           if (!retorno.error) {
                               opciones = retorno.respuesta.datos;
@@ -150,22 +150,22 @@
                       async: false
                   });
               }else{
-                  opciones = campo.opciones.origen;
+                  opciones = field.opciones.origen;
               }
 
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
                   var item = $('<option>')
-                      .attr('value',opcion[campo.opciones.id])
+                      .attr('value',opcion[field.opciones.id])
                       .html(
-                          typeof campo.opciones.formato==='function'?
-                          campo.opciones.formato.call(this,opcion) 
-                          : opcion[campo.opciones.formato]
+                          typeof field.opciones.formato==='function'?
+                          field.opciones.formato.call(this,opcion) 
+                          : opcion[field.opciones.formato]
                       )
-                      .appendTo(nuevo_input);
+                      .appendTo(select);
                   
-                  if(valorInput.toString()===opcion[campo.opciones.id].toString()){
+                  if(inputVal.toString()===opcion[field.opciones.id].toString()){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
@@ -174,16 +174,16 @@
               if(!seleccionado){
                   $('<option>').attr('value','').html('')
                       .attr('selected',true)
-                      .prependTo(nuevo_input);
+                      .prependTo(select);
               }
 
-              nuevo_input.combobox();    
+              select.combobox();    
           }
 
-          return nuevo_input;
+          return select;
        };
 
-       var conf_fecha_hora = {
+       var confDateTime = {
           'fecha': {
                   icono: 'calendar',
                   formato: 'dd/MM/yyyy',
@@ -203,20 +203,20 @@
               }
        };
 
-       var crear_combo_fecha_hora = function(tipo){
+       var newDateTimeCombobox = function(type){
           // Los datetimepicker siempre deberán tener íconos
-          campo.simple = false;
+          field.simple = false;
 
-          var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
-          var inputGroup = nuevo_input.parent();
+          var input = newInput(confDateTime[type].icono);
+          var inputGroup = input.parent();
           inputGroup.addClass('date');
 
-          nuevo_input.attr('data-format',conf_fecha_hora[tipo].formato)
+          input.attr('data-format',confDateTime[type].formato)
               .attr('type','text')
-              .attr('data-rule-'+conf_fecha_hora[tipo].rule,true)
+              .attr('data-rule-'+confDateTime[type].rule,true)
               .prependTo(inputGroup);
 
-          if(!soloLectura){
+          if(!readOnly){
               inputGroup.find('.input-group-addon').addClass('add-on')
                 .find('i').attr({
                   'data-time-icon': 'fa fa-clock-o',
@@ -224,7 +224,7 @@
                 });
 
               var constructor = {language: "es",autoclose: true};
-              $.extend(constructor,conf_fecha_hora[tipo].constructor);
+              $.extend(constructor,confDateTime[type].constructor);
               inputGroup.datetimepicker(constructor);
 
               var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
@@ -236,71 +236,71 @@
               widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       switch(campo.tipo) {
+       switch(field.tipo) {
 
           case 'booleano':
-              input = crear_input_select('input');
-              input.appendTo(elemento);
+              input = newInputSelect('input');
+              input.appendTo(element);
               input.prop('type','checkbox');
-              input.prop('checked',valorInput);
+              input.prop('checked',inputVal);
               input.removeClass('form-control');
-              elemento.addClass('checkbox');
+              element.addClass('checkbox');
           break;
 
           case 'numero':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
           break;
 
           case 'decimal':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
               input.attr('step','any');
           break;
 
           case 'archivo':
-              input = crear_input('file');
+              input = newInput('file');
               input.attr('type','file');
               //kForm.form.attr('enctype','multipart/form-data');
           break;
 
           case 'combo':
-              input = crear_select();
+              input = newSelect();
           break;
 
           case 'fecha':
-              input = crear_combo_fecha_hora('fecha');
+              input = newDateTimeCombobox('fecha');
           break;
 
           case 'hora':
-              input = crear_combo_fecha_hora('hora');
+              input = newDateTimeCombobox('hora');
           break;
 
           case 'fecha-hora':
-              input = crear_combo_fecha_hora('fecha-hora');
+              input = newDateTimeCombobox('fecha-hora');
           break;
 
           default:
               /* Tipo texto */
-              input = crear_input('align-right');
+              input = newInput('align-right');
               input.attr('type','text');
           break;
       }
 
-      if(campo.atributos!==undefined){
-          $.each(campo.atributos,function(atributo,valor){
+      if(field.atributos!==undefined){
+          $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
           
-          var campos_especiales = ['disabled','readonly'];
-          $.each(campos_especiales,function(e,especial){
-              if(campo.atributos[especial]==='false'){
+          var fields_especiales = ['disabled','readonly'];
+          $.each(fields_especiales,function(e,especial){
+              if(field.atributos[especial]==='false'){
                   input.removeAttr(especial);
               }
-              input.attr('data-'+especial,campo.atributos[especial]);
+              input.attr('data-'+especial,field.atributos[especial]);
           });
       }
     },
@@ -395,6 +395,69 @@
 
 (function ($) {
 
+  $.kui.i18n = {
+
+    // Input options
+    inputs: {
+
+      /* Funciones de list */
+      reload: 'recargar',
+      page: 'pagina',
+      first: 'primera',
+      prev: 'anterior',
+      next: 'siguiente',
+      last: 'ultima',
+      search: 'buscar',
+      select: 'seleccionar',
+      add: 'agregar',
+      edit: 'editar',
+      save: 'guardar',
+      activate: 'activar',
+      remove: 'remover',
+
+      /* Campos de List */
+      //url: 'url', // comparar con origen de Form >>> se convierte a source
+      id: 'id',
+      fields: 'campos',
+      ajax: 'ajax',
+      data: 'data',
+      titles: 'titulos',
+      pass: 'permisos',
+      sourceFormat: 'retorno',
+      buttons: 'botones',
+      pager: 'paginador',
+      selectable: 'seleccionable',
+      selected: 'seleccionados',
+      state: 'estado',
+      loadComplete: 'loadComplete',
+      onclick: 'onclick',
+      ondblclick: 'ondblclick',
+
+      /* Eventos de List */
+      reloadGrid: 'reloadGrid',
+
+      /* Campos de Form */
+      submit: 'submit',
+      submitAjax: 'ajaxSubmit',
+      submitButton: 'botonSubmit',
+      source: 'origen', //comparar con url de List
+      sourceAjax: 'ajaxOrigen',
+      sourceData: 'dataOrigen',
+      readOnly: 'soloLectura',
+      afterSubmit: 'afterSubmit',
+
+      /* Campos de Wizard */
+      steps: 'pasos',
+      indices: 'indices',
+      validate: 'validacion'
+
+    }
+
+  };
+
+}(jQuery));
+(function ($) {
+
 	$.kui.list = {
 
     	actions: function(o){
@@ -417,14 +480,14 @@
                 }
 
                 switch(o.data) {
-                    case 'recargar':
+                    case $.kui.i18n.inputs.reload:
                         // o.aux sirve para sobre-escribir el data
                         if(o.aux!==undefined){
                             instance.set_data(o.aux);
                         }
                         instance.cargar();
                         break;
-                    case 'pagina':
+                    case $.kui.i18n.inputs.page:
                         // o.aux recibe la pagina de destino, tambien puede recibir
                         // estas opciones: primera, anterior, siguiente, ultima
                         if(o.aux===undefined){
@@ -434,16 +497,16 @@
                         if(isNaN(pagina)){
                             pagina = 0;
                             switch(o.aux) {
-                                case 'primera':
+                                case $.kui.i18n.inputs.first:
                                     pagina = 1;
                                     break;
-                                case 'anterior':
+                                case $.kui.i18n.inputs.prev:
                                     pagina = parseInt(instance.pagina) - 1;
                                     break;
-                                case 'siguiente':
+                                case $.kui.i18n.inputs.next:
                                     pagina = parseInt(instance.pagina) + 1;
                                     break;
-                                case 'ultima':
+                                case $.kui.i18n.inputs.last:
                                     pagina = instance.totalPaginas;
                                     break;
                                 default:
@@ -456,7 +519,7 @@
                         instance.set_data({page:pagina});
                         instance.cargar();
                         break;
-                    case 'buscar':
+                    case $.kui.i18n.inputs.search:
                         // o.aux es la clave de búsqueda
                         if(o.aux===undefined){
                             return;
@@ -484,10 +547,10 @@
                         instance.set_data({page:1});
                         instance.cargar();
                         break;
-                    case 'seleccionar':
+                    case $.kui.i18n.inputs.select:
                         instance.seleccionar(o.aux);
                         break;
-                    case 'agregar':
+                    case $.kui.i18n.inputs.add:
                         instance.agregar(o.aux);
                         break;
                     default:
@@ -512,49 +575,34 @@
              */
         
             /* 
-             * Si no se provee algun campo obligatorio, 
-             * no se puede continuar.
+             * Required params
+             * 
             */
 
-            if( o.params.url===undefined || o.params.id===undefined || o.params.campos===undefined){
-                window.console.error('Los campos id, url y campos son obligatorios.');
+            if( o.params[$.kui.i18n.inputs.source]===undefined || 
+                o.params[$.kui.i18n.inputs.id]===undefined || 
+                o.params[$.kui.i18n.inputs.fields]===undefined){
+                window.console.error(
+                    'The params ' +
+                    '"' + $.kui.i18n.inputs.source + '", ' +
+                    '"' + $.kui.i18n.inputs.id + '" and ' +
+                    '"' + $.kui.i18n.inputs.fields + '"' +
+                    ' are required.'
+                );
                 return;
             }
             
             /*
-             * Se procesan los campos opcionales
+             * Optional params
              */
-            
-            if(o.params.ajax===undefined){
-                o.params.ajax = 'GET';
-            }
 
-            if(o.params.data===undefined){
-                o.params.data = {};
-            }
+             var finalParams = {};
+            finalParams[$.kui.i18n.inputs.ajax] = 'GET';
+            finalParams[$.kui.i18n.inputs.titles] = true;
+            finalParams[$.kui.i18n.inputs.serviceFormat] = {};
+            finalParams[$.kui.i18n.inputs.buttons] = [];
 
-            if(o.params.titulos===undefined){
-                o.params.titulos = true;
-            }
-            
-            if(o.params.permisos===undefined){
-                o.params.permisos = {};
-            }
-            
-            if(o.params.retorno===undefined){
-                o.params.retorno = {};
-            }
-            
-            if(o.params.botones===undefined){
-                o.params.botones = [];
-            }
-            
-            if(o.params.paginador===undefined){
-                o.params.paginador = $('<div>').addClass('text-center')
-                    .appendTo(o.div);
-            }
-            
-            var data_final = {
+             var data_final = {
                 _search:false,
                 filters:null,
                 page:1,
@@ -564,21 +612,24 @@
                 todos:false
             };
 
-            $.each(o.params.data,function(key,value){
-                data_final[key] = value;
-            });
+            $.extend(data_final,o.params[$.kui.i18n.inputs.data]);
+            finalParams[$.kui.i18n.inputs.data] = data_final;
+            
+            var permisos_finales = {};
+            permisos_finales[$.kui.i18n.inputs.add] = null;
+            permisos_finales[$.kui.i18n.inputs.edit] = null;
+            permisos_finales[$.kui.i18n.inputs.save] =  null;
+            permisos_finales[$.kui.i18n.inputs.activate] = null;
+            permisos_finales[$.kui.i18n.inputs.remove] = null;
 
-            var permisos_finales = {
-                agregar:null,
-                editar:null,
-                guardar: null,
-                activar:null,
-                remover:null
-            };
-
-            $.each(o.params.permisos,function(key,value){
-                permisos_finales[key] = value;
-            });
+            $.extend(permisos_finales,o.params[$.kui.i18n.inputs.pass]);
+            finalParams[$.kui.i18n.inputs.pass] = permisos_finales;
+            
+            if(o.params[$.kui.i18n.inputs.pager]===undefined){
+                o.params[$.kui.i18n.inputs.pager] = $('<div>')
+                    .addClass('text-center')
+                    .appendTo(o.div);
+            }
                     
             /*var retorno_final = {
                 lista: 'lista',                    
@@ -586,11 +637,11 @@
                 totalDatos: 'totalDatos'
             }
             
-            $.each(o.params.retorno,function(key,value){
+            $.each(o.params[$.kui.i18n.inputs.sourceFormat],function(key,value){
                 retorno_final[key] = value;
             });*/
 
-            if(o.params.seleccionable){
+            if(o.params[$.kui.i18n.inputs.selectable]){
                 // Agregar campo de selección al principio;
                 var campo_seleccion = {
                     nombre: 'kui_seleccionado',
@@ -602,37 +653,39 @@
                         'class': o.div.id + '_seleccionar_row'
                     }
                 };
-                o.params.campos.unshift(campo_seleccion);
+                o.params[$.kui.i18n.inputs.fields].unshift(campo_seleccion);
 
-                if(!o.params.seleccionados){
-                    o.params.seleccionados = [];
+                if(!o.params[$.kui.i18n.inputs.selected]){
+                    o.params[[$.kui.i18n.inputs.selected]] = [];
                 }
 
                 o.list.checkall = $('<input>');
-            } 
-                    
-            o.list.div = o.div;
-            o.list.url = o.params.url;
-            o.list.data = data_final;
-            o.list.id = o.params.id;
-            o.list.mostrar_titulos = o.params.titulos;
-            o.list.etiquetas = [];
-            o.list.campos = o.params.campos;
-            o.list.ajax = o.params.ajax;
-            o.list.permisos = permisos_finales;
-            o.list.botones = o.params.botones;
-            o.list.estado = o.params.estado;
-            //o.list.retorno = retorno_final;
-            o.list.load_complete = o.params.loadComplete;
-            o.list.paginador = o.params.paginador;
-            o.list.onclick = o.params.onclick;
-            o.list.ondblclick = o.params.ondblclick;
-            o.list.seleccionable = o.params.seleccionable;
-            o.list.seleccionados = {};
-            o.list.preseleccionados = o.params.seleccionados;
-            o.list.nuevos = 0;
-            o.list.enlace_dummy = 'javascript'+':'.toLowerCase()+'void(0)';
+            }
 
+            $.extend(finalParams,o.params);
+
+            $.extend(o.list,{
+                div : o.div,
+                url : finalParams[$.kui.i18n.inputs.source],
+                data : finalParams[$.kui.i18n.inputs.data],
+                id : finalParams[$.kui.i18n.inputs.id],
+                mostrar_titulos : finalParams[$.kui.i18n.inputs.titles],
+                campos : finalParams[$.kui.i18n.inputs.fields],
+                ajax : finalParams[$.kui.i18n.inputs.ajax],
+                permisos : finalParams[$.kui.i18n.inputs.pass],
+                botones : finalParams[$.kui.i18n.inputs.buttons],
+                estado : finalParams[$.kui.i18n.inputs.state],
+                //retorno : finalParams[$.kui.i18n.inputs.sourceFormat],
+                load_complete : finalParams[$.kui.i18n.inputs.loadComplete],
+                paginador : finalParams[$.kui.i18n.inputs.pager],
+                onclick : finalParams[$.kui.i18n.inputs.onclick],
+                ondblclick : finalParams[$.kui.i18n.inputs.ondblclick],
+                seleccionable : finalParams[$.kui.i18n.inputs.selectable],
+                seleccionados : {},
+                preseleccionados : finalParams[$.kui.i18n.inputs.selected],
+                nuevos : 0
+            });
+                    
             $.kui.list.cargar_estilos();
             $.kui.list.cargar_paginador(o.list);
             o.list.titulos();
@@ -659,7 +712,7 @@
                 .html($('<i>').addClass('fa fa-step-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','primera');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.first);
                 });
                 
            $('<button>').attr('id',pk+'pagina_anterior')
@@ -668,7 +721,7 @@
                 .html($('<i>').addClass('fa fa-backward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','anterior');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.prev);
                 });
         
           var alto = $('#'+pk+'pagina_anterior').outerHeight();
@@ -707,7 +760,7 @@
                 .html( $('<i>').addClass('fa fa-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','siguiente');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.next);
                 });
                 
            $('<button>').attr('id',pk+'ultima_pagina')
@@ -716,7 +769,7 @@
                 .html($('<i>').addClass('fa fa-step-forward'))
                 .appendTo(contenedor)
                 .click(function(){
-                    $('#'+list.div.id).kui(list.name,'pagina','ultima');
+                    $('#'+list.div.id).kui(list.name,$.kui.i18n.inputs.page,$.kui.i18n.inputs.last);
                 });
         },
 
@@ -869,7 +922,7 @@
 (function ($) {
 
   // Generate random ID
-  $.kui.random_id = function() {
+  $.kui.randomId = function() {
     return 'xxxx-xxxx-xxxx'.replace(/[x]/g,
       function(c) {
         var r = Math.random() * 16 | 0,
@@ -878,32 +931,35 @@
       }).toUpperCase();
   };
 
+  // Dummy link
+  $.kui.dummyLink = 'javascript'+':'.toLowerCase()+'void(0)';
+
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,soloLectura){
+  	format: function(item,name,format,combobox,readOnly){
 
-  		if(combo){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
+  		if(combobox){
+          var value = function(data,level1,level2){
+            return data[level1]? data[level1][level2] : 
+                   (data[level1+'.'+level2]? 
+                    data[level1+'.'+level2] : '');
           };
 
-          if(soloLectura){
-            return typeof combo.formato==='function'? 
-                combo.formato.call(this,
-                  item[nombre]?
-                  item[nombre] : 
-                  item[nombre+'.'+combo.id]) :
-                subvalor(item,nombre,combo.formato);
+          if(readOnly){
+            return typeof combobox.formato==='function'? 
+                combobox.formato.call(this,
+                  item[name]?
+                  item[name] : 
+                  item[name+'.'+combobox.id]) :
+                value(item,name,combobox.formato);
           }else{
-          	return subvalor(item,nombre,combo.id);
+          	return value(item,name,combobox.id);
           }
     	}
 
-        return typeof formato === 'function'?
-            formato.call(this,item[nombre],item) : item[nombre];
+        return typeof format === 'function'?
+            format.call(this,item[name],item) : item[name];
     }
 
   };

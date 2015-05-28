@@ -1,5 +1,5 @@
 $('#conagregar').kui('grid',{
-    url : 'js/datos.json',
+    origen : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
             nombre : 'nombre',

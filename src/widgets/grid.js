@@ -65,7 +65,7 @@
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
 
-            $.kui.formulario.validar.reglas();
+            $.kui.form.validar.reglas();
         },
 
         titulos: function(){
@@ -180,8 +180,8 @@
             var nueva_entrada = item===undefined;
             var pk = 'kGrid_' + kGrid.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kGrid.nuevos) : item[kGrid.id]);
-            var guardar = (nueva_entrada && kGrid.permisos['agregar'])?
-                kGrid.permisos['agregar'] : kGrid.permisos['guardar'];
+            var guardar = (nueva_entrada && kGrid.permisos[$.kui.i18n.inputs.add])?
+                kGrid.permisos[$.kui.i18n.inputs.add] : kGrid.permisos['guardar'];
 
             if(nueva_entrada){
 
@@ -253,7 +253,7 @@
 
                 if(campo.tipo==='booleano'){
 
-                    $.kui.formulario.nuevo_elemento(false,view,item,campo);
+                    $.kui.form.newElement(false,view,item,campo);
 
                     cell.find('[data-rol=input]')
                         .prop('disabled',!campo.editonly)
@@ -281,7 +281,7 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href',kGrid.enlace_dummy)
+                        .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
@@ -307,7 +307,7 @@
                                 .appendTo(cell)
                                 .hide();
 
-                            $.kui.formulario.nuevo_elemento(false,formItem,item,campo);
+                            $.kui.form.newElement(false,formItem,item,campo);
 
                             if(campo.tipo==='booleano'){
                                 formItem.removeClass('checkbox')
@@ -320,10 +320,10 @@
 
                             formItem.validate({
                                 showErrors: function(errorMap, errorList) {
-                                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                                    $.kui.form.validar.error(this, errorMap, errorList);
                                 },
                                 submitHandler: function(form) {
-                                    $.kui.formulario.validar.fecha(form);
+                                    $.kui.form.validar.fecha(form);
                                     var ready = $('#'+pk).data('ready');
                                     $('#'+pk).data('ready',++ready);
                                     return false;
@@ -533,7 +533,7 @@
                     };
                 }else{
                     var div_context = $('<div>')
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('kui-dropdown')
                         .appendTo('body');
 
@@ -542,7 +542,7 @@
                         .addClass('dropdown-menu')
                         .appendTo(div_context);
 
-                    var btn = crear_boton($.kui.random_id(),'Acciones','angle-down','primary');
+                    var btn = crear_boton($.kui.randomId(),'Acciones','angle-down','primary');
                     
                     btn.attr('data-toggle','dropdown')
                         .attr('aria-haspopup',true)
@@ -550,7 +550,7 @@
                         .appendTo(botones);
                     
                     var div_dropdown = btn.parent()
-                        .attr('id',$.kui.random_id())
+                        .attr('id',$.kui.randomId())
                         .addClass('dropdown kui-dropdown');
 
                     var ul = ul_context.clone()
@@ -599,9 +599,9 @@
 
                 $.each(kGrid.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
-                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kGrid.enlace_dummy);
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
                         
                         if(boton.onclick!==undefined){
                             btn.click(function(e){

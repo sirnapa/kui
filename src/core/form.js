@@ -6,12 +6,12 @@
 
 (function ($) {
 
-  $.kui.formulario = {
+  $.kui.form = {
 
-    nuevo_elemento: function(soloLectura,elemento,item,campo){
+    newElement: function(readOnly,element,item,field){
 
       /*
-       * Tipos de campo:
+       * Tipos de field:
        * - texto (no hace falta aclarar, es el tipo por defecto)
        * - booleano
        * - numero (enteros)
@@ -37,73 +37,73 @@
        */
 
        var input;
-       soloLectura = soloLectura || campo.soloLectura;
-       var valorInput  = $.kui.data.format(
-        item,campo.nombre,campo.formato,campo.opciones,soloLectura
+       readOnly = readOnly || field.soloLectura;
+       var inputVal  = $.kui.data.format(
+        item,field.nombre,field.formato,field.opciones,readOnly
        );
 
-       var crear_input_select = function(tipo){
+       var newInputSelect = function(type){
 
-          return $('<'+tipo+'>').addClass('form-control')
+          return $('<'+type+'>').addClass('form-control')
               .attr('data-rol','input')
-              .attr('name',campo.nombre)
+              .attr('name',field.nombre)
               .attr('placeholder',
-                  campo.placeholder===undefined?
-                  campo.titulo : campo.placeholder)
+                  field.placeholder===undefined?
+                  field.titulo : field.placeholder)
               .attr('title',
-                  campo.mensaje===undefined?
-                  'El formato ingresado no es correcto para ' + campo.titulo : campo.mensaje)
-              .val(valorInput)
-              .prop('required',campo.requerido);
+                  field.mensaje===undefined?
+                  'El formato ingresado no es correcto para ' + field.titulo : field.mensaje)
+              .val(inputVal)
+              .prop('required',field.requerido);
        };
 
-       var crear_input = function(icono){
+       var newInput = function(icono){
 
-          if(campo.icono!==undefined){
-              icono=campo.icono;
+          if(field.icono!==undefined){
+              icono=field.icono;
           }
 
-          var nuevo_input = crear_input_select('input');
+          var input = newInputSelect('input');
 
-          if(campo.simple){
-            nuevo_input.appendTo(elemento);
+          if(field.simple){
+            input.appendTo(element);
           }else{
             var inputGroup = $('<div>').addClass('input-group')
-              .appendTo(elemento);
+              .appendTo(element);
 
             $('<span>').addClass('input-group-addon')
                 .html('<i class="fa fa-' + icono + '"></i>')
                 .appendTo(inputGroup);
 
-            nuevo_input.appendTo(inputGroup);
+            input.appendTo(inputGroup);
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       var crear_select = function(){
-          var nuevo_input = crear_input_select(soloLectura?
+       var newSelect = function(){
+          var select = newInputSelect(readOnly?
               'input' : 'select');
-          nuevo_input.attr('name',campo.nombre+'.'+campo.opciones.id);
-          nuevo_input.appendTo(elemento);
+          select.attr('name',field.nombre+'.'+field.opciones.id);
+          select.appendTo(element);
 
-          if(!soloLectura){
+          if(!readOnly){
               var opciones = [];
 
-              if(typeof campo.opciones.origen === 'string'){
+              if(typeof field.opciones.origen === 'string'){
                   $.ajax({
-                      type: campo.opciones.ajax,
-                      url: campo.opciones.origen,
-                      data: campo.opciones.data===undefined?
+                      type: field.opciones.ajax,
+                      url: field.opciones.origen,
+                      data: field.opciones.data===undefined?
                       {
                           _search: false,
                           filters: null,
                           page:    1,
                           rows:    10,
-                          sidx:    campo.opciones.id,
+                          sidx:    field.opciones.id,
                           sord:    'asc',
                           todos:   true
-                      } : campo.opciones.data,
+                      } : field.opciones.data,
                       success: function(retorno){ 
                           if (!retorno.error) {
                               opciones = retorno.respuesta.datos;
@@ -112,22 +112,22 @@
                       async: false
                   });
               }else{
-                  opciones = campo.opciones.origen;
+                  opciones = field.opciones.origen;
               }
 
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
                   var item = $('<option>')
-                      .attr('value',opcion[campo.opciones.id])
+                      .attr('value',opcion[field.opciones.id])
                       .html(
-                          typeof campo.opciones.formato==='function'?
-                          campo.opciones.formato.call(this,opcion) 
-                          : opcion[campo.opciones.formato]
+                          typeof field.opciones.formato==='function'?
+                          field.opciones.formato.call(this,opcion) 
+                          : opcion[field.opciones.formato]
                       )
-                      .appendTo(nuevo_input);
+                      .appendTo(select);
                   
-                  if(valorInput.toString()===opcion[campo.opciones.id].toString()){
+                  if(inputVal.toString()===opcion[field.opciones.id].toString()){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
@@ -136,16 +136,16 @@
               if(!seleccionado){
                   $('<option>').attr('value','').html('')
                       .attr('selected',true)
-                      .prependTo(nuevo_input);
+                      .prependTo(select);
               }
 
-              nuevo_input.combobox();    
+              select.combobox();    
           }
 
-          return nuevo_input;
+          return select;
        };
 
-       var conf_fecha_hora = {
+       var confDateTime = {
           'fecha': {
                   icono: 'calendar',
                   formato: 'dd/MM/yyyy',
@@ -165,20 +165,20 @@
               }
        };
 
-       var crear_combo_fecha_hora = function(tipo){
+       var newDateTimeCombobox = function(type){
           // Los datetimepicker siempre deberán tener íconos
-          campo.simple = false;
+          field.simple = false;
 
-          var nuevo_input = crear_input(conf_fecha_hora[tipo].icono);
-          var inputGroup = nuevo_input.parent();
+          var input = newInput(confDateTime[type].icono);
+          var inputGroup = input.parent();
           inputGroup.addClass('date');
 
-          nuevo_input.attr('data-format',conf_fecha_hora[tipo].formato)
+          input.attr('data-format',confDateTime[type].formato)
               .attr('type','text')
-              .attr('data-rule-'+conf_fecha_hora[tipo].rule,true)
+              .attr('data-rule-'+confDateTime[type].rule,true)
               .prependTo(inputGroup);
 
-          if(!soloLectura){
+          if(!readOnly){
               inputGroup.find('.input-group-addon').addClass('add-on')
                 .find('i').attr({
                   'data-time-icon': 'fa fa-clock-o',
@@ -186,7 +186,7 @@
                 });
 
               var constructor = {language: "es",autoclose: true};
-              $.extend(constructor,conf_fecha_hora[tipo].constructor);
+              $.extend(constructor,confDateTime[type].constructor);
               inputGroup.datetimepicker(constructor);
 
               var widgets = $('.bootstrap-datetimepicker-widget.dropdown-menu');
@@ -198,71 +198,71 @@
               widgets.find('th.next').html($('<i>').addClass('fa fa-chevron-right').css('font-size','0.5em'));
           }
 
-          return nuevo_input;
+          return input;
        };
 
-       switch(campo.tipo) {
+       switch(field.tipo) {
 
           case 'booleano':
-              input = crear_input_select('input');
-              input.appendTo(elemento);
+              input = newInputSelect('input');
+              input.appendTo(element);
               input.prop('type','checkbox');
-              input.prop('checked',valorInput);
+              input.prop('checked',inputVal);
               input.removeClass('form-control');
-              elemento.addClass('checkbox');
+              element.addClass('checkbox');
           break;
 
           case 'numero':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
           break;
 
           case 'decimal':
-              input = crear_input('circle-thin');
+              input = newInput('circle-thin');
               input.attr('type','number');
               input.attr('step','any');
           break;
 
           case 'archivo':
-              input = crear_input('file');
+              input = newInput('file');
               input.attr('type','file');
               //kForm.form.attr('enctype','multipart/form-data');
           break;
 
           case 'combo':
-              input = crear_select();
+              input = newSelect();
           break;
 
           case 'fecha':
-              input = crear_combo_fecha_hora('fecha');
+              input = newDateTimeCombobox('fecha');
           break;
 
           case 'hora':
-              input = crear_combo_fecha_hora('hora');
+              input = newDateTimeCombobox('hora');
           break;
 
           case 'fecha-hora':
-              input = crear_combo_fecha_hora('fecha-hora');
+              input = newDateTimeCombobox('fecha-hora');
           break;
 
           default:
               /* Tipo texto */
-              input = crear_input('align-right');
+              input = newInput('align-right');
               input.attr('type','text');
           break;
       }
 
-      if(campo.atributos!==undefined){
-          $.each(campo.atributos,function(atributo,valor){
+      if(field.atributos!==undefined){
+          $.each(field.atributos,function(atributo,valor){
               input.attr(atributo,valor);
           });
           
-          var campos_especiales = ['disabled','readonly'];
-          $.each(campos_especiales,function(e,especial){
-              if(campo.atributos[especial]==='false'){
+          var fields_especiales = ['disabled','readonly'];
+          $.each(fields_especiales,function(e,especial){
+              if(field.atributos[especial]==='false'){
                   input.removeAttr(especial);
               }
-              input.attr('data-'+especial,campo.atributos[especial]);
+              input.attr('data-'+especial,field.atributos[especial]);
           });
       }
     },

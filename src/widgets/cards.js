@@ -138,8 +138,8 @@
             var nueva_entrada = item===undefined;
             var pk = 'kCard_' + kCard.div.id + '_' + 
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
-            var guardar = (nueva_entrada && kCard.permisos['agregar'])?
-                kCard.permisos['agregar'] : kCard.permisos['guardar'];
+            var guardar = (nueva_entrada && kCard.permisos[$.kui.i18n.inputs.add])?
+                kCard.permisos[$.kui.i18n.inputs.add] : kCard.permisos['guardar'];
 
             var formGroup = $('<div>').attr('id',pk)
                 .attr('data-pk',item[kCard.id])
@@ -233,7 +233,7 @@
                     var boton = $('<a>').attr('id', pk + '_' + id)
                         .addClass('text-muted kaccion')
                         .attr('title',titulo)
-                        .attr('href',kCard.enlace_dummy)
+                        .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
                         .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
@@ -333,14 +333,14 @@
                                 });
                             };
 
-                        $.kui.formulario.validar.reglas();
+                        $.kui.form.validar.reglas();
 
                         $(izquierda).validate({
                             showErrors: function(errorMap, errorList) {
-                                $.kui.formulario.validar.error(this, errorMap, errorList);
+                                $.kui.form.validar.error(this, errorMap, errorList);
                             },
                             submitHandler: function(form) {
-                                $.kui.formulario.validar.fecha(form);
+                                $.kui.form.validar.fecha(form);
                                 
                                 deshabilitar_edicion();
                                 var dato = {};
@@ -425,9 +425,9 @@
 
                 $.each(kCard.botones,function(b,boton){
                     if(typeof boton.mostrar !== 'function' || boton.mostrar.call(this,item)){
-                        var btn = crear_boton($.kui.random_id(),boton.comentario,boton.icono,'primary');
+                        var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
-                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : kCard.enlace_dummy);
+                        btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
                         
                         if(boton.onclick!==undefined){
                             btn.click(function(e){

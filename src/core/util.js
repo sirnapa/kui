@@ -7,7 +7,7 @@
 (function ($) {
 
   // Generate random ID
-  $.kui.random_id = function() {
+  $.kui.randomId = function() {
     return 'xxxx-xxxx-xxxx'.replace(/[x]/g,
       function(c) {
         var r = Math.random() * 16 | 0,
@@ -16,32 +16,35 @@
       }).toUpperCase();
   };
 
+  // Dummy link
+  $.kui.dummyLink = 'javascript'+':'.toLowerCase()+'void(0)';
+
   // Data & Format
   $.kui.data = {
 
-  	format: function(item,nombre,formato,combo,soloLectura){
+  	format: function(item,name,format,combobox,readOnly){
 
-  		if(combo){
-          var subvalor = function(dato,nivel_1,nivel_2){
-            return dato[nivel_1]? dato[nivel_1][nivel_2] : 
-                   (dato[nivel_1+'.'+nivel_2]? 
-                    dato[nivel_1+'.'+nivel_2] : '');
+  		if(combobox){
+          var value = function(data,level1,level2){
+            return data[level1]? data[level1][level2] : 
+                   (data[level1+'.'+level2]? 
+                    data[level1+'.'+level2] : '');
           };
 
-          if(soloLectura){
-            return typeof combo.formato==='function'? 
-                combo.formato.call(this,
-                  item[nombre]?
-                  item[nombre] : 
-                  item[nombre+'.'+combo.id]) :
-                subvalor(item,nombre,combo.formato);
+          if(readOnly){
+            return typeof combobox.formato==='function'? 
+                combobox.formato.call(this,
+                  item[name]?
+                  item[name] : 
+                  item[name+'.'+combobox.id]) :
+                value(item,name,combobox.formato);
           }else{
-          	return subvalor(item,nombre,combo.id);
+          	return value(item,name,combobox.id);
           }
     	}
 
-        return typeof formato === 'function'?
-            formato.call(this,item[nombre],item) : item[nombre];
+        return typeof format === 'function'?
+            format.call(this,item[name],item) : item[name];
     }
 
   };

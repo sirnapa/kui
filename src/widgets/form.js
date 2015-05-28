@@ -38,7 +38,7 @@
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
         this.load_complete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
-        this.soloLectura = dato.soloLectura===undefined? false : dato.soloLectura;
+        this.readOnly = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
         
@@ -102,7 +102,7 @@
             var item = kForm.dato;
 
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
-            if(kForm.soloLectura){
+            if(kForm.readOnly){
                 kForm.fieldset.attr('disabled',true);
             }
             
@@ -128,7 +128,7 @@
                 var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                $.kui.formulario.nuevo_elemento(kForm.soloLectura,centro,item,campo);                         
+                $.kui.form.newElement(kForm.readOnly,centro,item,campo);                         
             });
             
             $(kForm.div).data('dato',kForm.dato);
@@ -160,7 +160,7 @@
                 kForm.form.submit();
             });
 
-            $.kui.formulario.validar.reglas();
+            $.kui.form.validar.reglas();
 
             var afterSubmit = typeof kForm.after_submit === 'function'?
                 function(retorno){
@@ -189,10 +189,10 @@
 
             $(kForm.form).validate({
                 showErrors: function(errorMap, errorList) {
-                    $.kui.formulario.validar.error(this, errorMap, errorList);
+                    $.kui.form.validar.error(this, errorMap, errorList);
                 },
                 submitHandler: function(form) {
-                    $.kui.formulario.validar.fecha(form);
+                    $.kui.form.validar.fecha(form);
                     on_submit();
                     return false;
                 }
