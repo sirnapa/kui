@@ -1,6 +1,6 @@
 /*
  *
- *   +++++++++++++++++++++ List +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ List +++++++++++++++++++++
  *
  */
 
@@ -14,7 +14,7 @@
          *      {Object} constructor
          *      {Object} instances
          *      {Object} data
-         *      {Object} aux 
+         *      {Object} aux
          * }
          */
     	actions: function(o){
@@ -71,7 +71,7 @@
                         if(o.aux===undefined){
                             return;
                         }
-                        
+
                         var groupOp = 'AND';
                         if(o.aux.groupOp!==undefined){
                             groupOp=o.aux.groupOp;
@@ -83,7 +83,7 @@
                                 'data': (campo.data!==undefined)? campo.data : o.aux.data,
                                 'op': (campo.op!==undefined)? campo.op : 'cn'
                             });
-                        });  
+                        });
                         instance.setData({
                             _search: true,
                             filters: JSON.stringify({
@@ -102,7 +102,7 @@
                         break;
                     default:
                         return;
-                }	
+                }
             }else{
                 var newList = new o.constructor(o.element,o.data);
                 o.instances[o.element.id] = newList;
@@ -119,13 +119,13 @@
          * }
          */
         params: function(o){
-        
-            /* 
+
+            /*
              * Required params
              */
 
-            if( o.params[$.kui.i18n.source]===undefined || 
-                o.params[$.kui.i18n.id]===undefined || 
+            if( o.params[$.kui.i18n.source]===undefined ||
+                o.params[$.kui.i18n.id]===undefined ||
                 o.params[$.kui.i18n.fields]===undefined){
                 window.console.error(
                     'The params ' +
@@ -136,7 +136,7 @@
                 );
                 return;
             }
-            
+
             /*
              * Optional params
              */
@@ -146,42 +146,41 @@
             finalParams[$.kui.i18n.titles] = true;
             finalParams[$.kui.i18n.serviceFormat] = {};
             finalParams[$.kui.i18n.buttons] = [];
+            finalParams[$.kui.i18n.data] = {
+							_search:false,
+							filters:null,
+							page:1,
+							rows:o.rows,
+							sidx:o.params.id,
+							sord:'asc',
+							todos:false
+						};
 
-             var data_final = {
-                _search:false,
-                filters:null,
-                page:1,
-                rows:o.rows,
-                sidx:o.params.id,
-                sord:'asc', 
-                todos:false
-            };
+						window.console.log('+++++++++++++++++++++++',o.div.id,'+++++++++++++++++++++++');
+						$.each(finalParams[$.kui.i18n.data],function(key,value){
+							window.console.log(key,value);
+						});
 
-            $.extend(data_final,o.params[$.kui.i18n.data]);
-            finalParams[$.kui.i18n.data] = data_final;
-            
-            var permisos_finales = {};
-            permisos_finales[$.kui.i18n.add] = null;
-            permisos_finales[$.kui.i18n.edit] = null;
-            permisos_finales[$.kui.i18n.save] =  null;
-            permisos_finales[$.kui.i18n.activate] = null;
-            permisos_finales[$.kui.i18n.remove] = null;
+            var finalPass = {};
+            finalPass[$.kui.i18n.add] = null;
+            finalPass[$.kui.i18n.edit] = null;
+            finalPass[$.kui.i18n.save] =  null;
+            finalPass[$.kui.i18n.activate] = null;
+            finalPass[$.kui.i18n.remove] = null;
+            finalParams[$.kui.i18n.pass] = finalPass;
 
-            $.extend(permisos_finales,o.params[$.kui.i18n.pass]);
-            finalParams[$.kui.i18n.pass] = permisos_finales;
-            
             if(o.params[$.kui.i18n.pager]===undefined){
                 o.params[$.kui.i18n.pager] = $('<div>')
                     .addClass('text-center')
                     .appendTo(o.div);
             }
-                    
+
             /*var retorno_final = {
-                lista: 'lista',                    
+                lista: 'lista',
                 pagina: 'pagina',
                 totalDatos: 'totalDatos'
             }
-            
+
             $.each(o.params[$.kui.i18n.sourceFormat],function(key,value){
                 retorno_final[key] = value;
             });*/
@@ -207,22 +206,22 @@
                 o.list.checkall = $('<input>');
             }
 
-            $.extend(finalParams,o.params);
+            $.extend(true,finalParams,o.params);
 
             $.extend(o.list,{
                 div : o.div,
                 source : finalParams[$.kui.i18n.source],
                 data : finalParams[$.kui.i18n.data],
                 id : finalParams[$.kui.i18n.id],
-                mostrar_titulos : finalParams[$.kui.i18n.titles],
+                showTitles : finalParams[$.kui.i18n.titles],
                 campos : finalParams[$.kui.i18n.fields],
                 ajax : finalParams[$.kui.i18n.ajax],
                 permisos : finalParams[$.kui.i18n.pass],
                 botones : finalParams[$.kui.i18n.buttons],
                 estado : finalParams[$.kui.i18n.state],
                 //retorno : finalParams[$.kui.i18n.sourceFormat],
-                load_complete : finalParams[$.kui.i18n.loadComplete],
-                paginador : finalParams[$.kui.i18n.pager],
+                loadComplete : finalParams[$.kui.i18n.loadComplete],
+                pager : finalParams[$.kui.i18n.pager],
                 onclick : finalParams[$.kui.i18n.onclick],
                 ondblclick : finalParams[$.kui.i18n.ondblclick],
                 seleccionable : finalParams[$.kui.i18n.selectable],
@@ -230,27 +229,29 @@
                 preseleccionados : finalParams[$.kui.i18n.selected],
                 nuevos : 0
             });
-                    
+
+						window.console.log(o.list.data);
+
             $.kui.list.load_estilos();
-            $.kui.list.load_paginador(o.list);
+            $.kui.list.loadPager(o.list);
             o.list.titulos();
             o.list.load();
-            
+
             $(o.div).on('reloadGrid',function(){
                 $.kui.instances.kgrid[o.list.id].load();
             });
-            
+
         },
 
-        load_paginador : function(list){
-            if(!$(list.paginador).length){
+        loadPager : function(list){
+            if(!$(list.pager).length){
                 return;
             }
             var pk = 'kui_' + list.div.id + '_';
-            var contenedor = $('<div>').attr('id',pk+'paginador')
-                .addClass('kui-paginador btn-group')
-                .appendTo(list.paginador);
-            
+            var contenedor = $('<div>').attr('id',pk+$.kui.i18n.pager)
+                .addClass('kui-pager btn-group')
+                .appendTo(list.pager);
+
             $('<button>').attr('id',pk+'primera_pagina')
                 .attr('type','button')
                 .addClass('btn btn-default')
@@ -259,7 +260,7 @@
                 .click(function(){
                     $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.first);
                 });
-                
+
            $('<button>').attr('id',pk+'pagina_anterior')
                 .attr('type','button')
                 .addClass('btn btn-default')
@@ -268,10 +269,10 @@
                 .click(function(){
                     $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.prev);
                 });
-        
+
           var alto = $('#'+pk+'pagina_anterior').outerHeight();
           var ancho = $('#'+pk+'pagina_anterior').outerWidth();
-          
+
           var centro = $('<div>').addClass('btn btn-default kpagina')
                 .css('height',alto>0? alto : 34)
                 .appendTo(contenedor);
@@ -298,7 +299,7 @@
           var totalPaginas = $('<label>').html(' de ').appendTo(centro);
           $('<span>').attr('id',pk+'totalPaginas')
             .appendTo(totalPaginas);
-                
+
           $('<button>').attr('id',pk+'siguiente_pagina')
                 .attr('type','button')
                 .addClass('btn btn-default')
@@ -307,7 +308,7 @@
                 .click(function(){
                     $('#'+list.div.id).kui(list.name,$.kui.i18n.page,$.kui.i18n.next);
                 });
-                
+
            $('<button>').attr('id',pk+'ultima_pagina')
                 .attr('type','button')
                 .addClass('btn btn-default')
@@ -339,7 +340,7 @@
                 return;
             }
             var reglas = {
-                '.kui-list .kbtn': 
+                '.kui-list .kbtn':
                         [
                             'cursor: pointer'
                         ],
