@@ -1,6 +1,6 @@
 /*
  *
- *   +++++++++++++++++++++ Form +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ Form +++++++++++++++++++++
  *
  */
 
@@ -15,7 +15,7 @@
        * - texto (no hace falta aclarar, es el tipo por defecto)
        * - booleano
        * - numero (enteros)
-       * - decimal 
+       * - decimal
        * - archivo
        * - combo (requiere que se envíe "campo.opciones", que es un objeto que contiene:
                   * origen (requerido, puede ser una URL a un servicio o un array de objetos)
@@ -36,7 +36,7 @@
        * - fecha-hora
        */
 
-       
+
        readOnly = readOnly || field.soloLectura;
        if(create && field.atributos!==undefined && field.atributos['data-creable']){
         readOnly = false;
@@ -114,7 +114,7 @@
                           sord:    'asc',
                           todos:   true
                       } : field.opciones.data,
-                      success: function(retorno){ 
+                      success: function(retorno){
                           if (!retorno.error) {
                               opciones = retorno.respuesta.datos;
                           }
@@ -129,23 +129,24 @@
 
               $.each(opciones,function(o,opcion){
                   var item = $('<option>');
+                  var id = '';
 
                   if(stringOnly){
+                    id = opcion.toString();
                     item.html(opcion);
                   }else{
-                    item.attr('value',opcion[field.opciones.id])
+                    id = opcion[field.opciones.id];
+                    item.attr('value',id)
                       .html(
                         typeof field.opciones.formato==='function'?
-                          field.opciones.formato.call(this,opcion) 
+                          field.opciones.formato.call(this,opcion)
                           : opcion[field.opciones.formato]
                       );
                   }
-                     
+
                   item.appendTo(select);
-                  
-                  if( inputVal.toString() === 
-                      (stringOnly? opcion : opcion[field.opciones.id].toString())
-                    ){
+
+                  if( inputVal && inputVal.toString() === id){
                       item.attr('selected',true);
                       seleccionado = true;
                   }
@@ -157,7 +158,7 @@
                       .prependTo(select);
               }
 
-              select.combobox();    
+              select.combobox();
           }
 
           return select;
@@ -167,7 +168,7 @@
           'fecha': {
                   icono: 'calendar',
                   formato: 'dd/MM/yyyy',
-                  rule: 'date', 
+                  rule: 'date',
                   constructor: {pickTime: false}
               },
           'hora': {
@@ -277,7 +278,7 @@
       }
 
       if(readOnly){
-        input.attr(field.tipo==='booleano'? 
+        input.attr(field.tipo==='booleano'?
           'disabled':'readonly',true);
       }
 
@@ -299,8 +300,8 @@
                   var mm = parseInt(adata[1],10);
                   var aaaa = parseInt(adata[2],10);
                   var xdata = new Date(aaaa,mm-1,gg);
-                  if ( ( xdata.getFullYear() === aaaa ) && 
-                       ( xdata.getMonth () === mm - 1 ) && 
+                  if ( ( xdata.getFullYear() === aaaa ) &&
+                       ( xdata.getMonth () === mm - 1 ) &&
                        ( xdata.getDate() === gg ) ){
                     check = true;
                   } else{
@@ -352,7 +353,7 @@
               };
               if (fechaVal.indexOf('/') > 0){
                   fechaArray = fechaVal.split('/');
-              } else {                
+              } else {
                   fechaArray = fechaVal.split('-');
                   fechaFormato.yyyy = 0;
                   fechaFormato.dd = 2;

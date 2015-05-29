@@ -36,7 +36,7 @@
         this.origen = dato.origen;
         this.ajax_origen = dato.ajaxOrigen===undefined? 'GET' : dato.ajaxOrigen;
         this.ajax_submit = dato.ajaxSubmit===undefined? 'POST' : dato.ajaxSubmit;
-        this.load_complete = dato.loadComplete;
+        this.loadComplete = dato.loadComplete;
         this.boton_submit = dato.botonSubmit;
         this.readOnly = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
@@ -131,8 +131,8 @@
 
             kForm.funcion_submit();
                 
-            if(typeof kForm.load_complete === 'function'){
-                kForm.load_complete.call(this,kForm.dato);
+            if(typeof kForm.loadComplete === 'function'){
+                kForm.loadComplete.call(this,kForm.dato);
             }
         
         },

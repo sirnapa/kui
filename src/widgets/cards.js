@@ -111,8 +111,8 @@
                         $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
                     }
             
-                    if(typeof kCard.load_complete === 'function'){
-                        kCard.load_complete.call(this,retorno);
+                    if(typeof kCard.loadComplete === 'function'){
+                        kCard.loadComplete.call(this,retorno);
                     }
                 },
                 async: false
