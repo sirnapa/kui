@@ -133,7 +133,7 @@
 
                   if(stringOnly){
                     id = opcion.toString();
-                    item.html(opcion);
+                    item.html(opcion).attr('value',opcion);
                   }else{
                     id = opcion[field.opciones.id];
                     item.attr('value',id)

@@ -156,11 +156,6 @@
 							todos:false
 						};
 
-						window.console.log('+++++++++++++++++++++++',o.div.id,'+++++++++++++++++++++++');
-						$.each(finalParams[$.kui.i18n.data],function(key,value){
-							window.console.log(key,value);
-						});
-
             var finalPass = {};
             finalPass[$.kui.i18n.add] = null;
             finalPass[$.kui.i18n.edit] = null;
@@ -229,8 +224,6 @@
                 preseleccionados : finalParams[$.kui.i18n.selected],
                 nuevos : 0
             });
-
-						window.console.log(o.list.data);
 
             $.kui.list.load_estilos();
             $.kui.list.loadPager(o.list);
