@@ -1,5 +1,5 @@
 function validacion(paso){
-	console.log('Validación global de pasos');
+	console.log('Validación global >>> Paso', paso );
 	return true;
 }
 

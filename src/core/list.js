@@ -156,11 +156,6 @@
 							todos:false
 						};
 
-						window.console.log('+++++++++++++++++++++++',o.div.id,'+++++++++++++++++++++++');
-						$.each(finalParams[$.kui.i18n.data],function(key,value){
-							window.console.log(key,value);
-						});
-
             var finalPass = {};
             finalPass[$.kui.i18n.add] = null;
             finalPass[$.kui.i18n.edit] = null;
@@ -230,15 +225,13 @@
                 nuevos : 0
             });
 
-						window.console.log(o.list.data);
-
             $.kui.list.load_estilos();
             $.kui.list.loadPager(o.list);
             o.list.titulos();
             o.list.load();
 
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].load();
+								$('#'+o.list.div.id).kui(o.list.name,$.kui.i18n.reload);
             });
 
         },
