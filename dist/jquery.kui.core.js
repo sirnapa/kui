@@ -1,4 +1,4 @@
-/*! kui - v0.2.1 - 2015-06-01
+/*! kui - v0.2.1 - 2015-06-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -706,7 +706,7 @@
             o.list.load();
 
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].load();
+								$('#'+o.list.div.id).kui(o.list.name,$.kui.i18n.reload);
             });
 
         },

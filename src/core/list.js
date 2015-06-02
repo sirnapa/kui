@@ -231,7 +231,7 @@
             o.list.load();
 
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].load();
+								$('#'+o.list.div.id).kui(o.list.name,$.kui.i18n.reload);
             });
 
         },
