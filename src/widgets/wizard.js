@@ -1,6 +1,6 @@
 /*
  *
- *   +++++++++++++++++++++ Wizard +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ Wizard +++++++++++++++++++++
  *
  */
 
@@ -8,17 +8,17 @@
 
     // Instances
     $.kui.instances.wizard = {};
-    
+
     // Widget definition.
     $.kui.widgets.wizard = function (data) {
         return $.kui.instances.wizard[this.id] = new KWizard(this,data);
     };
-    
+
     var KWizard = function(div,params){
-        
+
         if( params[$.kui.i18n.steps]===undefined){
             window.console.error(
-                'The param ' + 
+                'The param ' +
                 '"' + $.kui.i18n.steps + '"' +
                 ' is required.'
             );
@@ -37,11 +37,11 @@
         this.div = div;
         this.load();
     };
-    
+
     KWizard.prototype = {
-    		        
+
         load : function() {
-            
+
             var kWizard = this;
             var wizard = $(kWizard.div);
 
@@ -71,15 +71,15 @@
                     .appendTo($('<nav>').appendTo(wizard));
             }
 
-            kWizard.pager.prev = kWizard.prev? 
-                $(kWizard.prev) : 
+            kWizard.pager.prev = kWizard.prev?
+                $(kWizard.prev) :
                 $('<button>').addClass('btn btn-default')
                     .html($.kui.i18n.prevMsg)
                     .appendTo($('<li>').appendTo(kWizard.pager.container))
                     .after('&nbsp;');
 
-            kWizard.pager.next = kWizard.next? 
-                $(kWizard.next) : 
+            kWizard.pager.next = kWizard.next?
+                $(kWizard.next) :
                 $('<button>').addClass('btn btn-primary')
                     .html($.kui.i18n.nextMsg)
                     .appendTo($('<li>').appendTo(kWizard.pager.container))
@@ -92,21 +92,21 @@
 
             kWizard.pager.next.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                if(kWizard.validate(step)){
+                if(kWizard.stepValid(step)){
                     kWizard.showStep(step+1);
                 }
             });
-            
+
             if(typeof kWizard.loadComplete === 'function'){
                 kWizard.loadComplete.call(this);
             }
 
             kWizard.showStep(1);
             wizard.fadeIn();
-            
+
         },
 
-        validate: function(step){
+        stepValid: function(step){
 
             var kWizard = this;
             var success = true;
@@ -120,7 +120,7 @@
         },
 
         showStep: function(step){
-            
+
             var kWizard = this;
             var wizard = $(kWizard.div);
             var currentStep = wizard.find('[data-wizard-step][data-step="'+step+'"]');
@@ -149,5 +149,5 @@
         }
 
     };
-    
+
 }(jQuery));

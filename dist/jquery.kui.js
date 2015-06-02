@@ -1,4 +1,4 @@
-/*! kui - v0.2.1 - 2015-05-29
+/*! kui - v0.2.1 - 2015-06-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -171,7 +171,7 @@
 
                   if(stringOnly){
                     id = opcion.toString();
-                    item.html(opcion);
+                    item.html(opcion).attr('value',opcion);
                   }else{
                     id = opcion[field.opciones.id];
                     item.attr('value',id)
@@ -631,11 +631,6 @@
 							todos:false
 						};
 
-						window.console.log('+++++++++++++++++++++++',o.div.id,'+++++++++++++++++++++++');
-						$.each(finalParams[$.kui.i18n.data],function(key,value){
-							window.console.log(key,value);
-						});
-
             var finalPass = {};
             finalPass[$.kui.i18n.add] = null;
             finalPass[$.kui.i18n.edit] = null;
@@ -705,15 +700,13 @@
                 nuevos : 0
             });
 
-						window.console.log(o.list.data);
-
             $.kui.list.load_estilos();
             $.kui.list.loadPager(o.list);
             o.list.titulos();
             o.list.load();
 
             $(o.div).on('reloadGrid',function(){
-                $.kui.instances.kgrid[o.list.id].load();
+								$('#'+o.list.div.id).kui(o.list.name,$.kui.i18n.reload);
             });
 
         },
@@ -961,21 +954,17 @@
 
     source : function(source,sourceAjax,sourceData){
 
-      window.console.log('source',source);
-      window.console.log('sourceAjax',sourceAjax);
-      window.console.log('sourceData',sourceData);
-
       var data = {};
 
       if(source===undefined){
           data = {};
       }else if(typeof source === 'string'){
-      
+
           $.ajax({
               type: sourceAjax,
               url: source,
               data: sourceData,
-              success: function(remoteData){ 
+              success: function(remoteData){
                   if (!remoteData.error) {
                       data = remoteData;
                   }
@@ -987,8 +976,6 @@
           data = source;
       }
 
-      window.console.log('* final data ',data);
-
       return data;
     },
 
@@ -996,10 +983,10 @@
 
   		if(combobox && combobox.id && combobox.formato){
           if(readOnly){
-            return typeof combobox.formato==='function'? 
+            return typeof combobox.formato==='function'?
                 combobox.formato.call(this,
                   item[name]?
-                  item[name] : 
+                  item[name] :
                   item[name+'.'+combobox.id]) :
                 $.kui.data.valueFromJson(item,name,combobox.formato);
           }else{
@@ -1012,14 +999,15 @@
     },
 
     valueFromJson: function(data,level1,level2){
-      return data[level1]? data[level1][level2] : 
-             (data[level1+'.'+level2]? 
+      return data[level1]? data[level1][level2] :
+             (data[level1+'.'+level2]?
               data[level1+'.'+level2] : '');
     }
 
   };
 
 }(jQuery));
+
 (function ($) {
 
     // Instances
@@ -2245,17 +2233,17 @@
 
     // Instances
     $.kui.instances.wizard = {};
-    
+
     // Widget definition.
     $.kui.widgets.wizard = function (data) {
         return $.kui.instances.wizard[this.id] = new KWizard(this,data);
     };
-    
+
     var KWizard = function(div,params){
-        
+
         if( params[$.kui.i18n.steps]===undefined){
             window.console.error(
-                'The param ' + 
+                'The param ' +
                 '"' + $.kui.i18n.steps + '"' +
                 ' is required.'
             );
@@ -2274,11 +2262,11 @@
         this.div = div;
         this.load();
     };
-    
+
     KWizard.prototype = {
-    		        
+
         load : function() {
-            
+
             var kWizard = this;
             var wizard = $(kWizard.div);
 
@@ -2308,15 +2296,15 @@
                     .appendTo($('<nav>').appendTo(wizard));
             }
 
-            kWizard.pager.prev = kWizard.prev? 
-                $(kWizard.prev) : 
+            kWizard.pager.prev = kWizard.prev?
+                $(kWizard.prev) :
                 $('<button>').addClass('btn btn-default')
                     .html($.kui.i18n.prevMsg)
                     .appendTo($('<li>').appendTo(kWizard.pager.container))
                     .after('&nbsp;');
 
-            kWizard.pager.next = kWizard.next? 
-                $(kWizard.next) : 
+            kWizard.pager.next = kWizard.next?
+                $(kWizard.next) :
                 $('<button>').addClass('btn btn-primary')
                     .html($.kui.i18n.nextMsg)
                     .appendTo($('<li>').appendTo(kWizard.pager.container))
@@ -2329,21 +2317,21 @@
 
             kWizard.pager.next.click(function(){
                 var step = parseInt(wizard.attr('data-step'));
-                if(kWizard.validate(step)){
+                if(kWizard.stepValid(step)){
                     kWizard.showStep(step+1);
                 }
             });
-            
+
             if(typeof kWizard.loadComplete === 'function'){
                 kWizard.loadComplete.call(this);
             }
 
             kWizard.showStep(1);
             wizard.fadeIn();
-            
+
         },
 
-        validate: function(step){
+        stepValid: function(step){
 
             var kWizard = this;
             var success = true;
@@ -2357,7 +2345,7 @@
         },
 
         showStep: function(step){
-            
+
             var kWizard = this;
             var wizard = $(kWizard.div);
             var currentStep = wizard.find('[data-wizard-step][data-step="'+step+'"]');
@@ -2386,5 +2374,5 @@
         }
 
     };
-    
+
 }(jQuery));
