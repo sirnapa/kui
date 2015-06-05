@@ -1,6 +1,6 @@
 /*
  *
- *   +++++++++++++++++++++ i18n +++++++++++++++++++++ 
+ *   +++++++++++++++++++++ i18n +++++++++++++++++++++
  *
  */
 
@@ -37,7 +37,7 @@
     ajax: 'ajax',
     data: 'data',
     titles: 'titulos',
-    pass: 'permisos',
+    actions: 'permisos',
     sourceFormat: 'retorno',
     buttons: 'botones',
     pager: 'paginador',
@@ -68,7 +68,12 @@
     /* Campos de Wizard */
     steps: 'pasos',
     indices: 'indices',
-    validate: 'validacion'
+    validate: 'validacion',
+
+    /* Date & time format */
+    dateFormat: 'dd/MM/yyyy',
+    hourFormat: 'hh:mm:ss',
+    dateTimeFormat: 'dd/MM/yyyy hh:mm:ss',
 
   };
 

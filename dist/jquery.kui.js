@@ -1,4 +1,4 @@
-/*! kui - v0.2.2 - 2015-06-05
+/*! kui - v0.2.3 - 2015-06-05
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -205,20 +205,20 @@
        var confDateTime = {
           'fecha': {
                   icono: 'calendar',
-                  formato: 'dd/MM/yyyy',
+                  formato: $.kui.i18n.dateFormat,
                   rule: 'date',
                   constructor: {pickTime: false}
               },
           'hora': {
                   icono: 'clock-o',
-                  formato: 'hh:mm:ss',
+                  formato: $.kui.i18n.hourFormat,
                   rule: 'hour',
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
                   icono: 'calendar-o',
                   rule: 'datetime',
-                  formato: 'dd/MM/yyyy hh:mm:ss'
+                  formato: $.kui.i18n.datetimeFormat
               }
        };
 
@@ -324,41 +324,6 @@
 
     validar: {
 
-      reglas: function(){
-
-          // Validaciones extras para el formulario
-
-          $.validator.methods["date"] = function(value, element) {
-              var check = false;
-              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
-              var es_fecha = function(separador){
-                  var adata = value.split(separador);
-                  var gg = parseInt(adata[0],10);
-                  var mm = parseInt(adata[1],10);
-                  var aaaa = parseInt(adata[2],10);
-                  var xdata = new Date(aaaa,mm-1,gg);
-                  if ( ( xdata.getFullYear() === aaaa ) &&
-                       ( xdata.getMonth () === mm - 1 ) &&
-                       ( xdata.getDate() === gg ) ){
-                    check = true;
-                  } else{
-                    check = false;
-                  }
-              };
-
-              if(re_con_barras.test(value)){
-                  es_fecha('/');
-              } else if(re_con_guiones.test(value)){
-                  es_fecha('-');
-              } else{
-                  check = false;
-              }
-              return this.optional(element) || check;
-          };
-
-      },
-
       error: function(form, errorMap, errorList) {
           // Clean up any tooltips for valid elements
           $.each(form.validElements(), function (index, element) {
@@ -377,30 +342,6 @@
                   .addClass("error")
                   .tooltip(); // Create a new tooltip based on the error messsage we just set in the title
               $element.parent().addClass("has-error");
-          });
-      },
-
-      fecha: function(form){
-          $(form).find('input[data-rule-date=true]').each(function(i,input){
-              var fechaVal = $(input).val();
-              var fechaArray;
-              var fechaFormato = {
-                      dd: 0,
-                      MM: 1,
-                      yyyy: 2
-              };
-              if (fechaVal.indexOf('/') > 0){
-                  fechaArray = fechaVal.split('/');
-              } else {
-                  fechaArray = fechaVal.split('-');
-                  fechaFormato.yyyy = 0;
-                  fechaFormato.dd = 2;
-              }
-              $(input).val(
-                      (fechaArray.length===3)?
-                              (fechaArray[fechaFormato.yyyy] +'-' + fechaArray[fechaFormato.MM] + '-' + fechaArray[fechaFormato.dd])
-                      : ''
-              );
           });
       }
 
@@ -443,7 +384,7 @@
     ajax: 'ajax',
     data: 'data',
     titles: 'titulos',
-    pass: 'permisos',
+    actions: 'permisos',
     sourceFormat: 'retorno',
     buttons: 'botones',
     pager: 'paginador',
@@ -474,11 +415,17 @@
     /* Campos de Wizard */
     steps: 'pasos',
     indices: 'indices',
-    validate: 'validacion'
+    validate: 'validacion',
+
+    /* Date & time format */
+    dateFormat: 'dd/MM/yyyy',
+    hourFormat: 'hh:mm:ss',
+    dateTimeFormat: 'dd/MM/yyyy hh:mm:ss',
 
   };
 
 }(jQuery));
+
 (function ($) {
 
 	$.kui.list = {
@@ -631,13 +578,13 @@
 							todos:false
 						};
 
-            var finalPass = {};
-            finalPass[$.kui.i18n.add] = null;
-            finalPass[$.kui.i18n.edit] = null;
-            finalPass[$.kui.i18n.save] =  null;
-            finalPass[$.kui.i18n.activate] = null;
-            finalPass[$.kui.i18n.remove] = null;
-            finalParams[$.kui.i18n.pass] = finalPass;
+            var finalActions = {};
+            finalActions[$.kui.i18n.add] = null;
+            finalActions[$.kui.i18n.edit] = null;
+            finalActions[$.kui.i18n.save] =  null;
+            finalActions[$.kui.i18n.activate] = null;
+            finalActions[$.kui.i18n.remove] = null;
+            finalParams[$.kui.i18n.actions] = finalActions;
 
             if(o.params[$.kui.i18n.pager]===undefined){
                 o.params[$.kui.i18n.pager] = $('<div>')
@@ -686,7 +633,7 @@
                 showTitles : finalParams[$.kui.i18n.titles],
                 campos : finalParams[$.kui.i18n.fields],
                 ajax : finalParams[$.kui.i18n.ajax],
-                permisos : finalParams[$.kui.i18n.pass],
+                permisos : finalParams[$.kui.i18n.actions],
                 botones : finalParams[$.kui.i18n.buttons],
                 estado : finalParams[$.kui.i18n.state],
                 //retorno : finalParams[$.kui.i18n.sourceFormat],
@@ -1334,21 +1281,21 @@
     $.kui.widgets['form'] = function (data) {
         return $.kui.instances.kform[this.id] = new KForm(this,data);
     };
-    
+
     var KForm = function(div,dato){
-        
-        /* 
-         * Si no se provee algun campo obligatorio, 
+
+        /*
+         * Si no se provee algun campo obligatorio,
          * no se puede continuar.
         */
 
         if( dato.campos===undefined || dato.submit===undefined){
             window.console.error('Los parámetros "campos" y "submit" son obligatorios.');
             return;
-        }        
-                
+        }
+
         this.div = div;
-        this.campos = dato.campos;        
+        this.campos = dato.campos;
         this.submit = dato.submit;
         this.origen = dato.origen;
         this.ajax_origen = dato.ajaxOrigen===undefined? 'GET' : dato.ajaxOrigen;
@@ -1358,11 +1305,11 @@
         this.readOnly = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
-        
+
         this.load();
-        
+
     };
-    
+
     KForm.prototype = {
 
         nuevo_form : function(){
@@ -1372,9 +1319,9 @@
                     .attr('action','#')
                     .prependTo(kForm.div);
         },
-        
+
         load : function() {
-            
+
             var kForm = this;
             if(kForm.form){
                 kForm.form.empty();
@@ -1383,18 +1330,18 @@
             }
 
             if(kForm.origen===undefined){
-                
+
                 /*
                  * En kForm.dato está la entidad con la que rellenaremos el formulario.
                  */
                 kForm.dato = {};
             }else if(typeof kForm.origen === 'string'){
-            
+
                 $.ajax({
                     type: kForm.ajax_origen,
                     url: kForm.origen,
                     data: kForm.data_origen,
-                    success: function(retorno){ 
+                    success: function(retorno){
                         if (!retorno.error) {
                             kForm.dato = retorno.objeto;
                         }
@@ -1410,7 +1357,7 @@
         },
 
         load_campos : function(){
-            
+
             var kForm = this;
             var item = kForm.dato;
 
@@ -1418,8 +1365,8 @@
             if(kForm.readOnly){
                 kForm.fieldset.attr('disabled',true);
             }
-            
-            $.each(kForm.campos,function(c,campo){ 
+
+            $.each(kForm.campos,function(c,campo){
                 var formGroup = $('<div>')
                     .addClass('form-group' + (campo.oculto? ' hidden' : ''))
                     .appendTo(kForm.fieldset);
@@ -1428,30 +1375,30 @@
                     campo.titulo = campo.nombre;
                 }
 
-                /* 
-                 * Lado izquierdo: Label 
+                /*
+                 * Lado izquierdo: Label
                  */
                 $('<label>').addClass('klabel col-sm-4 control-label')
                     .html(campo.titulo)
                     .appendTo(formGroup);
 
-                /* 
-                 * En el centro: Input 
+                /*
+                 * En el centro: Input
                  */
                 var centro = $('<div>').addClass('col-sm-8')
                     .appendTo(formGroup);
 
-                $.kui.form.newElement(kForm.readOnly,centro,item,campo);                         
+                $.kui.form.newElement(kForm.readOnly,centro,item,campo);
             });
-            
+
             $(kForm.div).data('dato',kForm.dato);
 
             kForm.funcion_submit();
-                
+
             if(typeof kForm.loadComplete === 'function'){
                 kForm.loadComplete.call(this,kForm.dato);
             }
-        
+
         },
 
         funcion_submit: function(){
@@ -1481,14 +1428,14 @@
                 }:function(){};
 
             var on_submit = typeof kForm.submit === 'function'?
-                function(){
-                    afterSubmit(kForm.submit.call(this,kForm.contenido(),kForm.dato));
-                } : function(){
+                function(content){
+                    afterSubmit(kForm.submit.call(this,content,kForm.dato));
+                } : function(content){
 
                     $.ajax({
                         type: kForm.ajax_submit,
                         url: kForm.submit,
-                        data: kForm.contenido(),
+                        data: content,
                         success: function(retorno){
                             if(retorno.mensaje){
                                 $.kui.messages(kForm.mensaje,kForm.div,retorno.tipoMensaje,retorno.mensaje);
@@ -1502,12 +1449,15 @@
 
             $(kForm.form).validate({
                 showErrors: function(errorMap, errorList) {
-                    $.kui.form.validar.error(this, errorMap, errorList);
+                  $.kui.form.validar.error(this, errorMap, errorList);
                 },
-                submitHandler: function(form) {
-                    $.kui.form.validar.fecha(form);
-                    on_submit();
-                    return false;
+                submitHandler: function(/*form*/) {
+                  var content = kForm.contenido();
+                  if(typeof kForm.beforeSubmit === 'function'){
+                      kForm.beforeSubmit.call(this,content,kForm.dato);
+                  }
+                  on_submit(content);
+                  return false;
                 }
             });
 
@@ -1529,10 +1479,11 @@
 
             return dato;
         }
-        
+
     };
 
 }(jQuery));
+
 (function ($) {
 
     // Instances
@@ -1864,8 +1815,7 @@
                                 showErrors: function(errorMap, errorList) {
                                     $.kui.form.validar.error(this, errorMap, errorList);
                                 },
-                                submitHandler: function(form) {
-                                    $.kui.form.validar.fecha(form);
+                                submitHandler: function(/*form*/) {
                                     var ready = $('#'+pk).data('ready');
                                     $('#'+pk).data('ready',++ready);
                                     return false;

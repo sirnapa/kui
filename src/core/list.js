@@ -156,13 +156,13 @@
 							todos:false
 						};
 
-            var finalPass = {};
-            finalPass[$.kui.i18n.add] = null;
-            finalPass[$.kui.i18n.edit] = null;
-            finalPass[$.kui.i18n.save] =  null;
-            finalPass[$.kui.i18n.activate] = null;
-            finalPass[$.kui.i18n.remove] = null;
-            finalParams[$.kui.i18n.pass] = finalPass;
+            var finalActions = {};
+            finalActions[$.kui.i18n.add] = null;
+            finalActions[$.kui.i18n.edit] = null;
+            finalActions[$.kui.i18n.save] =  null;
+            finalActions[$.kui.i18n.activate] = null;
+            finalActions[$.kui.i18n.remove] = null;
+            finalParams[$.kui.i18n.actions] = finalActions;
 
             if(o.params[$.kui.i18n.pager]===undefined){
                 o.params[$.kui.i18n.pager] = $('<div>')
@@ -211,7 +211,7 @@
                 showTitles : finalParams[$.kui.i18n.titles],
                 campos : finalParams[$.kui.i18n.fields],
                 ajax : finalParams[$.kui.i18n.ajax],
-                permisos : finalParams[$.kui.i18n.pass],
+                permisos : finalParams[$.kui.i18n.actions],
                 botones : finalParams[$.kui.i18n.buttons],
                 estado : finalParams[$.kui.i18n.state],
                 //retorno : finalParams[$.kui.i18n.sourceFormat],

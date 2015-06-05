@@ -167,20 +167,20 @@
        var confDateTime = {
           'fecha': {
                   icono: 'calendar',
-                  formato: 'dd/MM/yyyy',
+                  formato: $.kui.i18n.dateFormat,
                   rule: 'date',
                   constructor: {pickTime: false}
               },
           'hora': {
                   icono: 'clock-o',
-                  formato: 'hh:mm:ss',
+                  formato: $.kui.i18n.hourFormat,
                   rule: 'hour',
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
                   icono: 'calendar-o',
                   rule: 'datetime',
-                  formato: 'dd/MM/yyyy hh:mm:ss'
+                  formato: $.kui.i18n.datetimeFormat
               }
        };
 
@@ -286,41 +286,6 @@
 
     validar: {
 
-      reglas: function(){
-
-          // Validaciones extras para el formulario
-
-          $.validator.methods["date"] = function(value, element) {
-              var check = false;
-              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
-              var es_fecha = function(separador){
-                  var adata = value.split(separador);
-                  var gg = parseInt(adata[0],10);
-                  var mm = parseInt(adata[1],10);
-                  var aaaa = parseInt(adata[2],10);
-                  var xdata = new Date(aaaa,mm-1,gg);
-                  if ( ( xdata.getFullYear() === aaaa ) &&
-                       ( xdata.getMonth () === mm - 1 ) &&
-                       ( xdata.getDate() === gg ) ){
-                    check = true;
-                  } else{
-                    check = false;
-                  }
-              };
-
-              if(re_con_barras.test(value)){
-                  es_fecha('/');
-              } else if(re_con_guiones.test(value)){
-                  es_fecha('-');
-              } else{
-                  check = false;
-              }
-              return this.optional(element) || check;
-          };
-
-      },
-
       error: function(form, errorMap, errorList) {
           // Clean up any tooltips for valid elements
           $.each(form.validElements(), function (index, element) {
@@ -339,30 +304,6 @@
                   .addClass("error")
                   .tooltip(); // Create a new tooltip based on the error messsage we just set in the title
               $element.parent().addClass("has-error");
-          });
-      },
-
-      fecha: function(form){
-          $(form).find('input[data-rule-date=true]').each(function(i,input){
-              var fechaVal = $(input).val();
-              var fechaArray;
-              var fechaFormato = {
-                      dd: 0,
-                      MM: 1,
-                      yyyy: 2
-              };
-              if (fechaVal.indexOf('/') > 0){
-                  fechaArray = fechaVal.split('/');
-              } else {
-                  fechaArray = fechaVal.split('-');
-                  fechaFormato.yyyy = 0;
-                  fechaFormato.dd = 2;
-              }
-              $(input).val(
-                      (fechaArray.length===3)?
-                              (fechaArray[fechaFormato.yyyy] +'-' + fechaArray[fechaFormato.MM] + '-' + fechaArray[fechaFormato.dd])
-                      : ''
-              );
           });
       }
 
