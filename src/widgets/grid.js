@@ -504,10 +504,10 @@
                         e.stopPropagation();
                         habilitar_edicion();
                     });
+                }
 
-                    if(!nueva_entrada){
-                        btn_editar.appendTo(botones);
-                    }
+                if(!nueva_entrada){
+                    btn_editar.appendTo(botones);
                 }
 
                 if(kGrid.permisos['remover'] || nueva_entrada){
