@@ -418,7 +418,7 @@
     validate: 'validacion',
 
     /* Date & time format */
-    dateFormat: 'dd/MM/yyyy',
+    dateFormat: 'dd-MM-yyyy',
     hourFormat: 'hh:mm:ss',
     dateTimeFormat: 'dd/MM/yyyy hh:mm:ss',
 

@@ -156,8 +156,6 @@
                 kForm.form.submit();
             });
 
-            $.kui.form.validar.reglas();
-
             var afterSubmit = typeof kForm.after_submit === 'function'?
                 function(retorno){
                     kForm.after_submit.call(this,retorno);

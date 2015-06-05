@@ -418,7 +418,7 @@
     validate: 'validacion',
 
     /* Date & time format */
-    dateFormat: 'dd/MM/yyyy',
+    dateFormat: 'dd-MM-yyyy',
     hourFormat: 'hh:mm:ss',
     dateTimeFormat: 'dd/MM/yyyy hh:mm:ss',
 
@@ -1420,8 +1420,6 @@
                 kForm.form.submit();
             });
 
-            $.kui.form.validar.reglas();
-
             var afterSubmit = typeof kForm.after_submit === 'function'?
                 function(retorno){
                     kForm.after_submit.call(this,retorno);
@@ -1545,7 +1543,6 @@
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
 
-            $.kui.form.validar.reglas();
         },
 
         titulos: function(){

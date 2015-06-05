@@ -65,7 +65,6 @@
                 kGrid.seleccionar(kGrid.preseleccionados);
             }
 
-            $.kui.form.validar.reglas();
         },
 
         titulos: function(){
