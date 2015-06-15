@@ -286,6 +286,39 @@
 
     validar: {
 
+      reglas: function(){
+
+        $.validator.methods["date"] = function(value, element) {
+              var check = false;
+              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
+              var es_fecha = function(separador){
+                  var adata = value.split(separador);
+                  var gg = parseInt(adata[0],10);
+                  var mm = parseInt(adata[1],10);
+                  var aaaa = parseInt(adata[2],10);
+                  var xdata = new Date(aaaa,mm-1,gg);
+                  if ( ( xdata.getFullYear() === aaaa ) &&
+                       ( xdata.getMonth () === mm - 1 ) &&
+                       ( xdata.getDate() === gg ) ){
+                    check = true;
+                  } else{
+                    check = false;
+                  }
+              };
+
+              if(re_con_barras.test(value)){
+                  es_fecha('/');
+              } else if(re_con_guiones.test(value)){
+                  es_fecha('-');
+              } else{
+                  check = false;
+              }
+              return this.optional(element) || check;
+          };
+
+      },
+
       error: function(form, errorMap, errorList) {
           // Clean up any tooltips for valid elements
           $.each(form.validElements(), function (index, element) {
@@ -310,5 +343,7 @@
     }
 
   };
+
+  $.kui.form.validar.reglas();
 
 }(jQuery));
