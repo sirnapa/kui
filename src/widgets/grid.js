@@ -55,7 +55,7 @@
                 kGrid.permisos[$.kui.i18n.save]     ||
                 kGrid.permisos[$.kui.i18n.activate] ||
                 kGrid.permisos[$.kui.i18n.remove]
-            );
+            )? true : false;
 
             $(kGrid.div).addClass('kui-list');
 

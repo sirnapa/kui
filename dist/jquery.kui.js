@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-06-11
+/*! kui - v0.2.3 - 2015-06-16
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -1568,7 +1568,7 @@
                 kGrid.permisos[$.kui.i18n.save]     ||
                 kGrid.permisos[$.kui.i18n.activate] ||
                 kGrid.permisos[$.kui.i18n.remove]
-            );
+            )? true : false;
 
             $(kGrid.div).addClass('kui-list');
 
