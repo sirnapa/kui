@@ -181,17 +181,14 @@
 
                 };
 
-            $(kForm.form).validate({
-                showErrors: function(errorMap, errorList) {
-                  $.kui.form.validar.error(this, errorMap, errorList);
-                },
-                submitHandler: function(/*form*/) {
+            $.kui.form.validate.add({
+                form: kForm.form,
+                submit: function(/*form*/) {
                   var content = kForm.contenido();
                   if(typeof kForm.beforeSubmit === 'function'){
                       kForm.beforeSubmit.call(this,content,kForm.dato);
                   }
                   on_submit(content);
-                  return false;
                 }
             });
 

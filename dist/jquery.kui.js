@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-06-16
+/*! kui - v0.2.3 - 2015-06-26
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -322,38 +322,41 @@
 
     },
 
-    validar: {
+    validate: {
 
-      reglas: function(){
+      hasRules: false,
+
+      rules: function(){
+
+        if($.kui.form.validate.hasRules){
+          return;
+        }
+
+        // var isDate = function(value,separator,iso){
+        //     var check = false;
+        //     var adata = value.split(separator);
+        //     var gg = parseInt(adata[iso? 2 : 0],10);
+        //     var mm = parseInt(adata[1],10);
+        //     var aaaa = parseInt(adata[iso? 0 : 2],10);
+        //     var xdata = new Date(aaaa,mm-1,gg);
+        //     if ( ( xdata.getFullYear() === aaaa ) &&
+        //          ( xdata.getMonth () === mm - 1 ) &&
+        //          ( xdata.getDate() === gg ) ){
+        //       check = true;
+        //     } else{
+        //       check = false;
+        //     }
+        //     return check;
+        // };
 
         $.validator.methods["date"] = function(value, element) {
-              var check = false;
-              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
-              var es_fecha = function(separador){
-                  var adata = value.split(separador);
-                  var gg = parseInt(adata[0],10);
-                  var mm = parseInt(adata[1],10);
-                  var aaaa = parseInt(adata[2],10);
-                  var xdata = new Date(aaaa,mm-1,gg);
-                  if ( ( xdata.getFullYear() === aaaa ) &&
-                       ( xdata.getMonth () === mm - 1 ) &&
-                       ( xdata.getDate() === gg ) ){
-                    check = true;
-                  } else{
-                    check = false;
-                  }
-              };
+            var picker = $(element).parent().data('datetimepicker');
+            var date = picker.getDate();
+            window.console.log(date);
+            return this.optional(element) || date !== undefined;
+        };
 
-              if(re_con_barras.test(value)){
-                  es_fecha('/');
-              } else if(re_con_guiones.test(value)){
-                  es_fecha('-');
-              } else{
-                  check = false;
-              }
-              return this.optional(element) || check;
-          };
+        $.kui.form.validate.hasRules = true;
 
       },
 
@@ -376,13 +379,37 @@
                   .tooltip(); // Create a new tooltip based on the error messsage we just set in the title
               $element.parent().addClass("has-error");
           });
+      },
+
+      add: function(o){
+        $(o.form).validate({
+            showErrors: function(errorMap, errorList) {
+              $.kui.form.validate.error(this, errorMap, errorList);
+            },
+            submitHandler: function(form) {
+
+              $(form).find('input[data-rule-date=true]').each(function(i,input){
+                  var picker = $(input).parent().data('datetimepicker');
+                  var date = picker.getDate();
+                  var dateIso = '';
+                  if(date){
+                    var month = date.getMonth()+1;
+                    if(month<10){}
+                    dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + date.getDate();
+                  }
+                  $(input).val(dateIso);
+                  window.console.log(input,date,dateIso);
+              });
+
+              o.submit.call(this,form);
+              return false;
+            }
+        });
       }
 
     }
 
   };
-
-  $.kui.form.validar.reglas();
 
 }(jQuery));
 
@@ -453,9 +480,9 @@
     validate: 'validacion',
 
     /* Date & time format */
-    dateFormat: 'dd-MM-yyyy',
+    dateFormat: 'dd/MM/yyyy',
     hourFormat: 'hh:mm:ss',
-    dateTimeFormat: 'dd-MM-yyyy hh:mm:ss',
+    dateTimeFormat: 'dd/MM/yyyy hh:mm:ss',
 
   };
 
@@ -984,6 +1011,27 @@
       return data[level1]? data[level1][level2] :
              (data[level1+'.'+level2]?
               data[level1+'.'+level2] : '');
+    },
+
+    dateToIso: function(value){
+      var date;
+      var format = {
+        dd: 0,
+        MM: 1,
+        yyyy: 2
+      };
+
+      if (value.indexOf('/') > 0){
+          date = value.split('/');
+      } else {
+          date = value.split('-');
+          format.yyyy = 0;
+          format.dd = 2;
+      }
+
+      return (date.length===3)?
+        (date[format.yyyy] +'-' + date[format.MM] + '-' + date[format.dd])
+        : '';
     }
 
   };
@@ -1480,17 +1528,14 @@
 
                 };
 
-            $(kForm.form).validate({
-                showErrors: function(errorMap, errorList) {
-                  $.kui.form.validar.error(this, errorMap, errorList);
-                },
-                submitHandler: function(/*form*/) {
+            $.kui.form.validate.add({
+                form: kForm.form,
+                submit: function(/*form*/) {
                   var content = kForm.contenido();
                   if(typeof kForm.beforeSubmit === 'function'){
                       kForm.beforeSubmit.call(this,content,kForm.dato);
                   }
                   on_submit(content);
-                  return false;
                 }
             });
 
@@ -1901,14 +1946,11 @@
                             });
                     }
 
-                    formItem.validate({
-                        showErrors: function(errorMap, errorList) {
-                            $.kui.form.validar.error(this, errorMap, errorList);
-                        },
-                        submitHandler: function(/*form*/) {
+                    $.kui.form.validate.add({
+                        form: formItem,
+                        submit: function(/*form*/) {
                             var ready = $('#'+pk).data('ready');
                             $('#'+pk).data('ready',++ready);
-                            return false;
                         }
                     });
                 });

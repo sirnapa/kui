@@ -388,14 +388,11 @@
                             });
                     }
 
-                    formItem.validate({
-                        showErrors: function(errorMap, errorList) {
-                            $.kui.form.validar.error(this, errorMap, errorList);
-                        },
-                        submitHandler: function(/*form*/) {
+                    $.kui.form.validate.add({
+                        form: formItem,
+                        submit: function(/*form*/) {
                             var ready = $('#'+pk).data('ready');
                             $('#'+pk).data('ready',++ready);
-                            return false;
                         }
                     });
                 });
