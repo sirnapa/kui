@@ -1,4 +1,10 @@
-$('#conagregar').kui('grid',{
+var empresas =  [
+    {pkEmpresa:'1',nombre:'Konecta'},
+    {pkEmpresa:'2',nombre:'Documenta'},
+    {pkEmpresa:'3',nombre:'Otra empresa'},
+];
+
+$('#opciones').kui('grid',{
     origen : 'js/datos.json',
     id : 'pkEncuesta',
     campos : [{
@@ -15,17 +21,18 @@ $('#conagregar').kui('grid',{
             titulo: 'Empresa',
             ancho: 4,
             requerido: true,
-            soloLectura: true,
-            atributos: {
-                'data-creable': true
-                },
             tipo: 'combo',
             opciones: {
-                origen: [
-                    {pkEmpresa:'1',nombre:'Konecta'},
-                    {pkEmpresa:'2',nombre:'Documenta'},
-                    {pkEmpresa:'3',nombre:'Otra empresa'}
-                ],
+                origen: function(row){
+                    var opciones = empresas.slice(0);
+                    for(var i=1;i<6;i++){
+                        opciones.push({
+                            pkEmpresa: i,
+                            nombre: 'Adicional ' + i + ' para ' + row.nombre
+                        });
+                    }
+                    return opciones;
+                },
                 id: 'pkEmpresa',
                 formato: 'nombre'
             }
@@ -59,13 +66,13 @@ $('#conagregar').kui('grid',{
     ondblclick: true,
     loadComplete: function(){
         // Agrego un botón para agregar entradas
-        $('#conagregar').before(
+        $('#opciones').before(
             $('<button>').html('Agregar entrada')
             .addClass('btn btn-default')
             .click(function(){
-                $('#conagregar').kGrid('agregar');
+                $('#opciones').kGrid('agregar');
             })
         );
-        $('#conagregar').before('<br><br>');
+        $('#opciones').before('<br><br>');
     }
 });

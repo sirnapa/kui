@@ -72,6 +72,27 @@
       return data[level1]? data[level1][level2] :
              (data[level1+'.'+level2]?
               data[level1+'.'+level2] : '');
+    },
+
+    dateToIso: function(value){
+      var date;
+      var format = {
+        dd: 0,
+        MM: 1,
+        yyyy: 2
+      };
+
+      if (value.indexOf('/') > 0){
+          date = value.split('/');
+      } else {
+          date = value.split('-');
+          format.yyyy = 0;
+          format.dd = 2;
+      }
+
+      return (date.length===3)?
+        (date[format.yyyy] +'-' + date[format.MM] + '-' + date[format.dd])
+        : '';
     }
 
   };
