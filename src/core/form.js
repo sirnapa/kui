@@ -121,6 +121,8 @@
                       },
                       async: false
                   });
+              }else if(typeof field.opciones.origen === 'function'){
+                  opciones = field.opciones.origen.call(this,item);
               }else{
                   opciones = field.opciones.origen;
               }
@@ -128,15 +130,15 @@
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
-                  var item = $('<option>');
+                  var $opcion = $('<option>');
                   var id = '';
 
                   if(stringOnly){
                     id = opcion.toString();
-                    item.html(opcion).attr('value',opcion);
+                    $opcion.html(opcion).attr('value',opcion);
                   }else{
                     id = opcion[field.opciones.id];
-                    item.attr('value',id)
+                    $opcion.attr('value',id)
                       .html(
                         typeof field.opciones.formato==='function'?
                           field.opciones.formato.call(this,opcion)
@@ -144,10 +146,10 @@
                       );
                   }
 
-                  item.appendTo(select);
+                  $opcion.appendTo(select);
 
                   if( inputVal && inputVal.toString() === id){
-                      item.attr('selected',true);
+                      $opcion.attr('selected',true);
                       seleccionado = true;
                   }
               });
@@ -314,7 +316,6 @@
         $.validator.methods["date"] = function(value, element) {
             var picker = $(element).parent().data('datetimepicker');
             var date = picker.getDate();
-            window.console.log(date);
             return this.optional(element) || date !== undefined;
         };
 
@@ -360,7 +361,6 @@
                     dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + date.getDate();
                   }
                   $(input).val(dateIso);
-                  window.console.log(input,date,dateIso);
               });
 
               o.submit.call(this,form);
