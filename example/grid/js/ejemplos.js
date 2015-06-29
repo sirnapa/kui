@@ -16,4 +16,6 @@ $(document).ready(function () {
     agregar_ejemplo('seleccionable','Seleccionable');
     agregar_ejemplo('conagregar','Agregar entradas');
     agregar_ejemplo('conbotones','Botones');
+    agregar_ejemplo('sinbotones','Sin botones');
+    agregar_ejemplo('opciones','Opciones como función');
 });

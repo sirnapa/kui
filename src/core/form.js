@@ -121,6 +121,8 @@
                       },
                       async: false
                   });
+              }else if(typeof field.opciones.origen === 'function'){
+                  opciones = field.opciones.origen.call(this,item);
               }else{
                   opciones = field.opciones.origen;
               }
@@ -128,15 +130,15 @@
               var seleccionado = false;
 
               $.each(opciones,function(o,opcion){
-                  var item = $('<option>');
+                  var $opcion = $('<option>');
                   var id = '';
 
                   if(stringOnly){
                     id = opcion.toString();
-                    item.html(opcion).attr('value',opcion);
+                    $opcion.html(opcion).attr('value',opcion);
                   }else{
                     id = opcion[field.opciones.id];
-                    item.attr('value',id)
+                    $opcion.attr('value',id)
                       .html(
                         typeof field.opciones.formato==='function'?
                           field.opciones.formato.call(this,opcion)
@@ -144,10 +146,10 @@
                       );
                   }
 
-                  item.appendTo(select);
+                  $opcion.appendTo(select);
 
                   if( inputVal && inputVal.toString() === id){
-                      item.attr('selected',true);
+                      $opcion.attr('selected',true);
                       seleccionado = true;
                   }
               });
@@ -167,20 +169,20 @@
        var confDateTime = {
           'fecha': {
                   icono: 'calendar',
-                  formato: 'dd/MM/yyyy',
+                  formato: $.kui.i18n.dateFormat,
                   rule: 'date',
                   constructor: {pickTime: false}
               },
           'hora': {
                   icono: 'clock-o',
-                  formato: 'hh:mm:ss',
+                  formato: $.kui.i18n.hourFormat,
                   rule: 'hour',
                   constructor: {pickDate: false}
               },
           'fecha-hora': {
                   icono: 'calendar-o',
                   rule: 'datetime',
-                  formato: 'dd/MM/yyyy hh:mm:ss'
+                  formato: $.kui.i18n.datetimeFormat
               }
        };
 
@@ -284,40 +286,40 @@
 
     },
 
-    validar: {
+    validate: {
 
-      reglas: function(){
+      hasRules: false,
 
-          // Validaciones extras para el formulario
+      rules: function(){
 
-          $.validator.methods["date"] = function(value, element) {
-              var check = false;
-              var re_con_barras = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-              var re_con_guiones = /^\d{1,2}-\d{1,2}-\d{4}$/;
-              var es_fecha = function(separador){
-                  var adata = value.split(separador);
-                  var gg = parseInt(adata[0],10);
-                  var mm = parseInt(adata[1],10);
-                  var aaaa = parseInt(adata[2],10);
-                  var xdata = new Date(aaaa,mm-1,gg);
-                  if ( ( xdata.getFullYear() === aaaa ) &&
-                       ( xdata.getMonth () === mm - 1 ) &&
-                       ( xdata.getDate() === gg ) ){
-                    check = true;
-                  } else{
-                    check = false;
-                  }
-              };
+        if($.kui.form.validate.hasRules){
+          return;
+        }
 
-              if(re_con_barras.test(value)){
-                  es_fecha('/');
-              } else if(re_con_guiones.test(value)){
-                  es_fecha('-');
-              } else{
-                  check = false;
-              }
-              return this.optional(element) || check;
-          };
+        // var isDate = function(value,separator,iso){
+        //     var check = false;
+        //     var adata = value.split(separator);
+        //     var gg = parseInt(adata[iso? 2 : 0],10);
+        //     var mm = parseInt(adata[1],10);
+        //     var aaaa = parseInt(adata[iso? 0 : 2],10);
+        //     var xdata = new Date(aaaa,mm-1,gg);
+        //     if ( ( xdata.getFullYear() === aaaa ) &&
+        //          ( xdata.getMonth () === mm - 1 ) &&
+        //          ( xdata.getDate() === gg ) ){
+        //       check = true;
+        //     } else{
+        //       check = false;
+        //     }
+        //     return check;
+        // };
+
+        $.validator.methods["date"] = function(value, element) {
+            var picker = $(element).parent().data('datetimepicker');
+            var date = picker.getDate();
+            return this.optional(element) || date !== undefined;
+        };
+
+        $.kui.form.validate.hasRules = true;
 
       },
 
@@ -342,28 +344,29 @@
           });
       },
 
-      fecha: function(form){
-          $(form).find('input[data-rule-date=true]').each(function(i,input){
-              var fechaVal = $(input).val();
-              var fechaArray;
-              var fechaFormato = {
-                      dd: 0,
-                      MM: 1,
-                      yyyy: 2
-              };
-              if (fechaVal.indexOf('/') > 0){
-                  fechaArray = fechaVal.split('/');
-              } else {
-                  fechaArray = fechaVal.split('-');
-                  fechaFormato.yyyy = 0;
-                  fechaFormato.dd = 2;
-              }
-              $(input).val(
-                      (fechaArray.length===3)?
-                              (fechaArray[fechaFormato.yyyy] +'-' + fechaArray[fechaFormato.MM] + '-' + fechaArray[fechaFormato.dd])
-                      : ''
-              );
-          });
+      add: function(o){
+        $(o.form).validate({
+            showErrors: function(errorMap, errorList) {
+              $.kui.form.validate.error(this, errorMap, errorList);
+            },
+            submitHandler: function(form) {
+
+              $(form).find('input[data-rule-date=true]').each(function(i,input){
+                  var picker = $(input).parent().data('datetimepicker');
+                  var date = picker.getDate();
+                  var dateIso = '';
+                  if(date){
+                    var month = date.getMonth()+1;
+                    if(month<10){}
+                    dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + date.getDate();
+                  }
+                  $(input).val(dateIso);
+              });
+
+              o.submit.call(this,form);
+              return false;
+            }
+        });
       }
 
     }
