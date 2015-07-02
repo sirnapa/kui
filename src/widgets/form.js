@@ -65,30 +65,7 @@
                 kForm.nuevo_form();
             }
 
-            if(kForm.origen===undefined){
-
-                /*
-                 * En kForm.dato está la entidad con la que rellenaremos el formulario.
-                 */
-                kForm.dato = {};
-            }else if(typeof kForm.origen === 'string'){
-
-                $.ajax({
-                    type: kForm.ajax_origen,
-                    url: kForm.origen,
-                    data: kForm.data_origen,
-                    success: function(retorno){
-                        if (!retorno.error) {
-                            kForm.dato = retorno.objeto;
-                        }
-                    },
-                    async: false
-                });
-
-            }else{
-                kForm.dato = kForm.origen;
-            }
-
+            kForm.dato = $.kui.data.source(kForm.origen,kForm.ajax_origen,kForm.data_origen);
             kForm.load_campos();
         },
 

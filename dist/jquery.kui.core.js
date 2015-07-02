@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-06-29
+/*! kui - v0.2.3 - 2015-07-02
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -963,6 +963,8 @@
 
     source : function(source,sourceAjax,sourceData){
 
+      window.console.log('Params',source,sourceAjax,sourceData);
+
       var data = {};
 
       if(source===undefined){
@@ -985,6 +987,8 @@
           data = source;
       }
 
+      window.console.log('Data',data);
+
       return data;
     },
 
@@ -1002,6 +1006,8 @@
           	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
+
+      window.console.log(item,name,item[name]);
 
       return typeof format === 'function'?
         format.call(this,item[name],item) : item[name];
@@ -1034,6 +1040,16 @@
         : '';
     }
 
+  };
+
+  // Ajax
+  $.kui.ajax = function(o) {
+    var div = o.div? $(o.div) : $('body');
+    $('<div>').appendTo(div);
+    window.console.log('Ajax start');
+    var ajaxRequest = $.ajax(o);
+    window.console.log('Ajax stop');
+    return ajaxRequest;
   };
 
 }(jQuery));
