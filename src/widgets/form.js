@@ -65,7 +65,12 @@
                 kForm.nuevo_form();
             }
 
-            kForm.dato = $.kui.data.source(kForm.origen,kForm.ajax_origen,kForm.data_origen);
+            kForm.dato = $.kui.data.source({
+              source: kForm.origen,
+              sourceAjax: kForm.ajax_origen,
+              sourceData: kForm.data_origen,
+              key: 'objeto'
+            });
             kForm.load_campos();
         },
 

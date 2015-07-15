@@ -12,8 +12,8 @@ var datos_json = JSON.stringify($.parseJSON($.ajax({
     }).responseText),null,4);
 
 $(document).ready(function () {
-    // agregar_ejemplo('agregar','Agregar');
+    agregar_ejemplo('agregar','Agregar');
     agregar_ejemplo('editar','Editar');
-    // agregar_ejemplo('solo_lectura','Sólo lectura');
-    // agregar_ejemplo('selects','Selects y soloLectura');
+    agregar_ejemplo('solo_lectura','Sólo lectura');
+    agregar_ejemplo('selects','Selects y soloLectura');
 });

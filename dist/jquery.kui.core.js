@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-07-02
+/*! kui - v0.2.3 - 2015-07-15
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -961,33 +961,49 @@
   // Data & Format
   $.kui.data = {
 
-    source : function(source,sourceAjax,sourceData){
+    /*
+     * @param o = {
+     *      {Object} source
+     *      {String} sourceAjax
+     *      {Object} sourceData
+     *      {Function} sourceParse
+     *      {String} key,
+     *      {Object} message,
+     *      {Object} messageContainer,
+     * }
+     */
 
-      window.console.log('Params',source,sourceAjax,sourceData);
+    source : function(o){
+
+      window.console.log('Params',o.source,o.sourceAjax,o.sourceData);
 
       var data = {};
 
-      if(source===undefined){
+      if(o.source===undefined){
           data = {};
-      }else if(typeof source === 'string'){
+      }else if(typeof o.source === 'string'){
 
           $.ajax({
-              type: sourceAjax,
-              url: source,
-              data: sourceData,
+              type: o.sourceAjax,
+              url: o.source,
+              data: o.sourceData,
               success: function(remoteData){
-                  if (!remoteData.error) {
-                      data = remoteData;
+                  if(typeof o.sourceParse === 'function'){
+                    data = o.sourceParse.call(this,remoteData);
+                  }else if(remoteData.error && remoteData.mensaje){
+                      $.kui.messages(o.message,o.messageContainer,remoteData.tipoMensaje,remoteData.mensaje);
+                  }else{
+                    data = remoteData[o.key];
                   }
               },
               async: false
           });
 
       }else{
-          data = source;
+          data = o.source;
       }
 
-      window.console.log('Data',data);
+      window.console.log('Data >>> ',data);
 
       return data;
     },
@@ -1006,8 +1022,6 @@
           	return $.kui.data.valueFromJson(item,name,combobox.id);
           }
     	}
-
-      window.console.log(item,name,item[name]);
 
       return typeof format === 'function'?
         format.call(this,item[name],item) : item[name];
@@ -1046,9 +1060,9 @@
   $.kui.ajax = function(o) {
     var div = o.div? $(o.div) : $('body');
     $('<div>').appendTo(div);
-    window.console.log('Ajax start');
+    window.alert('Ajax start');
     var ajaxRequest = $.ajax(o);
-    window.console.log('Ajax stop');
+    window.alert('Ajax stop');
     return ajaxRequest;
   };
 
