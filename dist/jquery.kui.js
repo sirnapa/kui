@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-07-15
+/*! kui - v0.2.3 - 2015-07-16
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -969,13 +969,11 @@
      *      {Function} sourceParse
      *      {String} key,
      *      {Object} message,
-     *      {Object} messageContainer,
+     *      {Object} targetS,
      * }
      */
 
     source : function(o){
-
-      window.console.log('Params',o.source,o.sourceAjax,o.sourceData);
 
       var data = {};
 
@@ -983,7 +981,8 @@
           data = {};
       }else if(typeof o.source === 'string'){
 
-          $.ajax({
+          $.kui.ajax({
+              target: o.target,
               type: o.sourceAjax,
               url: o.source,
               data: o.sourceData,
@@ -991,19 +990,19 @@
                   if(typeof o.sourceParse === 'function'){
                     data = o.sourceParse.call(this,remoteData);
                   }else if(remoteData.error && remoteData.mensaje){
-                      $.kui.messages(o.message,o.messageContainer,remoteData.tipoMensaje,remoteData.mensaje);
+                      $.kui.messages(o.message,o.target,remoteData.tipoMensaje,remoteData.mensaje);
                   }else{
                     data = remoteData[o.key];
                   }
               },
               async: false
+          }).error(function(o){
+            window.console.log('error....',o);
           });
 
       }else{
           data = o.source;
       }
-
-      window.console.log('Data >>> ',data);
 
       return data;
     },
@@ -1058,13 +1057,45 @@
 
   // Ajax
   $.kui.ajax = function(o) {
-    var div = o.div? $(o.div) : $('body');
-    $('<div>').appendTo(div);
-    window.alert('Ajax start');
+    $.kui.loading.show(o);
     var ajaxRequest = $.ajax(o);
-    window.alert('Ajax stop');
+    $.kui.loading.hide(o);
     return ajaxRequest;
   };
+
+  // Loading
+  $.kui.loading = {
+    init: function(o) {
+      var target = $(o.target);
+      var id = $.kui.randomId();
+      var div = $('<div>').attr('id',id)
+        .addClass('text-center text-muted')
+        .css('margin-botton',10)
+        .hide();
+      $('<i>').addClass('fa fa-5x fa-circle-o-notch fa-spin')
+        .appendTo(div);
+      target.before(div);
+      target.attr('data-loading',id);
+    },
+    show: function(o) {
+      var target = o.target? $(o.target) : $('body');
+      if(!target.data('loading')){
+        o.target = target;
+        $.kui.loading.init(o);
+      }
+
+      target.hide();
+      $('#'+target.data('loading')).fadeIn('slow');
+    },
+    hide: function(o){
+      var target = $(o.target);
+      var loading = $('#'+target.data('loading'));
+      loading.fadeOut('slow',function(){
+        target.fadeIn('fast');
+      });
+    }
+  };
+
 
 }(jQuery));
 
@@ -1130,7 +1161,7 @@
               sourceData: kCard.data,
               key: 'respuesta',
               message: kCard.mensaje,
-              messageContainer: kCard.contenido
+              target: kCard.contenido
             });
 
             if (source) {
@@ -1445,7 +1476,8 @@
               source: kForm.origen,
               sourceAjax: kForm.ajax_origen,
               sourceData: kForm.data_origen,
-              key: 'objeto'
+              key: 'objeto',
+              target: kForm.div
             });
             kForm.load_campos();
         },
@@ -1717,7 +1749,7 @@
               sourceData: kGrid.data,
               key: 'respuesta',
               message: kGrid.mensaje,
-              messageContainer: kGrid.div
+              target: kGrid.div
             });
 
             if(source) {

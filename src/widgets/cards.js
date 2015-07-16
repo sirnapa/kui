@@ -66,7 +66,7 @@
               sourceData: kCard.data,
               key: 'respuesta',
               message: kCard.mensaje,
-              messageContainer: kCard.contenido
+              target: kCard.contenido
             });
 
             if (source) {

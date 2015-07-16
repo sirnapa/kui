@@ -69,7 +69,8 @@
               source: kForm.origen,
               sourceAjax: kForm.ajax_origen,
               sourceData: kForm.data_origen,
-              key: 'objeto'
+              key: 'objeto',
+              target: kForm.div
             });
             kForm.load_campos();
         },

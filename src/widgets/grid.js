@@ -148,7 +148,7 @@
               sourceData: kGrid.data,
               key: 'respuesta',
               message: kGrid.mensaje,
-              messageContainer: kGrid.div
+              target: kGrid.div
             });
 
             if(source) {
