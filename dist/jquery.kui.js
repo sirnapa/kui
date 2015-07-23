@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-07-16
+/*! kui - v0.2.4 - 2015-07-23
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -186,7 +186,7 @@
 
                   $opcion.appendTo(select);
 
-                  if( inputVal && inputVal.toString() === id){
+                  if( inputVal && inputVal.toString() == id){
                       $opcion.attr('selected',true);
                       seleccionado = true;
                   }
