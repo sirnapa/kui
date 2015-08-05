@@ -22,28 +22,47 @@
   // Data & Format
   $.kui.data = {
 
-    source : function(source,sourceAjax,sourceData){
+    /*
+     * @param o = {
+     *      {Object} source
+     *      {String} sourceAjax
+     *      {Object} sourceData
+     *      {Function} sourceParse
+     *      {String} key,
+     *      {Object} message,
+     *      {Object} targetS,
+     * }
+     */
+
+    source : function(o){
 
       var data = {};
 
-      if(source===undefined){
+      if(o.source===undefined){
           data = {};
-      }else if(typeof source === 'string'){
+      }else if(typeof o.source === 'string'){
 
-          $.ajax({
-              type: sourceAjax,
-              url: source,
-              data: sourceData,
+          $.kui.ajax({
+              target: o.target,
+              type: o.sourceAjax,
+              url: o.source,
+              data: o.sourceData,
               success: function(remoteData){
-                  if (!remoteData.error) {
-                      data = remoteData;
+                  if(typeof o.sourceParse === 'function'){
+                    data = o.sourceParse.call(this,remoteData);
+                  }else if(remoteData.error && remoteData.mensaje){
+                      $.kui.messages(o.message,o.target,remoteData.tipoMensaje,remoteData.mensaje);
+                  }else{
+                    data = remoteData[o.key];
                   }
               },
               async: false
+          }).error(function(o){
+            window.console.log('error....',o);
           });
 
       }else{
-          data = source;
+          data = o.source;
       }
 
       return data;
@@ -96,5 +115,47 @@
     }
 
   };
+
+  // Ajax
+  $.kui.ajax = function(o) {
+    $.kui.loading.show(o);
+    var ajaxRequest = $.ajax(o);
+    $.kui.loading.hide(o);
+    return ajaxRequest;
+  };
+
+  // Loading
+  $.kui.loading = {
+    init: function(o) {
+      var target = $(o.target);
+      var id = $.kui.randomId();
+      var div = $('<div>').attr('id',id)
+        .addClass('text-center text-muted')
+        .css('margin-botton',10)
+        .hide();
+      $('<i>').addClass('fa fa-5x fa-circle-o-notch fa-spin')
+        .appendTo(div);
+      target.before(div);
+      target.attr('data-loading',id);
+    },
+    show: function(o) {
+      var target = o.target? $(o.target) : $('body');
+      if(!target.data('loading')){
+        o.target = target;
+        $.kui.loading.init(o);
+      }
+
+      target.hide();
+      $('#'+target.data('loading')).fadeIn('slow');
+    },
+    hide: function(o){
+      var target = $(o.target);
+      var loading = $('#'+target.data('loading'));
+      loading.fadeOut('slow',function(){
+        target.fadeIn('fast');
+      });
+    }
+  };
+
 
 }(jQuery));
