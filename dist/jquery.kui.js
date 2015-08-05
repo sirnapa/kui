@@ -1,4 +1,4 @@
-/*! kui - v0.2.3 - 2015-06-29
+/*! kui - v0.2.4 - 2015-07-23
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -186,7 +186,7 @@
 
                   $opcion.appendTo(select);
 
-                  if( inputVal && inputVal.toString() === id){
+                  if( inputVal && inputVal.toString() == id){
                       $opcion.attr('selected',true);
                       seleccionado = true;
                   }
@@ -961,28 +961,47 @@
   // Data & Format
   $.kui.data = {
 
-    source : function(source,sourceAjax,sourceData){
+    /*
+     * @param o = {
+     *      {Object} source
+     *      {String} sourceAjax
+     *      {Object} sourceData
+     *      {Function} sourceParse
+     *      {String} key,
+     *      {Object} message,
+     *      {Object} targetS,
+     * }
+     */
+
+    source : function(o){
 
       var data = {};
 
-      if(source===undefined){
+      if(o.source===undefined){
           data = {};
-      }else if(typeof source === 'string'){
+      }else if(typeof o.source === 'string'){
 
-          $.ajax({
-              type: sourceAjax,
-              url: source,
-              data: sourceData,
+          $.kui.ajax({
+              target: o.target,
+              type: o.sourceAjax,
+              url: o.source,
+              data: o.sourceData,
               success: function(remoteData){
-                  if (!remoteData.error) {
-                      data = remoteData;
+                  if(typeof o.sourceParse === 'function'){
+                    data = o.sourceParse.call(this,remoteData);
+                  }else if(remoteData.error && remoteData.mensaje){
+                      $.kui.messages(o.message,o.target,remoteData.tipoMensaje,remoteData.mensaje);
+                  }else{
+                    data = remoteData[o.key];
                   }
               },
               async: false
+          }).error(function(o){
+            window.console.log('error....',o);
           });
 
       }else{
-          data = source;
+          data = o.source;
       }
 
       return data;
@@ -1036,13 +1055,55 @@
 
   };
 
+  // Ajax
+  $.kui.ajax = function(o) {
+    $.kui.loading.show(o);
+    var ajaxRequest = $.ajax(o);
+    $.kui.loading.hide(o);
+    return ajaxRequest;
+  };
+
+  // Loading
+  $.kui.loading = {
+    init: function(o) {
+      var target = $(o.target);
+      var id = $.kui.randomId();
+      var div = $('<div>').attr('id',id)
+        .addClass('text-center text-muted')
+        .css('margin-botton',10)
+        .hide();
+      $('<i>').addClass('fa fa-5x fa-circle-o-notch fa-spin')
+        .appendTo(div);
+      target.before(div);
+      target.attr('data-loading',id);
+    },
+    show: function(o) {
+      var target = o.target? $(o.target) : $('body');
+      if(!target.data('loading')){
+        o.target = target;
+        $.kui.loading.init(o);
+      }
+
+      target.hide();
+      $('#'+target.data('loading')).fadeIn('slow');
+    },
+    hide: function(o){
+      var target = $(o.target);
+      var loading = $('#'+target.data('loading'));
+      loading.fadeOut('slow',function(){
+        target.fadeIn('fast');
+      });
+    }
+  };
+
+
 }(jQuery));
 
 (function ($) {
 
     // Instances
     $.kui.instances.kcard = {};
-    
+
     // Widget definition.
     $.kui.widgets.cards = function (data,aux) {
         return $.kui.list.actions({
@@ -1053,7 +1114,7 @@
             aux: aux
         });
     };
-    
+
     var KCard = function(div,params){
     	$.kui.list.params({
             list: this,
@@ -1062,16 +1123,16 @@
             rows: 5
         });
     };
-    
+
     KCard.prototype = {
 
         name: 'cards',
-    		
+
         setData: function(data){
             var kCard = this;
             $.each(data,function(key,value){
                 kCard.data[key] = value;
-            });            
+            });
         },
 
         nueva_grilla : function(){
@@ -1084,80 +1145,78 @@
         titulos: function(){
         	return;
         },
-        
+
         load : function() {
-            
+
             var kCard = this;
             if(kCard.contenido){
                 kCard.contenido.empty();
             }else{
                 kCard.nueva_grilla();
             }
-            
-            $.ajax({
-                type: kCard.ajax,
-                url: kCard.source,
-                data: kCard.data,
-                success: function(retorno){                                    
-                    if (!retorno.error) {
 
-                        var lista = retorno.respuesta.datos;
-                        var datos = {};
-                        
-                        kCard.totalDatos = parseInt(retorno.respuesta.totalDatos);
-                        kCard.pagina = parseInt(retorno.respuesta.pagina);
-                        kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
-
-                        kCard.grilla = $('<div>').addClass('kCard').prependTo(kCard.contenido);                       
-                        
-                        $.each(lista,function(i,item){
-                            datos[item[kCard.id]] = item;
-                            kCard.load_entrada(item);                          
-                        });
-
-                        kCard.grilla.find('.kscore').each(function(s,score){
-                            var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
-                            $(score).css('width',lado);
-                            $(score).css('height',lado);
-                        });
-                        
-                        kCard.grilla.find('.kacciones,.kscores').each(function(e,elemento){
-                            var top = $(elemento).parent().parent().height() - $(elemento).height();
-                            var siguiente = $(elemento).next();
-                            if(siguiente.hasClass('kscores') && !siguiente.is(':empty')){
-                                $(elemento).css('font-size','0.5em');
-                            }else{
-                                top = top/2;
-                            }
-                            if(top > 0){
-                                $(elemento).css('padding-top',top);
-                            }
-                        });
-
-                        $(kCard.div).data($.kui.i18n.source,datos);
-                        $(kCard.div).data($.kui.i18n.totalData,kCard.totalDatos);
-                        $(kCard.div).data($.kui.i18n.page,kCard.pagina);
-                        $(kCard.div).data($.kui.i18n.totalPages,kCard.totalPaginas);
-                                                
-                        $.kui.list.reloadPager(kCard);
-                        
-                    }else if(retorno.mensaje){
-                        $.kui.messages(kCard.mensaje,kCard.contenido,retorno.tipoMensaje,retorno.mensaje);
-                    }
-            
-                    if(typeof kCard.loadComplete === 'function'){
-                        kCard.loadComplete.call(this,retorno);
-                    }
-                },
-                async: false
+            var source = $.kui.data.source({
+              source: kCard.source,
+              sourceAjax: kCard.ajax,
+              sourceData: kCard.data,
+              key: 'respuesta',
+              message: kCard.mensaje,
+              target: kCard.contenido
             });
+
+            if (source) {
+                var lista = source.datos;
+                var datos = {};
+
+                kCard.totalDatos = parseInt(source.totalDatos);
+                kCard.pagina = parseInt(source.pagina);
+                kCard.totalPaginas = Math.ceil(kCard.totalDatos/kCard.data.rows);
+
+                kCard.grilla = $('<div>').addClass('kCard').prependTo(kCard.contenido);
+
+                $.each(lista,function(i,item){
+                    datos[item[kCard.id]] = item;
+                    kCard.load_entrada(item);
+                });
+
+                kCard.grilla.find('.kscore').each(function(s,score){
+                    var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
+                    $(score).css('width',lado);
+                    $(score).css('height',lado);
+                });
+
+                kCard.grilla.find('.kacciones,.kscores').each(function(e,elemento){
+                    var top = $(elemento).parent().parent().height() - $(elemento).height();
+                    var siguiente = $(elemento).next();
+                    if(siguiente.hasClass('kscores') && !siguiente.is(':empty')){
+                        $(elemento).css('font-size','0.5em');
+                    }else{
+                        top = top/2;
+                    }
+                    if(top > 0){
+                        $(elemento).css('padding-top',top);
+                    }
+                });
+
+                $(kCard.div).data($.kui.i18n.source,datos);
+                $(kCard.div).data($.kui.i18n.totalData,kCard.totalDatos);
+                $(kCard.div).data($.kui.i18n.page,kCard.pagina);
+                $(kCard.div).data($.kui.i18n.totalPages,kCard.totalPaginas);
+
+                $.kui.list.reloadPager(kCard);
+
+            }
+
+            if(typeof kCard.loadComplete === 'function'){
+                kCard.loadComplete.call(this,source);
+            }
         },
 
         load_entrada: function(item){
 
             var kCard = this;
             var nueva_entrada = item===undefined;
-            var pk = 'kCard_' + kCard.div.id + '_' + 
+            var pk = 'kCard_' + kCard.div.id + '_' +
                 (nueva_entrada? ('nuevo_'+kCard.nuevos) : item[kCard.id]);
 
             var formGroup = $('<div>').attr('id',pk)
@@ -1168,7 +1227,7 @@
             if(!nueva_entrada && typeof kCard.estado === 'function'){
                 activo = kCard.estado.call(this,item);
             }
-            
+
             if(kCard.onclick){
                 var onclick = typeof kCard.onclick === 'function'?
                     kCard.onclick : function(){
@@ -1179,7 +1238,7 @@
                        onclick.call(this,item);
                     });
             }else if(kCard.ondblclick){
-                if( (typeof kCard.ondblclick === 'function') || 
+                if( (typeof kCard.ondblclick === 'function') ||
                     (activo && typeof kCard.permisos['editar'] === 'function')){
                     var ondblclick = typeof kCard.ondblclick === 'function'?
                         kCard.ondblclick : function(){
@@ -1190,7 +1249,7 @@
                     });
                 }
             }
-                                        
+
             var izquierda = $('<div>')
                 .addClass('col-sm-7')
                 .appendTo(formGroup);
@@ -1201,8 +1260,8 @@
                 .appendTo(derecha);
             var scores = $('<div>').addClass('kscores pull-right')
                 .appendTo(derecha);
-                            
-            $.each(kCard.campos,function(c,campo){ 
+
+            $.each(kCard.campos,function(c,campo){
                 var columna;
 
                 if(campo.tipo!=='score'){
@@ -1215,7 +1274,7 @@
                     if(campo.tipo==='encabezado'){
                         contenedor = '<h2>';
                     }
-                    
+
                     columna = $(contenedor)
                         .addClass('col-sm-'+ancho_columna)
                         .appendTo(izquierda);
@@ -1239,13 +1298,13 @@
                         $('<small>').html(campo.titulo)
                             .appendTo(columna);
                     }
-                } 
+                }
 
                 if(typeof campo.formato === 'function'){
                     item[campo.nombre] = campo.formato.call(this,item[campo.nombre],item);
-                }                         
-            });                            
-                                            
+                }
+            });
+
             var dimension = 'fa-3x';
 
             var crear_boton = function(id,titulo,icono,hover){
@@ -1254,7 +1313,7 @@
                         .attr('title',titulo)
                         .attr('href',$.kui.dummyLink)
                         .html('<i class="fa ' + dimension + ' fa-'+icono+'"></i>')
-                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);}, 
+                        .hover( function(){ $(this).removeClass('text-muted').addClass('text-'+hover);},
                                 function(){ $(this).addClass('text-muted').removeClass('text-'+hover);});
                     return boton;
                 };
@@ -1293,8 +1352,8 @@
 
                     btn_remover.appendTo(botones);
                 }
-                
-            } else{                                    
+
+            } else{
                 if(typeof kCard.permisos['activar'] === 'function'){
                     formGroup.addClass('has-error');
                     var btn_activar = crear_boton('reactivar',$.kui.i18n.activateMsg,'check','success');
@@ -1305,7 +1364,7 @@
                         }).appendTo(botones);
                 }
             }
-            
+
             if(kCard.botones.length){
 
                 var ubicar_boton = function(btn){
@@ -1317,14 +1376,14 @@
                         var btn = crear_boton($.kui.randomId(),boton.comentario,boton.icono,'primary');
 
                         btn.attr('href', (boton.enlace!==undefined)? boton.enlace : $.kui.dummyLink);
-                        
+
                         if(boton.onclick!==undefined){
                             btn.click(function(e){
                                 e.stopPropagation();
                                 boton.onclick.call(this,item);
                             });
                         }
-                        
+
                         if(boton.atributos!==undefined){
                             $.each(boton.atributos,function(atributo,valor){
                                 btn.attr(atributo,valor);
@@ -1332,7 +1391,7 @@
                         }
 
                         ubicar_boton(btn);
-                    }   
+                    }
                 });
             }
 
@@ -1349,8 +1408,9 @@
         }
 
     };
-    
+
 }(jQuery));
+
 (function ($) {
 
     $.kui.instances.kform = {};
@@ -1412,30 +1472,13 @@
                 kForm.nuevo_form();
             }
 
-            if(kForm.origen===undefined){
-
-                /*
-                 * En kForm.dato está la entidad con la que rellenaremos el formulario.
-                 */
-                kForm.dato = {};
-            }else if(typeof kForm.origen === 'string'){
-
-                $.ajax({
-                    type: kForm.ajax_origen,
-                    url: kForm.origen,
-                    data: kForm.data_origen,
-                    success: function(retorno){
-                        if (!retorno.error) {
-                            kForm.dato = retorno.objeto;
-                        }
-                    },
-                    async: false
-                });
-
-            }else{
-                kForm.dato = kForm.origen;
-            }
-
+            kForm.dato = $.kui.data.source({
+              source: kForm.origen,
+              sourceAjax: kForm.ajax_origen,
+              sourceData: kForm.data_origen,
+              key: 'objeto',
+              target: kForm.div
+            });
             kForm.load_campos();
         },
 
@@ -1700,51 +1743,49 @@
                 kGrid.newGrid();
             }
 
-            $.ajax({
-                type: kGrid.ajax,
-                url: kGrid.source,
-                data: kGrid.data,
-                success: function(retorno){
-                    if (!retorno.error) {
-
-                        var lista = retorno.respuesta.datos;
-                        var datos = {};
-                        kGrid.totalDatos = parseInt(retorno.respuesta.totalDatos);
-                        kGrid.pagina = parseInt(retorno.respuesta.pagina);
-                        kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
-
-                        $.each(lista,function(i,item){
-                            datos[item[kGrid.id]] = item;
-                            kGrid.load_entrada(item);
-                        });
-
-                        $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
-                            .each(function(i,item){
-                                if(kGrid.seleccionados[$(item).data('pk')]){
-                                    $(item).attr('checked','checked');
-                                }
-                                $(item).change(function(){
-                                    kGrid.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
-                                });
-                            });
-
-                        $(kGrid.div).data('datos',datos);
-                        $(kGrid.div).data('totalDatos',kGrid.totalDatos);
-                        $(kGrid.div).data('pagina',kGrid.pagina);
-                        $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
-
-                        $.kui.list.reloadPager(kGrid);
-
-                    }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.div,retorno.tipoMensaje,retorno.mensaje);
-                    }
-
-                    if(typeof kGrid.loadComplete === 'function'){
-                        kGrid.loadComplete.call(this,retorno);
-                    }
-                },
-                async: false
+            var source = $.kui.data.source({
+              source: kGrid.source,
+              sourceAjax: kGrid.ajax,
+              sourceData: kGrid.data,
+              key: 'respuesta',
+              message: kGrid.mensaje,
+              target: kGrid.div
             });
+
+            if(source) {
+                var lista = source.datos;
+                var datos = {};
+                kGrid.totalDatos = parseInt(source.totalDatos);
+                kGrid.pagina = parseInt(source.pagina);
+                kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
+
+                $.each(lista,function(i,item){
+                    datos[item[kGrid.id]] = item;
+                    kGrid.load_entrada(item);
+                });
+
+                $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
+                    .each(function(i,item){
+                        if(kGrid.seleccionados[$(item).data('pk')]){
+                            $(item).attr('checked','checked');
+                        }
+                        $(item).change(function(){
+                            kGrid.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
+                        });
+                    });
+
+                $(kGrid.div).data('datos',datos);
+                $(kGrid.div).data('totalDatos',kGrid.totalDatos);
+                $(kGrid.div).data('pagina',kGrid.pagina);
+                $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
+
+                $.kui.list.reloadPager(kGrid);
+
+            }
+
+            if(typeof kGrid.loadComplete === 'function'){
+                kGrid.loadComplete.call(this,source);
+            }
         },
 
         load_entrada: function(item){

@@ -142,51 +142,49 @@
                 kGrid.newGrid();
             }
 
-            $.ajax({
-                type: kGrid.ajax,
-                url: kGrid.source,
-                data: kGrid.data,
-                success: function(retorno){
-                    if (!retorno.error) {
-
-                        var lista = retorno.respuesta.datos;
-                        var datos = {};
-                        kGrid.totalDatos = parseInt(retorno.respuesta.totalDatos);
-                        kGrid.pagina = parseInt(retorno.respuesta.pagina);
-                        kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
-
-                        $.each(lista,function(i,item){
-                            datos[item[kGrid.id]] = item;
-                            kGrid.load_entrada(item);
-                        });
-
-                        $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
-                            .each(function(i,item){
-                                if(kGrid.seleccionados[$(item).data('pk')]){
-                                    $(item).attr('checked','checked');
-                                }
-                                $(item).change(function(){
-                                    kGrid.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
-                                });
-                            });
-
-                        $(kGrid.div).data('datos',datos);
-                        $(kGrid.div).data('totalDatos',kGrid.totalDatos);
-                        $(kGrid.div).data('pagina',kGrid.pagina);
-                        $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
-
-                        $.kui.list.reloadPager(kGrid);
-
-                    }else if(retorno.mensaje){
-                        $.kui.messages(kGrid.mensaje,kGrid.div,retorno.tipoMensaje,retorno.mensaje);
-                    }
-
-                    if(typeof kGrid.loadComplete === 'function'){
-                        kGrid.loadComplete.call(this,retorno);
-                    }
-                },
-                async: false
+            var source = $.kui.data.source({
+              source: kGrid.source,
+              sourceAjax: kGrid.ajax,
+              sourceData: kGrid.data,
+              key: 'respuesta',
+              message: kGrid.mensaje,
+              target: kGrid.div
             });
+
+            if(source) {
+                var lista = source.datos;
+                var datos = {};
+                kGrid.totalDatos = parseInt(source.totalDatos);
+                kGrid.pagina = parseInt(source.pagina);
+                kGrid.totalPaginas = Math.ceil(kGrid.totalDatos/kGrid.data.rows);
+
+                $.each(lista,function(i,item){
+                    datos[item[kGrid.id]] = item;
+                    kGrid.load_entrada(item);
+                });
+
+                $(kGrid.tbody).find('.' + kGrid.div.id + '_seleccionar_row')
+                    .each(function(i,item){
+                        if(kGrid.seleccionados[$(item).data('pk')]){
+                            $(item).attr('checked','checked');
+                        }
+                        $(item).change(function(){
+                            kGrid.cambiar_seleccion($(item).data('pk'),$(item).is(':checked'));
+                        });
+                    });
+
+                $(kGrid.div).data('datos',datos);
+                $(kGrid.div).data('totalDatos',kGrid.totalDatos);
+                $(kGrid.div).data('pagina',kGrid.pagina);
+                $(kGrid.div).data('totalPaginas',kGrid.totalPaginas);
+
+                $.kui.list.reloadPager(kGrid);
+
+            }
+
+            if(typeof kGrid.loadComplete === 'function'){
+                kGrid.loadComplete.call(this,source);
+            }
         },
 
         load_entrada: function(item){

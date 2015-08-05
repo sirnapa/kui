@@ -148,7 +148,7 @@
 
                   $opcion.appendTo(select);
 
-                  if( inputVal && inputVal.toString() === id){
+                  if( inputVal && inputVal.toString() == id){
                       $opcion.attr('selected',true);
                       seleccionado = true;
                   }
