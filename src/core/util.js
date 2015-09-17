@@ -108,7 +108,6 @@
           format.yyyy = 0;
           format.dd = 2;
       }
-
       return (date.length===3)?
         (date[format.yyyy] +'-' + date[format.MM] + '-' + date[format.dd])
         : '';
