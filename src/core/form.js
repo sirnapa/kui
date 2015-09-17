@@ -315,7 +315,7 @@
 
         $.validator.methods["date"] = function(value, element) {
             var picker = $(element).parent().data('datetimepicker');
-            var date = picker.getDate();
+            var date = picker.getLocalDate();
             return this.optional(element) || date !== undefined;
         };
 
@@ -351,18 +351,16 @@
             },
             submitHandler: function(form) {
 
-              $(form).find('input[data-rule-date=true]').each(function(i,input){
-                  var picker = $(input).parent().data('datetimepicker');
-                  var date = picker.getDate();
-                  var dateIso = '';
-                  if(date){
-                    var month = date.getMonth()+1;
-                    if(month<10){}
-                    dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + date.getDate();
-                  }
-                  $(input).val(dateIso);
-              });
-
+              // $(form).find('input[data-rule-date=true]').each(function(i,input){
+              //     var picker = $(input).parent().data('datetimepicker');
+              //     var date = picker.getLocalDate();
+              //     var dateIso = '';
+              //     if(date){
+              //       var month = date.getMonth()+1;
+              //       dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + (date.getDate()<10? '0' : '') + date.getDate();
+              //     }
+              //     $(input).val(dateIso);
+              // });
               o.submit.call(this,form);
               return false;
             }

@@ -60,9 +60,10 @@
             $(kGrid.div).addClass('kui-list');
 
             kGrid.table = $('<table>')
-                .addClass('table table-bordered table-striped')
+                .addClass('table table-striped')
                 .prependTo(
-                    $('<div>').addClass('table-responsive')
+                    $('<div>')
+                        // .addClass('table-responsive')
                         .prependTo(kGrid.div)
                     );
 

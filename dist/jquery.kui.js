@@ -1,4 +1,4 @@
-/*! kui - v0.2.4 - 2015-07-23
+/*! kui - v0.2.4 - 2015-09-14
 * https://github.com/konecta/kui
 * Copyright (c) 2015 Nelson Paez; Licensed MIT */
 (function ($) {
@@ -353,7 +353,7 @@
 
         $.validator.methods["date"] = function(value, element) {
             var picker = $(element).parent().data('datetimepicker');
-            var date = picker.getDate();
+            var date = picker.getLocalDate();
             return this.optional(element) || date !== undefined;
         };
 
@@ -389,18 +389,16 @@
             },
             submitHandler: function(form) {
 
-              $(form).find('input[data-rule-date=true]').each(function(i,input){
-                  var picker = $(input).parent().data('datetimepicker');
-                  var date = picker.getDate();
-                  var dateIso = '';
-                  if(date){
-                    var month = date.getMonth()+1;
-                    if(month<10){}
-                    dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + date.getDate();
-                  }
-                  $(input).val(dateIso);
-              });
-
+              // $(form).find('input[data-rule-date=true]').each(function(i,input){
+              //     var picker = $(input).parent().data('datetimepicker');
+              //     var date = picker.getLocalDate();
+              //     var dateIso = '';
+              //     if(date){
+              //       var month = date.getMonth()+1;
+              //       dateIso = date.getFullYear() + '-' + (month<10? '0' : '') + month + '-' + (date.getDate()<10? '0' : '') + date.getDate();
+              //     }
+              //     $(input).val(dateIso);
+              // });
               o.submit.call(this,form);
               return false;
             }
@@ -1047,7 +1045,6 @@
           format.yyyy = 0;
           format.dd = 2;
       }
-
       return (date.length===3)?
         (date[format.yyyy] +'-' + date[format.MM] + '-' + date[format.dd])
         : '';
@@ -1661,9 +1658,10 @@
             $(kGrid.div).addClass('kui-list');
 
             kGrid.table = $('<table>')
-                .addClass('table table-bordered table-striped')
+                .addClass('table table-striped')
                 .prependTo(
-                    $('<div>').addClass('table-responsive')
+                    $('<div>')
+                        // .addClass('table-responsive')
                         .prependTo(kGrid.div)
                     );
 
