@@ -1,6 +1,22 @@
 {
   "name": "kui",
   "version": "0.2.5",
+  "main": "dist/jquery.kui.js",
+  "ignore": [
+      "src",
+      "assets",
+      "example",
+      ".bowerrc",
+      ".gitignore",
+      ".editorconfig",
+      ".jshintignore",
+      ".jshintrc",
+      ".travis.yml",
+      "bower.json",
+      "gruntfile.js",
+      "package.json",
+      "README.md"
+  ],
   "dependencies": {
     "jquery": "~2.1.4",
     "bootstrap": "~3.3.2",
