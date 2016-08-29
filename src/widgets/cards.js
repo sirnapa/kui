@@ -85,7 +85,7 @@
                 });
 
                 kCard.grilla.find('.kscore').each(function(s,score){
-                    var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
+                    var lado = 124;
                     $(score).css('width',lado);
                     $(score).css('height',lado);
                 });

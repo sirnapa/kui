@@ -1,6 +1,6 @@
-/*! kui - v0.2.5 - 2015-09-17
+/*! kui - v0.2.5 - 2016-07-27
 * https://github.com/konecta/kui
-* Copyright (c) 2015 Nelson Paez; Licensed MIT */
+* Copyright (c) 2016 Nelson Paez; Licensed MIT */
 (function ($) {
 
   // Collection method.
@@ -1177,7 +1177,7 @@
                 });
 
                 kCard.grilla.find('.kscore').each(function(s,score){
-                    var lado = parseInt($(score).parent().parent().parent().height()) * 0.8;
+                    var lado = 124;
                     $(score).css('width',lado);
                     $(score).css('height',lado);
                 });
@@ -2214,7 +2214,7 @@
 
               var ubicar_boton;
 
-              if(kGrid.botones.length===1){
+              if(kGrid.botones.length < 3){
                   ubicar_boton = function(btn){
                       $(btn).appendTo(botones);
                   };

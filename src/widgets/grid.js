@@ -616,7 +616,7 @@
 
               var ubicar_boton;
 
-              if(kGrid.botones.length===1){
+              if(kGrid.botones.length < 3){
                   ubicar_boton = function(btn){
                       $(btn).appendTo(botones);
                   };
