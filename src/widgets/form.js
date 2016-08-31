@@ -41,6 +41,7 @@
         this.readOnly = dato.soloLectura===undefined? false : dato.soloLectura;
         this.data_origen = dato.dataOrigen;
         this.after_submit = dato.afterSubmit;
+        this.columnas = dato.columnas;
 
         this.load();
 
@@ -80,6 +81,10 @@
             var kForm = this;
             var item = kForm.dato;
 
+            var columnas = kForm.columnas ? kForm.columnas : 1;
+            var anchoColumna = Math.ceil(12 / columnas);
+            var variasColumnas = columnas > 1;
+
             kForm.fieldset = $('<fieldset>').appendTo(kForm.form);
             if(kForm.readOnly){
                 kForm.fieldset.attr('disabled',true);
@@ -87,7 +92,7 @@
 
             $.each(kForm.campos,function(c,campo){
                 var formGroup = $('<div>')
-                    .addClass('form-group' + (campo.oculto? ' hidden' : ''))
+                    .addClass('form-group' + (campo.oculto? ' hidden' : '') + (variasColumnas? ' col-md-'+anchoColumna : ''))
                     .appendTo(kForm.fieldset);
 
                 if(campo.titulo===undefined){
