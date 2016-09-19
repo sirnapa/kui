@@ -1,6 +1,6 @@
 {
   "name": "kui",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "main": "dist/jquery.kui.js",
   "ignore": [
       "src",
